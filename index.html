@@ -1265,11 +1265,11 @@
   // Work tabs: Selected layout vs filtered list of all projects
   (function(){
     const P=[
-      {id:'qnet', nda:true, t:'Qnet · Project Phoenix', d:'Helping TQS field reps see what needs attention, in seconds.', ind:['Enterprise'], tags:['Enterprise','B2B SaaS','Automotive','Web · desktop & tablet'], ic:'📊', b:'#efe9fc', img:'cs/qnet-dashboard.jpg'},
+      {id:'qnet', lock:'Private', t:'Qnet · Project Phoenix', d:'Helping TQS field reps see what needs attention, in seconds.', ind:['Enterprise'], tags:['Enterprise','B2B SaaS','Automotive','Web · desktop & tablet'], ic:'📊', b:'#efe9fc', img:'cs/qnet-dashboard.jpg'},
       {id:'curo', t:'Curo', d:'Helping cancer care teams see side effects early, before they become emergencies.', ind:['Healthcare','AI'], tags:['Healthcare','With Mayo Clinic','Oncology','Mobile + web'], ic:'💬', b:'#e7efff', img:'cs/curo-dashboard.jpg'},
       {id:'water', t:'Arizona Water Chatbot', d:'Making Arizona\'s water story easy to explore.', ind:['AI'], tags:['AI','Conversational design','Civic tech','Responsive web'], ic:'💧', b:'#e3f1fb', img:'cs/water-home.jpg'},
       {id:'web', t:'TQS Website Redesign', d:'Letting suppliers find coverage, see the price and start a quote from the first screen.', ind:['Enterprise'], tags:['Enterprise','Marketing website','Automotive','Responsive web'], ic:'🌐', b:'#f2eee6', img:'cs/web-new-hero.jpg'},
-      {id:'care', nda:true, t:'HealthWink', d:'Getting the right resident help first, from the nursing station to the bedside.', ind:['Healthcare'], tags:['Healthcare','Smart Care','Real-time','Desktop + tablet'], ic:'🩺', b:'#e9f0e2'}
+      {id:'care', lock:'NDA', t:'HealthWink', d:'Getting the right resident help first, from the nursing station to the bedside.', ind:['Healthcare'], tags:['Healthcare','Smart Care','Real-time','Desktop + tablet'], ic:'🩺', b:'#e9f0e2'}
     ];
     const tabs=[...document.querySelectorAll('.wtabs button')],
           sel=document.getElementById('wsel'), lst=document.getElementById('wlist'), ul=document.getElementById('plist'), empty=lst.querySelector('.pempty');
@@ -1279,7 +1279,7 @@
       move(tabs.find(b=>b.dataset.f===f));
       const items=P.filter(p=>f==='all'||p.ind.includes(f));
       if(window.unmountScenes) unmountScenes(ul);
-      ul.innerHTML=items.map((p,i)=>`<a class="pcard" href="#case-${p.id}" style="animation-delay:${i*80}ms;--b:${p.b}"><div class="pmedia">${(document.querySelector(`#scenetpl template[data-p="${p.id}"]`)||{innerHTML:''}).innerHTML}${p.nda?'<span class="plock">🔒 NDA</span>':''}</div><div class="pbody"><h3>${p.t}<span class="parr">→</span></h3><p>${p.d}</p><div class="ptags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div></div></a>`).join('');
+      ul.innerHTML=items.map((p,i)=>`<a class="pcard" href="#case-${p.id}" style="animation-delay:${i*80}ms;--b:${p.b}"><div class="pmedia">${(document.querySelector(`#scenetpl template[data-p="${p.id}"]`)||{innerHTML:''}).innerHTML}${p.lock?`<span class="plock">🔒 ${p.lock}</span>`:''}</div><div class="pbody"><h3>${p.t}<span class="parr">→</span></h3><p>${p.d}</p><div class="ptags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div></div></a>`).join('');
       empty.hidden=items.length>0;
       if(window.mountScenes) requestAnimationFrame(()=>mountScenes(ul));
     }
@@ -1385,7 +1385,7 @@
             </dl>
           </div>
           <div class="cx-live">${c.live.map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${l} ↗</a>`).join('')}</div>
-          ${c.locked ? `<div class="cx-lock"><div class="lk-ic">🔒</div><h3 class="serif">This case study is under NDA.</h3><p>Enter the password to see the full story, screens and prototype.</p><form class="lk-f"><input type="password" placeholder="Password" aria-label="Password" autocomplete="current-password"><button type="submit">Unlock</button></form><small class="lk-m" role="status"></small><p class="lk-ask">Don't have it? <a href="mailto:gatakala.chandana@gmail.com">Ask me for access</a>.</p></div>` : `<div class="cx-shot"><video class="auto" src="${M.__video||`vid/${id}.mp4`}" poster="${M.__poster||`vid/${id}.jpg`}" muted loop playsinline preload="metadata" aria-label="${c.title} in use"></video></div>`}
+          ${c.locked ? `<div class="cx-lock"><div class="lk-ic">🔒</div><h3 class="serif">${c.nda?'This case study is under NDA.':'This case study is password protected.'}</h3><p>Enter the password to see the full story, screens and prototype.</p><form class="lk-f"><input type="password" placeholder="Password" aria-label="Password" autocomplete="current-password"><button type="submit">Unlock</button></form><small class="lk-m" role="status"></small><p class="lk-ask">Don't have it? <a href="mailto:gatakala.chandana@gmail.com">Ask me for access</a>.</p></div>` : `<div class="cx-shot"><video class="auto" src="${M.__video||`vid/${id}.mp4`}" poster="${M.__poster||`vid/${id}.jpg`}" muted loop playsinline preload="metadata" aria-label="${c.title} in use"></video></div>`}
         </div>
       </header>
       ${c.locked ? `<section class="cx-locked" style="--c1:${th.c1}">${c.teaser?`<div class="cx-teaser">${c.teaser.map(([k,v])=>`<div><span>${k}</span><p>${v}</p></div>`).join('')}</div>`:''}</section>` : ''}

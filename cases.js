@@ -368,6 +368,7 @@ window.CASES = {
     ]
   },
   "care": {
+    "nda": true,
     "title": "HealthWink",
     "kicker": "Healthcare · Smart Care · two connected apps",
     "headline": "I designed a nursing station board and a caregiver tablet so <b>the right resident gets help first</b>, and no one is woken for a check they didn't need.",
