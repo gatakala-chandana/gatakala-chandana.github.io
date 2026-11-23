@@ -288,6 +288,12 @@
   /* Work tabs + list */
   .whead{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
   .whead .label{margin:0}
+  .wall{font-size:14px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;transition:border-color .2s}
+  .wall span{display:inline-block;transition:transform .25s}.wall:hover{border-color:var(--ink)}.wall:hover span{transform:translateX(4px)}
+  .pj-head{padding:clamp(56px,9vh,96px) 0 28px}
+  .pj-head h1{font-size:clamp(44px,5vw,68px);line-height:1.05;margin:18px 0 10px}
+  .pj-head p{color:var(--muted);max-width:560px;margin-bottom:26px}
+  #projects{padding-bottom:80px}
   .wtabs{display:flex;gap:8px;flex-wrap:wrap}
   .wtabs button{font:inherit;font-size:14px;padding:8px 16px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;transition:background .25s,color .25s,border-color .25s,transform .2s}
   .wtabs button:hover{border-color:var(--ink);color:var(--ink)}
@@ -672,7 +678,7 @@
 <nav><div class="bar">
   <a href="#top" class="logo"><span class="lf">Sai </span>Chandana<span class="lf"> Gatakala</span></a>
   <ul>
-    <li><a href="#work">Work</a></li>
+    <li><a href="#projects">Work</a></li>
     <li><a href="https://www.linkedin.com/in/saichandana-gatakala/" target="_blank" rel="noopener">LinkedIn</a></li>
     <li><a href="#" target="_blank" rel="noopener">Resume</a></li>
     <li><button class="tgl" id="theme" role="switch" aria-checked="false" aria-label="Dark mode"><span class="ti sun">☀</span><span class="ti moon">☾</span><span class="knob"></span></button></li>
@@ -743,13 +749,7 @@
   <section id="work">
     <div class="whead reveal">
       <div class="label">Work</div>
-      <div class="wtabs" role="tablist" aria-label="Filter projects">
-        <button role="tab" aria-selected="true" data-f="selected">Selected</button>
-        <button role="tab" aria-selected="false" data-f="all">All</button>
-        <button role="tab" aria-selected="false" data-f="Healthcare">Healthcare</button>
-        <button role="tab" aria-selected="false" data-f="AI">AI</button>
-        <button role="tab" aria-selected="false" data-f="Enterprise">Enterprise</button>
-      </div>
+      <a class="wall" href="#projects">See all projects <span>→</span></a>
     </div>
     <div id="wsel">
 
@@ -886,7 +886,6 @@
           </div>
         </div></template>
     </div>
-    <div id="wlist" hidden><div class="pgrid" id="plist"></div><p class="pempty" hidden>More projects coming soon.</p></div>
   </section>
 
   <section class="aband" id="about">
@@ -963,6 +962,20 @@
 
 </div>
 
+<main id="projects" hidden><div class="wrap">
+  <header class="pj-head">
+    <a class="cx-back" href="#work">← Home</a>
+    <h1 class="serif">All work</h1>
+    <p>Product design across healthcare, AI and enterprise, from research to shipped UI.</p>
+    <div class="wtabs" role="tablist" aria-label="Filter projects">
+      <button role="tab" aria-selected="true" data-f="all">All</button>
+      <button role="tab" aria-selected="false" data-f="Healthcare">Healthcare</button>
+      <button role="tab" aria-selected="false" data-f="AI">AI</button>
+      <button role="tab" aria-selected="false" data-f="Enterprise">Enterprise</button>
+    </div>
+  </header>
+  <div id="wlist"><div class="pgrid" id="plist"></div><p class="pempty" hidden>More projects coming soon.</p></div>
+</div></main>
 <main id="case" hidden></main>
 
 <footer id="contact"><div class="bar">
@@ -1211,7 +1224,7 @@
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href^="#"]'); if (!a) return;
     const id = a.getAttribute('href').slice(1);
-    if (!id || id.startsWith('case-')) return;
+    if (!id || id.startsWith('case-') || id === 'projects') return;
     const t = document.getElementById(id); if (!t || document.getElementById('home').hidden) return;
     e.preventDefault(); history.replaceState(null,'','#'+id); smoothTo(t.getBoundingClientRect().top + scrollY - 70);
   });
@@ -1252,11 +1265,11 @@
   // Work tabs: Selected layout vs filtered list of all projects
   (function(){
     const P=[
-      {id:'qnet', t:'Qnet · Project Phoenix', d:'Helping TQS field reps see what needs attention, in seconds.', ind:['Enterprise'], tags:['Enterprise','B2B SaaS','Automotive','Web · desktop & tablet'], ic:'📊', b:'#efe9fc', img:'cs/qnet-dashboard.jpg'},
+      {id:'qnet', nda:true, t:'Qnet · Project Phoenix', d:'Helping TQS field reps see what needs attention, in seconds.', ind:['Enterprise'], tags:['Enterprise','B2B SaaS','Automotive','Web · desktop & tablet'], ic:'📊', b:'#efe9fc', img:'cs/qnet-dashboard.jpg'},
       {id:'curo', t:'Curo', d:'Helping cancer care teams see side effects early, before they become emergencies.', ind:['Healthcare','AI'], tags:['Healthcare','With Mayo Clinic','Oncology','Mobile + web'], ic:'💬', b:'#e7efff', img:'cs/curo-dashboard.jpg'},
       {id:'water', t:'Arizona Water Chatbot', d:'Making Arizona\'s water story easy to explore.', ind:['AI'], tags:['AI','Conversational design','Civic tech','Responsive web'], ic:'💧', b:'#e3f1fb', img:'cs/water-home.jpg'},
       {id:'web', t:'TQS Website Redesign', d:'Letting suppliers find coverage, see the price and start a quote from the first screen.', ind:['Enterprise'], tags:['Enterprise','Marketing website','Automotive','Responsive web'], ic:'🌐', b:'#f2eee6', img:'cs/web-new-hero.jpg'},
-      {id:'care', t:'HealthWink', d:'Getting the right resident help first, from the nursing station to the bedside.', ind:['Healthcare'], tags:['Healthcare','Smart Care','Real-time','Desktop + tablet'], ic:'🩺', b:'#e9f0e2'}
+      {id:'care', nda:true, t:'HealthWink', d:'Getting the right resident help first, from the nursing station to the bedside.', ind:['Healthcare'], tags:['Healthcare','Smart Care','Real-time','Desktop + tablet'], ic:'🩺', b:'#e9f0e2'}
     ];
     const tabs=[...document.querySelectorAll('.wtabs button')],
           sel=document.getElementById('wsel'), lst=document.getElementById('wlist'), ul=document.getElementById('plist'), empty=lst.querySelector('.pempty');
@@ -1264,16 +1277,15 @@
     function show(f){
       tabs.forEach(b=>b.setAttribute('aria-selected', b.dataset.f===f?'true':'false'));
       move(tabs.find(b=>b.dataset.f===f));
-      if(f==='selected'){ sel.hidden=false; lst.hidden=true; if(typeof fx==='function') requestAnimationFrame(fx); return; }
       const items=P.filter(p=>f==='all'||p.ind.includes(f));
       if(window.unmountScenes) unmountScenes(ul);
       ul.innerHTML=items.map((p,i)=>`<a class="pcard" href="#case-${p.id}" style="animation-delay:${i*80}ms;--b:${p.b}"><div class="pmedia">${(document.querySelector(`#scenetpl template[data-p="${p.id}"]`)||{innerHTML:''}).innerHTML}${p.nda?'<span class="plock">🔒 NDA</span>':''}</div><div class="pbody"><h3>${p.t}<span class="parr">→</span></h3><p>${p.d}</p><div class="ptags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div></div></a>`).join('');
-      empty.hidden=items.length>0; sel.hidden=true; lst.hidden=false;
+      empty.hidden=items.length>0;
       if(window.mountScenes) requestAnimationFrame(()=>mountScenes(ul));
     }
     tabs.forEach(b=>b.addEventListener('click',()=>show(b.dataset.f)));
     addEventListener('resize',()=>move(tabs.find(b=>b.getAttribute('aria-selected')==='true')));
-    (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>move(tabs[0])); move(tabs[0]);
+    window.showWork = () => show((tabs.find(b=>b.getAttribute('aria-selected')==='true')||tabs[0]).dataset.f);
   })();
 
   // Theme
@@ -1302,8 +1314,19 @@
     const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
     const key = await crypto.subtle.deriveKey({name:'PBKDF2', salt:b(j.salt), iterations:j.it, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']);
     const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:b(j.iv)}, key, b(j.ct));
-    return JSON.parse(new TextDecoder().decode(pt));
+    const p = JSON.parse(new TextDecoder().decode(pt));
+    // Decrypt this case's screenshots and video into in-memory URLs
+    p.media = {};
+    await Promise.all(Object.entries(p.assets||{}).map(async ([k,a]) => {
+      const buf = await (await fetch(a.f)).arrayBuffer();
+      const raw = await crypto.subtle.decrypt({name:'AES-GCM', iv:b(a.iv)}, key, buf);
+      p.media[k] = URL.createObjectURL(new Blob([raw], {type:a.t}));
+    }));
+    delete p.assets;
+    try { localStorage.setItem('nda-pw', pw); } catch(e) {}
+    return p;
   }
+  function savedPw(){ try { return localStorage.getItem('nda-pw'); } catch(e) { return null; } }
   function renderCase(id){
     const c = CASES[id]; if(!c) return false;
     const M = c.media||{}, src = k => M[k] || `cs/${k}.jpg`;
@@ -1350,7 +1373,7 @@
     caseEl.innerHTML = `
       <header id="toc-top" class="cx-hero ${th.glow?'glow':''}" style="--c1:${th.c1};--c2:${th.c2};--hb:${th.bg}">
         <div class="cx-in">
-          <a class="cx-back" href="#work">← All work</a>
+          <a class="cx-back" href="#projects">← All work</a>
           <div class="cx-top">
             <h1>${c.headline.replace(/<\/?b>/g,'')}</h1>
             <dl class="cx-meta">
@@ -1377,9 +1400,12 @@
       <div class="wide"><a class="cx-next" href="#case-${next}"><div><small>Next case study</small><strong>${CASES[next].title}</strong></div><span>→</span></a></div>`;
     if(c.locked){
       const f=caseEl.querySelector('.lk-f'), inp=f.querySelector('input'), msg=caseEl.querySelector('.lk-m');
+      const go = async pw => { const p = await unlockCase(id, pw); Object.assign(CASES[id], p, {locked:false}); if((location.hash||'')==='#case-'+id){ renderCase(id); watchVideos(); if(window._tocScroll) window._tocScroll(); } };
       f.addEventListener('submit', async e => { e.preventDefault(); msg.textContent='Unlocking…';
-        try{ const p = await unlockCase(id, inp.value); Object.assign(CASES[id], p, {locked:false}); renderCase(id); watchVideos(); if(window._tocScroll) window._tocScroll(); }
+        try{ await go(inp.value); }
         catch(err){ msg.textContent='That password didn\'t work. Try again.'; inp.select(); } });
+      // Already unlocked once on this browser? Open it straight away.
+      const pw = savedPw(); if(pw){ msg.textContent='Unlocking…'; go(pw).catch(()=>{ msg.textContent=''; try{ localStorage.removeItem('nda-pw'); }catch(e){} }); }
       return true;
     }
     const toc = caseEl.querySelector('.cx-toc'), hero = caseEl.querySelector('.cx-hero');
@@ -1402,13 +1428,17 @@
     }));
     return true;
   }
+  const projEl = document.getElementById('projects');
   function route(){
     const h = (location.hash||'').slice(1);
-    if(h.startsWith('case-') && renderCase(h.slice(5))){
-      home.hidden = true; caseEl.hidden = false; if(window.lenis_) lenis_.scrollTo(0,{immediate:true}); window.scrollTo(0,0); watchVideos();
+    if(h==='projects'){
+      home.hidden = true; caseEl.hidden = true; projEl.hidden = false; showWork();
+      if(window.lenis_) lenis_.scrollTo(0,{immediate:true}); window.scrollTo(0,0);
+    } else if(h.startsWith('case-') && renderCase(h.slice(5))){
+      home.hidden = true; projEl.hidden = true; caseEl.hidden = false; if(window.lenis_) lenis_.scrollTo(0,{immediate:true}); window.scrollTo(0,0); watchVideos();
     } else {
-      const wasCase = !caseEl.hidden;
-      caseEl.hidden = true; home.hidden = false;
+      const wasCase = !caseEl.hidden || !projEl.hidden;
+      caseEl.hidden = true; projEl.hidden = true; home.hidden = false;
       const t = h && document.getElementById(h);
       if(t) { const y=t.getBoundingClientRect().top+scrollY-70; if(window.lenis_) lenis_.scrollTo(y,{immediate:true}); else scrollTo(0,y); } else if(wasCase) { if(window.lenis_) lenis_.scrollTo(0,{immediate:true}); scrollTo(0,0); }
       if(typeof fx==='function') requestAnimationFrame(fx);
