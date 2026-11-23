@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qnet · Metrics</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Source+Sans+3:ital,wght@0,300..800;1,300..800&display=swap"><script>window.__resources={"https://unpkg.com/react@18.3.1/umd/react.production.min.js":"assets/react.js","https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js":"assets/react-dom.js"};</script><link rel="stylesheet" href="assets/qnet-glue.css"><script src="assets/dc-runtime.js"></script>
+</head>
+<body>
+
+<x-dc>
+<helmet>
+<script>(function(){if(window.top===window&&!document.getElementById("vt-opt")){var s=document.createElement("style");s.id="vt-opt";s.textContent="@view-transition{navigation:auto}";document.head.appendChild(s)}function q(v){if(!v)return;["ready","finished","updateCallbackDone"].forEach(function(k){v[k]&&v[k].catch(function(){})})}addEventListener("pagereveal",function(e){q(e.viewTransition)});addEventListener("pageswap",function(e){q(e.viewTransition)});addEventListener("unhandledrejection",function(e){if(e.reason&&/Transition was aborted|ViewTransition/i.test(String(e.reason&&e.reason.message||e.reason)))e.preventDefault()})})();</script>
+<style>/* Team Quality Services — design system entry point.
+   Consumers link this one file. Source of truth: TQS-AI-Team/tqs-brand-guide
+   (tokens/tokens.json → tokens/tqs-tokens.css). Import lines only. */
+/* Two webfonts, split by output medium — brand/05-typography.md.
+   Open Sans   → web and software UI (screen).
+   Source Sans 3 → print, Word documents, decks, posters, ad creative.
+   Both are SIL OFL 1.1, so both may be self-hosted and embedded with no
+   licensing gate. No binaries were supplied in tqs-brand-guide/assets/fonts
+   (README only), so both load from the Google CDN; the brand guide prefers
+   self-hosting — drop .woff2 files into assets/fonts/ and swap to @font-face.
+
+   Source Sans 3 replaced Myriad Pro on 2026-08-18 (decision D21). Myriad Pro
+   is retired: never specify it. "Source Sans Pro" stays in the print stack
+   because some machines carry that earlier release name instead.
+   Do not ship final ad creative rendered in a fallback face — stop and flag. */
+/* Color — brand/04-color.md. Canonical unless marked [PROPOSED]. */
+:root {
+  /* Primary brand */
+  --tqs-yellow: #fedd00;   /* Pantone Yellow C — surface/accent, never a text color */
+  --tqs-ink: #212322;      /* Pantone 419 C — replaces black, everywhere */
+  --tqs-gray: #aaaaaa;     /* Pantone Cool Gray 6 C — NOT a text color on light */
+  --tqs-white: #ffffff;    /* Pantone 000C White */
+
+  /* Secondary — accent only, never dominant */
+  --tqs-mist: #c4c6c8;     /* Pantone 421 C */
+
+  /* Artwork value, not a palette color: the horizontal lockup wordmark fill. */
+  --tqs-logo-wordmark-ink: #5b6670;
+
+  /* Neutral ramp ([PROPOSED]: 50, 200, 600) */
+  --tqs-neutral-50: #f4f4f4;
+  --tqs-neutral-100: #e2e2e2;
+  --tqs-neutral-200: #d2d2d2;
+  --tqs-neutral-300: #c4c6c8; /* = mist */
+  --tqs-neutral-400: #aaaaaa; /* = gray */
+  --tqs-neutral-500: #8d8d8d; /* lightest neutral usable as a perceivable border (3.32:1) */
+  --tqs-neutral-600: #6b6b6b; /* lowest step passing AA on white (5.33:1) */
+  --tqs-neutral-700: #555555;
+  --tqs-neutral-800: #383838;
+  --tqs-neutral-900: #212322; /* = ink */
+
+  /* Semantic text */
+  --tqs-text-primary: var(--tqs-ink);              /* 15.81:1 on white — AAA */
+  --tqs-text-secondary: var(--tqs-neutral-600);    /*  5.33:1 on white — AA  */
+  --tqs-text-disabled: var(--tqs-neutral-400);     /*  2.32:1 — disabled only */
+  --tqs-text-on-dark: var(--tqs-white);            /* 15.81:1 on ink — AAA */
+  --tqs-text-on-dark-secondary: var(--tqs-mist);   /*  9.23:1 on ink — AAA */
+  --tqs-text-on-yellow: var(--tqs-ink);            /* 11.71:1 — the ONLY approved text color on yellow */
+  --tqs-text-yellow-on-light: #867400;             /*  4.65:1 — last resort; prefer the accent bar */
+
+  /* Surfaces */
+  --tqs-surface: var(--tqs-white);
+  --tqs-surface-subtle: var(--tqs-neutral-50);
+  --tqs-surface-inverse: var(--tqs-ink);
+  --tqs-surface-accent: var(--tqs-yellow);
+
+  /* Borders */
+  --tqs-border-subtle: var(--tqs-neutral-200);
+  --tqs-border: var(--tqs-gray);                /* 2.32:1 — decorative dividers only */
+  --tqs-border-strong: var(--tqs-neutral-500);  /* 3.32:1 — meets the 3:1 non-text minimum */
+
+  /* Interaction (hover/active fills, [PROPOSED] — derived by darkening ~8% / ~14%) */
+  --tqs-yellow-hover: #e8ca00;
+  --tqs-yellow-active: #d4b800;
+  --tqs-ink-hover: #383838;
+  --tqs-ink-active: #4a4a4a;
+
+  /* Status — indicator = fills/chart marks/icons on dark; -text = text on light;
+     -surface = the tint behind that text (pairs at exactly 4.5:1). */
+  --tqs-info: #0a84ff;
+  --tqs-info-text: #086dd3;
+  --tqs-info-surface: #e6f3ff;
+  --tqs-info-surface-dark: #1d344a;
+
+  --tqs-success: #30d158;
+  --tqs-success-text: #1e8237;
+  --tqs-success-surface: #eafaee;
+  --tqs-success-surface-dark: #24422c;
+
+  /* Warning is TQS brand yellow. Status-yellow ALWAYS carries a warning icon
+     and a text label, or it is not a valid warning state. */
+  --tqs-warning: var(--tqs-yellow);
+  --tqs-warning-text: #867400;
+  --tqs-warning-surface: #fffce6;
+  --tqs-warning-surface-dark: #49441c;
+
+  --tqs-danger: #ff453a;
+  --tqs-danger-text: #ca372e;
+  --tqs-danger-surface: #ffeceb;
+  --tqs-danger-surface-dark: #492926;
+
+  /* Chart series — quality trend data. Yellow marks the SERIES OF INTEREST only;
+     the rest of a chart is the neutral ramp. Never yellow for every series. */
+  --tqs-chart-focus: var(--tqs-yellow);
+  --tqs-chart-1: var(--tqs-ink);
+  --tqs-chart-2: var(--tqs-neutral-500);
+  --tqs-chart-3: var(--tqs-mist);
+  --tqs-chart-4: var(--tqs-neutral-700);
+  --tqs-chart-grid: var(--tqs-neutral-200);
+  --tqs-chart-axis: var(--tqs-neutral-600);
+  --tqs-chart-pass: var(--tqs-success);
+  --tqs-chart-fail: var(--tqs-danger);
+}
+
+/* Typography — brand/05-typography.md. Two families split by output MEDIUM,
+   not by heading vs body: Open Sans if it renders in a browser as software,
+   Source Sans 3 if it renders on a page or in generated creative. Within each
+   medium there is one family — hierarchy comes from weight and size, never
+   from mixing families. Type scale is [PROPOSED]. */
+:root {
+  --tqs-font-web: "Open Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tqs-font-heading: var(--tqs-font-web);
+  --tqs-font-body: var(--tqs-font-web);
+  /* Print / Word / decks / posters / social & ad creative. Replaced Myriad Pro
+     2026-08-18 (D21); Myriad Pro is retired — never specify it. */
+  --tqs-font-print: "Source Sans 3", "Source Sans Pro", Arial, sans-serif;
+  --tqs-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --tqs-weight-light: 300;      /* large body, long-form web text */
+  --tqs-weight-regular: 400;    /* default body, UI text */
+  --tqs-weight-semibold: 600;   /* subheads, buttons, table headers, emphasis */
+  --tqs-weight-bold: 700;       /* display and ad headlines */
+
+  /* 1.25 modular scale, 16px base [PROPOSED] */
+  --tqs-text-xs: 0.75rem;    /* 12 — labels, legal, table meta */
+  --tqs-text-sm: 0.875rem;   /* 14 — secondary text, captions */
+  --tqs-text-base: 1rem;     /* 16 — body default; never ship body below this */
+  --tqs-text-lg: 1.125rem;   /* 18 */
+  --tqs-text-xl: 1.375rem;   /* 22 — H4, lead paragraph */
+  --tqs-text-2xl: 1.75rem;   /* 28 — H3 */
+  --tqs-text-3xl: 2.25rem;   /* 36 — section H2 */
+  --tqs-text-4xl: 3rem;      /* 48 — page H1 */
+  --tqs-text-5xl: 3.75rem;   /* 60 — hero display */
+
+  --tqs-leading-tight: 1.15;   /* 3xl and up */
+  --tqs-leading-snug: 1.3;     /* xl, 2xl */
+  --tqs-leading-normal: 1.55;  /* body */
+  --tqs-leading-relaxed: 1.7;
+
+  --tqs-tracking-tight: -0.02em; /* display sizes */
+  --tqs-tracking-normal: 0em;
+  --tqs-tracking-wide: 0.04em;   /* xs labels */
+  --tqs-tracking-caps: 0.08em;   /* all-caps labels and badges */
+
+  /* PRINT SCALE. Source Sans 3 sets a 9.2% smaller x-height than Open Sans
+     (0.486 vs 0.535 em) — at 16px it has the apparent size of Open Sans at
+     14.5px. Do NOT reuse the web scale verbatim on a print artboard: these
+     are the web steps sized up ~10% and optically checked. Body is 17.5px. */
+  --tqs-print-xs: 0.8125rem;  /* 13 — legal, table meta */
+  --tqs-print-sm: 0.9375rem;  /* 15 — captions, secondary */
+  --tqs-print-base: 1.09375rem; /* 17.5 — body default on a page */
+  --tqs-print-lg: 1.25rem;    /* 20 — large body */
+  --tqs-print-xl: 1.5rem;     /* 24 — lead paragraph, deck body minimum */
+  --tqs-print-2xl: 1.9375rem; /* 31 */
+  --tqs-print-3xl: 2.5rem;    /* 40 */
+  --tqs-print-4xl: 3.3125rem; /* 53 */
+  --tqs-print-5xl: 4.125rem;  /* 66 — poster / cover display */
+}
+
+/* Spacing, radius, layout — brand/07-ui-design-system.md.
+   4px base. The whole scale is [PROPOSED] scaffolding: no TQS precedent existed. */
+:root {
+  --tqs-space-1: 0.25rem;  /*  4 */
+  --tqs-space-2: 0.5rem;   /*  8 */
+  --tqs-space-3: 0.75rem;  /* 12 */
+  --tqs-space-4: 1rem;     /* 16 */
+  --tqs-space-5: 1.5rem;   /* 24 */
+  --tqs-space-6: 2rem;     /* 32 */
+  --tqs-space-7: 3rem;     /* 48 */
+  --tqs-space-8: 4rem;     /* 64 */
+  --tqs-space-9: 6rem;     /* 96 */
+  --tqs-space-10: 8rem;    /* 128 */
+
+  --tqs-radius-none: 0;
+  --tqs-radius-sm: 0.125rem;  /* 2 */
+  --tqs-radius-md: 0.25rem;   /* 4 — the default for buttons, inputs, cards */
+  --tqs-radius-lg: 0.5rem;    /* 8 — dialogs, drawers */
+  --tqs-radius-pill: 9999px;  /* chips, tags, status badges only */
+
+  --tqs-border-hairline: 1px;
+  --tqs-border-thick: 2px;
+  --tqs-accent-bar: 4px;      /* the yellow rule motif */
+
+  /* Controls */
+  --tqs-control-h-sm: 32px;
+  --tqs-control-h-md: 40px;   /* default button and input height */
+  --tqs-control-h-lg: 48px;
+  --tqs-touch-min: 44px;      /* minimum touch target */
+  --tqs-row-h: 44px;          /* table row, default */
+  --tqs-row-h-compact: 36px;
+
+  /* Layout — content max and breakpoints are canonical */
+  --tqs-content-max: 1140px;
+  --tqs-prose-max: 68ch;
+  --tqs-gutter: 24px;
+  --tqs-gutter-mobile: 16px;
+  --tqs-bp-md: 767px;
+  --tqs-bp-lg: 1024px;
+
+  /* Icons — Lucide, 24px grid, 1.5px stroke */
+  --tqs-icon-size: 24px;
+  --tqs-icon-stroke: 1.5px;
+
+  /* Motif opacities — brand/06-imagery-motifs.md */
+  /* yellow 8x6 dot grid, right-anchored */
+  --tqs-dot-grid-opacity: 0.4; /* @kind other */
+  /* dotted-Q watermark, in Mist */
+  --tqs-watermark-opacity: 0.24; /* @kind other */
+  --tqs-map-watermark-opacity: 0.6; /* @kind other */
+}
+
+/* Elevation — [PROPOSED]. Ink-tinted, never black. Prefer borders for static
+   grouping; reserve shadow for things that genuinely float. */
+:root {
+  --tqs-shadow-sm: 0 1px 2px rgba(33, 35, 34, 0.08);   /* card at rest */
+  --tqs-shadow-md: 0 2px 8px rgba(33, 35, 34, 0.1);    /* interactive card hover */
+  --tqs-shadow-lg: 0 8px 24px rgba(33, 35, 34, 0.14);  /* menus, dialogs, popovers */
+  --tqs-scrim: rgba(33, 35, 34, 0.6);                  /* text over photography, modal backdrop */
+}
+
+/* Motion — [PROPOSED]. Precise and mechanical. No bounce, no overshoot, no spin. */
+:root {
+  --tqs-duration-micro: 140ms; /* @kind other */
+  --tqs-duration-base: 220ms; /* @kind other */
+  --tqs-ease-enter: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --tqs-ease-exit: cubic-bezier(0.4, 0, 1, 1); /* @kind other */
+  --tqs-translate: 8px;         /* 4–12px is the whole range */
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tqs-duration-micro: 0ms; /* @kind other */
+    --tqs-duration-base: 0ms; /* @kind other */
+    --tqs-translate: 0px;
+  }
+}
+
+/* Dark surface context — brand/07-ui-design-system.md#dark-mode.
+   The dark surface is the SIGNATURE TQS look, not an accommodation: white/mist
+   type on ink with yellow accents. Reach for it before a light layout.
+   Apply .tqs-inverse to any section that should render dark. Yellow never remaps. */
+.tqs-inverse {
+  --tqs-surface: var(--tqs-ink);
+  --tqs-surface-subtle: var(--tqs-neutral-800);
+  --tqs-text-primary: var(--tqs-white);
+  --tqs-text-secondary: var(--tqs-mist);
+  --tqs-text-disabled: var(--tqs-neutral-600);
+  --tqs-border-subtle: var(--tqs-neutral-800);
+  --tqs-border: var(--tqs-neutral-700);
+  --tqs-border-strong: var(--tqs-gray);
+
+  /* On dark, the raw indicator colors ARE legible — use them directly. */
+  --tqs-info-text: var(--tqs-info);
+  --tqs-success-text: var(--tqs-success);
+  --tqs-warning-text: var(--tqs-warning);
+  --tqs-danger-text: var(--tqs-danger);
+  --tqs-info-surface: var(--tqs-info-surface-dark);
+  --tqs-success-surface: var(--tqs-success-surface-dark);
+  --tqs-warning-surface: var(--tqs-warning-surface-dark);
+  --tqs-danger-surface: var(--tqs-danger-surface-dark);
+
+  /* Chart series invert to light-on-dark; focus stays yellow. */
+  --tqs-chart-1: var(--tqs-white);
+  --tqs-chart-2: var(--tqs-gray);
+  --tqs-chart-3: var(--tqs-neutral-600);
+  --tqs-chart-4: var(--tqs-mist);
+  --tqs-chart-grid: var(--tqs-neutral-800);
+  --tqs-chart-axis: var(--tqs-mist);
+
+  background-color: var(--tqs-surface);
+  color: var(--tqs-text-primary);
+}
+
+/* Explicit theme toggle: light on :root, dark by preference unless forced light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+}
+
+/* Base utilities that carry accessibility rules the tokens alone can't. */
+
+/* Focus visibility. Yellow alone is 1.35:1 on white — a yellow-only ring is
+   invisible on light surfaces. Pair it with an ink ring. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--tqs-border-thick) solid var(--tqs-ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--tqs-yellow);
+}
+.tqs-inverse :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--tqs-border-thick) solid var(--tqs-yellow);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* Links: underlined, ink on light, white on dark. Never yellow on white. */
+a { color: var(--tqs-text-primary); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--tqs-neutral-700); }
+.tqs-inverse a { color: var(--tqs-white); }
+.tqs-inverse a:hover { color: var(--tqs-mist); }
+
+/* The accent bar — the correct way to get yellow emphasis into a light layout. */
+.tqs-accent-bar { border-left: var(--tqs-accent-bar) solid var(--tqs-yellow); padding-left: var(--tqs-space-4); }
+.tqs-accent-rule { border-bottom: var(--tqs-accent-bar) solid var(--tqs-yellow); padding-bottom: var(--tqs-space-2); display: inline-block; }
+
+/* Dot grid motif: yellow, 40%, 8x6, right-anchored. Decorative — aria-hidden it. */
+.tqs-dot-grid {
+  background-image: radial-gradient(var(--tqs-yellow) 1.5px, transparent 1.6px);
+  background-size: 14px 14px;
+  opacity: var(--tqs-dot-grid-opacity);
+  width: 112px; height: 84px;
+}
+
+/* Tabular figures for data displays. */
+.tqs-tnum { font-variant-numeric: tabular-nums; }
+
+/* Light island inside a dark section. The ink surface is a context, so a white
+   card placed inside .tqs-inverse would otherwise inherit white text. Put
+   .tqs-light on that card to restore the light token values. */
+.tqs-light {
+  --tqs-surface: var(--tqs-white);
+  --tqs-surface-subtle: var(--tqs-neutral-50);
+  --tqs-text-primary: var(--tqs-ink);
+  --tqs-text-secondary: var(--tqs-neutral-600);
+  --tqs-text-disabled: var(--tqs-neutral-400);
+  --tqs-border-subtle: var(--tqs-neutral-200);
+  --tqs-border: var(--tqs-gray);
+  --tqs-border-strong: var(--tqs-neutral-500);
+  --tqs-info-text: #086dd3;
+  --tqs-success-text: #1e8237;
+  --tqs-warning-text: #867400;
+  --tqs-danger-text: #ca372e;
+  --tqs-info-surface: #e6f3ff;
+  --tqs-success-surface: #eafaee;
+  --tqs-warning-surface: #fffce6;
+  --tqs-danger-surface: #ffeceb;
+  background-color: var(--tqs-surface);
+  color: var(--tqs-text-primary);
+}
+
+</style>
+<style></style>
+<script src="assets/lucide.js"></script>
+<script src="assets/tqs-ds.js"></script>
+<style>::view-transition-old(root),::view-transition-new(root){animation-duration:160ms;animation-timing-function:cubic-bezier(0.2,0,0,1)}::view-transition-group(sidebar),::view-transition-group(topbar){animation-duration:0s}body{margin:0;font-family:"Geist","Open Sans",system-ui,sans-serif;background:#f7f7f8;color:#212322;-webkit-font-smoothing:antialiased}a{color:#4f46e5}a:hover{color:#4338ca}</style>
+<script src="assets/qnet-nav.js"></script>
+</helmet>
+<div data-screen-label="Metrics" style="display:flex;min-height:100vh;min-width:1280px;background:#f7f7f8">
+<aside aria-label="Primary" style="position:sticky;top:0;align-self:flex-start;width:240px;height:100vh;flex-shrink:0;background:#161616;border-right:1px solid #161616;display:flex;flex-direction:column;padding:16px 12px;box-sizing:border-box;overflow-y:auto">
+<div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 4px 0 8px;margin-bottom:20px">
+<a href="dashboard.html" aria-label="Qnet home" style="display:flex;align-items:center;text-decoration:none;color:#ffffff;font-size:22px;font-weight:800;letter-spacing:-0.01em;line-height:1">QNET</a>
+<button type="button" aria-label="Collapse sidebar" style="margin-left:auto;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:#aaaaaa;cursor:pointer" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="panel-left" size="18" hint-size="18px,18px"></x-import></button>
+</div>
+<div style="padding:0 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">Overview</div>
+<nav aria-label="Overview" style="display:flex;flex-direction:column;gap:2px">
+<a href="dashboard.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="layout-grid" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Dashboard</span></a>
+<a href="metrics.html" aria-current="page" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c7d2fe;background:rgba(99,102,241,0.22);text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#a5b4fc"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="trending-up" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Metrics</span></a>
+</nav>
+<div style="padding:24px 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">Operations</div>
+<nav aria-label="Operations" style="display:flex;flex-direction:column;gap:2px">
+<a href="quality-issues.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="bell" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Quality Issues</span></a>
+<a href="locations.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="map-pin" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Locations</span></a>
+<a href="agreements.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="file-text" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Agreements</span></a>
+<a href="part-management.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="package" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Part Management</span></a>
+<a href="action-center.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="clipboard-check" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Action Center</span></a>
+</nav>
+<div style="padding:24px 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">System</div>
+<nav aria-label="System" style="display:flex;flex-direction:column;gap:2px">
+<a href="account.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="user" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Account</span></a>
+<a href="settings.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="settings" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Settings</span></a>
+<a href="index.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="log-out" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Log Out</span></a>
+</nav>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:16px;border-top:1px solid #2a2a2a">
+<button type="button" role="switch" aria-checked="false" style="display:flex;align-items:center;gap:10px;height:44px;padding:0 12px;border-radius:8px;border:none;background:transparent;font:inherit;font-size:16px;font-weight:600;color:#c4c6c8;cursor:pointer;text-align:left" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="moon" size="18" hint-size="18px,18px"></x-import></span><span style="flex:1">Dark mode</span><span aria-hidden="true" style="position:relative;width:32px;height:18px;border-radius:999px;background:#3a3a3a;flex-shrink:0"><span style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:999px;background:#ffffff"></span></span></button>
+</div>
+</aside>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column">
+<header style="view-transition-name:topbar;position:sticky;top:0;z-index:5;display:flex;align-items:center;height:60px;padding:0 32px;background:#ffffff;border-bottom:1px solid #e2e2e2;box-sizing:border-box">
+<nav aria-label="Breadcrumb" style="display:flex;align-items:center;gap:8px;font-size:13px;min-width:0">
+<sc-for list="{{ nav.crumbs }}" as="c" hint-placeholder-count="2"><sc-if value="{{ c.sep }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="display:flex;color:#8d8d8d"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-right" size="14" hint-size="14px,14px"></x-import></span></sc-if><sc-if value="{{ c.link }}" hint-placeholder-val="{{ true }}"><a href="{{ c.href }}" style="color:#6b6b6b;text-decoration:none;white-space:nowrap" style-hover="color:#212322;text-decoration:underline">{{ c.label }}</a></sc-if><sc-if value="{{ c.cur }}" hint-placeholder-val="{{ false }}"><span aria-current="page" style="color:#212322;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.label }}</span></sc-if></sc-for>
+</nav>
+<div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+<span style="font-size:14px;font-weight:500;color:#212322">Daniel Brown</span>
+<span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:999px;background:#eef2ff;color:#212322;font-size:12px;font-weight:600">DB</span>
+</div>
+</header>
+
+<main style="flex:1;padding:32px clamp(32px,4vw,64px) 48px;box-sizing:border-box">
+<div style="max-width:1440px;margin:0 auto">
+<sc-if value="{{ nav.hasBack }}" hint-placeholder-val="{{ false }}"><a href="{{ nav.backHref }}" style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin:0 0 12px -2px;padding:2px;border-radius:6px;font-size:14px;font-weight:600;color:#555555;text-decoration:none" style-hover="color:#212322;text-decoration:underline" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-left" size="16" hint-size="16px,16px"></x-import>Back to {{ nav.backLabel }}</a></sc-if>
+<h1 style="margin:0;font-size:26px;line-height:1.2;letter-spacing:-0.02em;font-weight:600;color:#212322">Metrics</h1>
+<p style="margin:6px 0 0;font-size:14px;line-height:1.55;color:#6b6b6b">Week-to-date performance across your locations</p>
+
+<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:24px">
+<sc-for list="{{ cards }}" as="c" hint-placeholder-count="5">
+<div role="button" tabindex="0" aria-pressed="{{ c.on }}" sc-camel-on-click="{{ c.pick }}" style="{{ c.style }}" style-hover="border-color:#aaaaaa">
+<div style="display:flex;align-items:flex-start;gap:8px;min-height:32px">
+<span style="{{ c.iconStyle }}"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="{{ c.icon }}" size="14" hint-size="14px,14px"></x-import></span>
+<span style="flex:1;min-width:0;font-size:12px;font-weight:600;line-height:1.3;color:#555555;text-wrap:balance">{{ c.label }}</span>
+<button type="button" aria-label="Pin metric" aria-pressed="{{ c.pinned }}" sc-camel-on-click="{{ c.pin }}" style="{{ c.pinStyle }}" style-hover="background:#f4f4f4"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="bookmark" size="14" hint-size="14px,14px"></x-import></button>
+</div>
+<div style="margin-top:10px;min-height:18px;font-size:13px;font-weight:600;color:#212322;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.sub }}</div>
+<div style="display:flex;align-items:baseline;gap:6px;margin-top:4px"><span style="font-size:30px;font-weight:600;line-height:1.1;letter-spacing:-0.02em;color:#212322;font-variant-numeric:tabular-nums;white-space:nowrap">{{ c.value }}</span><span style="font-size:13px;color:#6b6b6b;white-space:nowrap">{{ c.unit }}</span></div>
+<div style="display:flex;align-items:center;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid #f4f4f4;font-size:12px;color:#6b6b6b"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.period }}</span><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-right" size="14" hint-size="14px,14px"></x-import></div>
+</div>
+</sc-for>
+</div>
+
+<div style="{{ splitStyle }}">
+<section style="min-width:0;background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid #f4f4f4">
+<span style="{{ dIconStyle }}"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="{{ dIcon }}" size="15" hint-size="15px,15px"></x-import></span>
+<div style="flex:1;min-width:0">
+<h2 style="margin:0;font-size:15px;font-weight:600;color:#212322;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ dTitle }}</h2>
+<sc-if value="{{ hasLoc }}" hint-placeholder-val="{{ true }}"><div style="margin-top:1px;font-size:13px;color:#6b6b6b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ locName }}</div></sc-if>
+</div>
+<sc-if value="{{ hasLoc }}" hint-placeholder-val="{{ true }}">
+<div style="position:relative">
+<button type="button" aria-haspopup="listbox" aria-expanded="{{ locOpen }}" sc-camel-on-click="{{ toggleLoc }}" style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:8px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:12px;font-weight:600;cursor:pointer" style-hover="background:#f4f4f4" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-left-right" size="13" hint-size="13px,13px"></x-import>Switch</button>
+<sc-if value="{{ locOpen }}" hint-placeholder-val="{{ false }}">
+<div sc-camel-on-click="{{ toggleLoc }}" style="position:fixed;inset:0;z-index:40"></div>
+<div role="listbox" style="position:absolute;top:calc(100% + 6px);left:0;z-index:41;min-width:220px;padding:4px;background:#ffffff;border:1px solid #e2e2e2;border-radius:10px;box-shadow:0 8px 24px rgba(33,35,34,0.12)">
+<sc-for list="{{ locOpts }}" as="o" hint-placeholder-count="2"><button type="button" role="option" aria-selected="{{ o.on }}" sc-camel-on-click="{{ o.pick }}" style="{{ o.style }}" style-hover="background:#f4f4f4"><span style="flex:1">{{ o.name }}</span><span>{{ o.score }}</span></button></sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+<div style="flex-basis:100%"><div role="tablist" aria-label="Range" style="display:inline-flex;gap:2px;padding:3px;border:1px solid #d2d2d2;border-radius:10px;background:#f7f7f8">
+<sc-for list="{{ ranges }}" as="r" hint-placeholder-count="3"><button type="button" role="tab" aria-selected="{{ r.on }}" sc-camel-on-click="{{ r.pick }}" style="{{ r.style }}">{{ r.label }}</button></sc-for>
+</div></div>
+</div>
+<div style="padding:20px 24px 8px">
+<div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#6b6b6b">{{ headLabel }}</div>
+<div style="display:flex;align-items:baseline;gap:10px;margin-top:4px"><span style="font-size:36px;font-weight:600;line-height:1.1;letter-spacing:-0.02em;color:#212322;font-variant-numeric:tabular-nums">{{ headValue }}</span><span style="{{ deltaStyle }}">{{ deltaText }}</span></div>
+<div style="margin-top:4px;font-size:13px;color:#6b6b6b;font-variant-numeric:tabular-nums">{{ dateRange }}</div>
+</div>
+<div style="position:relative;padding:8px 24px 20px">
+<svg sc-camel-view-box="0 0 760 260" width="100%" height="260" sc-camel-preserve-aspect-ratio="none" role="img" aria-label="{{ chartLabel }}" style="display:block;overflow:visible">
+<defs><linearGradient id="mfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#212322" stop-opacity="0.16"></stop><stop offset="1" stop-color="#212322" stop-opacity="0"></stop></linearGradient></defs>
+<sc-for list="{{ gridLines }}" as="g" hint-placeholder-count="3"><line x1="0" x2="720" y1="{{ g.y }}" y2="{{ g.y }}" stroke="#f0f0f0" stroke-width="1"></line></sc-for>
+<sc-if value="{{ hasGoal }}" hint-placeholder-val="{{ false }}"><line x1="0" x2="720" y1="{{ goalY }}" y2="{{ goalY }}" stroke="#aaaaaa" stroke-width="1" stroke-dasharray="4 4"></line></sc-if>
+<path d="{{ areaPath }}" fill="url(#mfill)"></path>
+<path d="{{ linePath }}" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>
+<sc-if value="{{ hasHover }}" hint-placeholder-val="{{ false }}"><line x1="{{ hover.x }}" x2="{{ hover.x }}" y1="10" y2="230" stroke="#d2d2d2" stroke-width="1"></line></sc-if>
+<sc-for list="{{ points }}" as="p" hint-placeholder-count="0"><circle cx="{{ p.x }}" cy="{{ p.y }}" r="{{ p.r }}" fill="{{ p.fill }}" stroke="#4f46e5" stroke-width="2"></circle><rect x="{{ p.hx }}" y="0" width="{{ p.hw }}" height="240" fill="transparent" sc-camel-on-mouse-enter="{{ p.enter }}" sc-camel-on-mouse-leave="{{ p.leave }}" style="cursor:crosshair"></rect></sc-for>
+</svg>
+<sc-if value="{{ hasHover }}" hint-placeholder-val="{{ false }}"><div role="tooltip" style="{{ tipStyle }}"><div style="font-size:11px;color:#6b6b6b;white-space:nowrap">{{ hover.label }}</div><div style="margin-top:2px;font-size:14px;font-weight:600;color:#212322;white-space:nowrap;font-variant-numeric:tabular-nums">{{ hover.value }}</div></div></sc-if>
+<div style="position:absolute;top:8px;right:24px;bottom:44px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none">
+<sc-for list="{{ yLabels }}" as="y" hint-placeholder-count="3"><span style="font-size:11px;color:#8d8d8d;font-variant-numeric:tabular-nums;line-height:1">{{ y }}</span></sc-for>
+</div>
+<div style="{{ xAxisStyle }}">
+<sc-for list="{{ xLabels }}" as="x" hint-placeholder-count="7"><span style="text-align:center;font-size:11px;color:#8d8d8d">{{ x }}</span></sc-for>
+</div>
+</div>
+</section>
+
+<sc-if value="{{ hasList }}" hint-placeholder-val="{{ true }}">
+<section style="min-width:0;height:0;min-height:100%;display:flex;flex-direction:column;overflow:hidden;background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<div style="display:flex;align-items:center;gap:8px;padding:16px 20px;border-bottom:1px solid #f4f4f4">
+<h2 style="margin:0;font-size:15px;font-weight:600;color:#212322">Agreements missing activity</h2>
+<span style="display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums">{{ missingCount }}</span>
+</div>
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto">
+<sc-for list="{{ weeks }}" as="w" hint-placeholder-count="3">
+<div style="padding:14px 20px 8px">
+<div style="display:flex;align-items:center;gap:8px"><h3 style="margin:0;font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#6b6b6b">{{ w.title }}</h3><sc-if value="{{ w.isCurrent }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;font-size:11px;color:#6b6b6b">Last activity</span></sc-if></div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+<sc-for list="{{ w.items }}" as="a" hint-placeholder-count="1">
+<div style="border:1px solid #e2e2e2;border-radius:10px;background:#ffffff">
+<button type="button" aria-expanded="{{ a.open }}" sc-camel-on-click="{{ a.toggle }}" disabled="{{ a.static }}" style="{{ a.headStyle }}" style-hover="background:#fafafa" style-focus="outline:2px solid #212322;outline-offset:-2px">
+<span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600;color:#212322">{{ a.name }}</span><span style="display:block;margin-top:2px;font-size:12px;color:#6b6b6b">{{ a.loc }}</span></span>
+<span style="{{ a.dateStyle }}">{{ a.dateText }}</span>
+<sc-if value="{{ a.expandable }}" hint-placeholder-val="{{ true }}"><span style="{{ a.chevStyle }}"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="15" hint-size="15px,15px"></x-import></span></sc-if>
+</button>
+<sc-if value="{{ a.open }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #f4f4f4">
+<sc-for list="{{ a.acts }}" as="x" hint-placeholder-count="3"><div style="{{ x.style }}"><div style="font-size:11px;font-weight:600;color:#6b6b6b">{{ x.label }}</div><div style="margin-top:3px;font-size:13px;font-weight:600;color:#212322;font-variant-numeric:tabular-nums">{{ x.date }}</div></div></sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+<sc-if value="{{ w.empty }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px dashed #d2d2d2;border-radius:10px;font-size:13px;color:#6b6b6b"><span style="display:flex;color:#22c55e"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="circle-check" size="15" hint-size="15px,15px"></x-import></span>No missed activity</div></sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-if>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+class Component extends DCLogic {
+  state = { hover: null, metric: "lps0", range: 0, loc: 0, locOpen: false, open: { "Bosch - CC Division|cur": true }, pinned: { lps0: true, lps1: true } };
+  static LOCS = [
+    { name: "GM - Fort Wayne, IN", score: [100, 96, 94], series: [[100, 100], [97, 95, 96, 98, 94, 96, 97], [93, 92, 95, 94, 91, 93, 96, 95, 94, 92, 95, 96, 100]] },
+    { name: "Honda - Alliston, ON", score: [92, 89, 90], series: [[91, 93], [88, 90, 87, 91, 89, 90, 88], [91, 89, 90, 88, 92, 90, 89, 91, 90, 88, 89, 90, 92]] },
+  ];
+  static RANGES = ["Week-to-date", "Prior Week", "Last 90 Days"];
+  static DATES = ["Oct 21, 2024 – Oct 22, 2024", "Oct 14, 2024 – Oct 20, 2024", "Jul 24, 2024 – Oct 22, 2024"];
+  static X = [["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], ["Jul 22", "", "Aug 5", "", "Aug 19", "", "Sep 2", "", "Sep 16", "", "Sep 30", "", "Oct 14"]];
+  static MISSING = [
+    [{ title: "Current week-to-date", key: "cur", items: [["Bosch - CC Division", "Oct 2, 2024", "Oct 1, 2024", "Sep 30, 2024", "Oct 2, 2024"], ["Magna Mirrors", "Oct 3, 2024", "Oct 3, 2024", "Sep 27, 2024", "Oct 1, 2024"], ["Autoliv - OTC", "Oct 4, 2024", "Oct 2, 2024", "Oct 4, 2024", "Oct 3, 2024"]] },
+     { title: "Week of Oct 14, 2024", key: "o14", none: ["Bosch - CC Division"] }, { title: "Week of Oct 7, 2024", key: "o7", none: [] }, { title: "Week of Sep 30, 2024", key: "s30", none: ["Magna Mirrors"] }],
+    [{ title: "Current week-to-date", key: "cur", items: [["Toyota Boshoku - Seat Frames", "Oct 9, 2024", "Oct 9, 2024", "Oct 3, 2024", "Oct 8, 2024"], ["Denso - HVAC", "Oct 11, 2024", "Oct 10, 2024", "Oct 11, 2024", "Oct 7, 2024"]] },
+     { title: "Week of Oct 14, 2024", key: "o14", none: [] }, { title: "Week of Oct 7, 2024", key: "o7", none: ["Denso - HVAC"] }, { title: "Week of Sep 30, 2024", key: "s30", none: [] }],
+  ];
+  chart(vals, slots, lo, hi, goal) {
+    const W = 720, H = 220, top = 10;
+    const x = (i) => (slots <= 1 ? 0 : (i / (slots - 1)) * W);
+    const y = (v) => top + (1 - (v - lo) / (hi - lo)) * H;
+    const pts = vals.map((v, i) => ({ x: +x(i).toFixed(1), y: +y(v).toFixed(1), v }));
+    const line = pts.map((p, i) => `${i ? "L" : "M"}${p.x},${p.y}`).join(" ");
+    const area = pts.length ? `${line} L${pts[pts.length - 1].x},${top + H} L${pts[0].x},${top + H} Z` : "";
+    return { pts, line, area, grid: [0, 0.5, 1].map((f) => ({ y: top + f * H })), goalY: goal != null ? y(goal) : 0 };
+  }
+  renderVals() {
+    const N = window.QnetNav;
+    const v = this.__rv();
+    const label = "Metrics";
+    const parents = [{ label: "Dashboard", href: "dashboard.html" }];
+    const nav = N ? N.vals(parents, label) : { crumbs: [...parents.map((p, i) => ({ ...p, link: true, cur: false, sep: i > 0 })), { label, href: "#", link: false, cur: true, sep: parents.length > 0 }], hasBack: false };
+    return { ...v, nav };
+  }
+  __rv() {
+    const s = this.state, C = Component;
+    const loc = C.LOCS[s.loc];
+    const tint = { green: ["#dcfce7", "#166534"], indigo: ["#eef2ff", "#212322"], amber: ["#fef3c7", "#92400e"], rose: ["#ffe4e6", "#be123c"] };
+    const defs = [
+      { id: "lps0", icon: "factory", tone: "green", label: "Location Performance Score", sub: C.LOCS[0].name, value: "100%", unit: "", period: "Week-to-Date" },
+      { id: "lps1", icon: "factory", tone: "green", label: "Location Performance Score", sub: C.LOCS[1].name, value: "92%", unit: "", period: "Week-to-Date" },
+      { id: "time", icon: "clock", tone: "indigo", label: "Time-on-site", sub: "", value: "7.2", unit: "Hours", period: "Daily Average Week-to-Date" },
+      { id: "cust", icon: "hourglass", tone: "amber", label: "Customers without activity", sub: "", value: "2", unit: "Customers", period: "Week-to-Date" },
+      { id: "eff", icon: "scale", tone: "rose", label: "Effectiveness", sub: "", value: "2.1 : 1", unit: "QA : NM Ratio", period: "Week-to-Date" },
+    ];
+    const cur = defs.find((d) => d.id === s.metric);
+    const isLps = cur.id.startsWith("lps");
+    const r = s.range;
+    let vals, slots, lo, hi, goal = null, headLabel, headValue, delta, yLabels, fmt;
+    if (isLps) { vals = loc.series[r]; slots = r === 2 ? 13 : 7; lo = 80; hi = 100; headLabel = "Average LPS"; headValue = loc.score[r] + "%"; delta = r === 0 ? loc.score[0] - loc.score[1] : null; yLabels = ["100%", "90%", "80%"]; fmt = (v) => v + "%"; }
+    else if (cur.id === "time") { vals = [[7.4, 7.0], [6.8, 7.1, 7.5, 6.9, 7.3, 0, 0], [7.1, 6.9, 7.3, 7.0, 6.6, 7.2, 7.4, 7.1, 6.8, 7.0, 7.3, 7.1, 7.2]][r]; slots = r === 2 ? 13 : 7; lo = 0; hi = 10; goal = 7; headLabel = "Daily average"; headValue = ["7.2", "7.1", "7.1"][r] + " hrs"; delta = r === 0 ? 0.1 : null; yLabels = ["10h", "5h", "0h"]; fmt = (v) => v + " hrs"; }
+    else if (cur.id === "cust") { vals = [[3, 2], [4, 3, 3, 2, 2, 2, 1], [5, 4, 4, 3, 5, 4, 3, 3, 2, 3, 2, 1, 2]][r]; slots = r === 2 ? 13 : 7; lo = 0; hi = 6; headLabel = "Customers without activity"; headValue = ["2", "1", "2"][r]; delta = null; yLabels = ["6", "3", "0"]; fmt = (v) => v + " customers"; }
+    else { vals = [[2.0, 2.1], [1.8, 1.9, 2.2, 2.0, 1.9, 2.1, 2.0], [1.6, 1.7, 1.9, 1.8, 2.0, 1.9, 2.1, 2.0, 1.8, 2.0, 2.2, 2.0, 2.1]][r]; slots = r === 2 ? 13 : 7; lo = 0; hi = 3; goal = 3; headLabel = "QA : NM ratio"; headValue = ["2.1 : 1", "2.0 : 1", "1.9 : 1"][r]; delta = r === 0 ? 0.1 : null; yLabels = ["3.0", "1.5", "0"]; fmt = (v) => v + " : 1"; }
+    const ch = this.chart(vals, slots, lo, hi, goal);
+    const xl = C.X[r];
+    const hp = s.hover != null ? ch.pts[s.hover] : null;
+    const weekDates = [["Mon, Oct 21", "Tue, Oct 22"], ["Mon, Oct 14", "Tue, Oct 15", "Wed, Oct 16", "Thu, Oct 17", "Fri, Oct 18", "Sat, Oct 19", "Sun, Oct 20"]];
+    const hpLabel = hp ? (r < 2 ? weekDates[r][s.hover] : (() => { const d = new Date(2024, 6, 22 + s.hover * 7); return "Week of " + d.toLocaleDateString("en-US", { month: "short", day: "numeric" }); })()) : "";
+    const hasList = isLps || cur.id === "cust";
+    const missing = C.MISSING[isLps ? s.loc : 0];
+    const weeks = (cur.id === "cust" ? missing.slice(0, 1).map((w) => ({ ...w, items: w.items.slice(0, 2) })) : missing).map((w) => {
+      const items = w.items ? w.items.map(([name, last, pa, qa, at]) => {
+        const k = name + "|" + w.key, open = !!s.open[k];
+        return { name, loc: isLps ? loc.name : C.LOCS[0].name, open, expandable: true, static: false, dateText: last,
+          toggle: () => this.setState((st) => ({ open: { ...st.open, [k]: !st.open[k] } })),
+          headStyle: { display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, background: "transparent", fontFamily: "inherit", textAlign: "left", cursor: "pointer" },
+          dateStyle: { fontSize: 13, fontWeight: 600, color: "#92400e", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" },
+          chevStyle: { display: "flex", color: "#8d8d8d", transform: open ? "rotate(180deg)" : "none", transition: "transform 140ms" },
+          acts: [["Proactive Audit", pa], ["QA/NM", qa], ["Action Taken", at]].map(([label, date], i) => ({ label, date, style: { padding: "10px 12px", borderLeft: i ? "1px solid #f4f4f4" : "none" } })) };
+      }) : w.none.map((name) => ({ name, loc: isLps ? loc.name : C.LOCS[0].name, open: false, expandable: false, static: true, dateText: "No activity", acts: [], toggle: () => {},
+          headStyle: { display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, background: "transparent", fontFamily: "inherit", textAlign: "left", cursor: "default" },
+          dateStyle: { display: "inline-flex", alignItems: "center", height: 22, padding: "0 8px", borderRadius: 999, background: "#ffe4e6", color: "#9f1239", fontSize: 11, fontWeight: 600, whiteSpace: "nowrap" }, chevStyle: {} }));
+      return { title: w.title, isCurrent: w.key === "cur", items, empty: items.length === 0 };
+    });
+    const missingCount = weeks.reduce((n, w) => n + w.items.length, 0);
+    const [tb, tf] = tint[cur.tone];
+    return {
+      cards: defs.map((d) => { const on = d.id === s.metric, [b, fg] = tint[d.tone], pinned = !!s.pinned[d.id]; return { ...d, on, pinned,
+        pick: () => this.setState({ metric: d.id, loc: d.id === "lps1" ? 1 : d.id === "lps0" ? 0 : s.loc, locOpen: false }),
+        pin: (e) => { e.stopPropagation(); this.setState((st) => ({ pinned: { ...st.pinned, [d.id]: !st.pinned[d.id] } })); },
+        style: { display: "flex", flexDirection: "column", padding: 16, background: "#ffffff", borderRadius: 12, cursor: "pointer", outline: "none", border: on ? "1px solid #8d8d8d" : "1px solid #e2e2e2", boxShadow: on ? "0 0 0 3px #eef2ff" : "0 1px 2px rgba(33,35,34,0.03)", transition: "border-color 140ms, box-shadow 140ms" },
+        iconStyle: { display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 7, background: b, color: fg, flexShrink: 0 },
+        pinStyle: { display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, margin: "-4px -6px -4px 0", border: "none", borderRadius: 6, background: "transparent", color: pinned ? "#212322" : "#aaaaaa", fill: pinned ? "#212322" : "none", cursor: "pointer" } }; }),
+      splitStyle: { display: "grid", gridTemplateColumns: hasList ? "minmax(0,1fr) 340px" : "minmax(0,1fr)", gap: 20, marginTop: 20, alignItems: "stretch" },
+      dIcon: cur.icon, dIconStyle: { display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: 8, background: tb, color: tf, flexShrink: 0 },
+      dTitle: cur.label, hasLoc: isLps, locName: loc.name, locOpen: s.locOpen, toggleLoc: () => this.setState((st) => ({ locOpen: !st.locOpen })),
+      locOpts: C.LOCS.map((l, i) => ({ name: l.name, score: l.score[0] + "%", on: i === s.loc, pick: () => this.setState({ loc: i, metric: "lps" + i, locOpen: false }),
+        style: { width: "100%", display: "flex", alignItems: "center", gap: 12, minHeight: 36, padding: "0 10px", border: "none", borderRadius: 6, background: i === s.loc ? "#eef2ff" : "transparent", color: i === s.loc ? "#212322" : "#212322", fontFamily: "inherit", fontSize: 13, fontWeight: i === s.loc ? 600 : 400, textAlign: "left", cursor: "pointer" } })),
+      ranges: C.RANGES.map((label, i) => { const on = i === r; return { label, on, pick: () => this.setState({ range: i, hover: null }),
+        style: { height: 28, padding: "0 12px", borderRadius: 7, border: on ? "1px solid #d2d2d2" : "1px solid transparent", background: on ? "#ffffff" : "transparent", color: on ? "#212322" : "#6b6b6b", fontFamily: "inherit", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", boxShadow: on ? "0 1px 2px rgba(33,35,34,0.06)" : "none" } }; }),
+      headLabel, headValue, dateRange: C.DATES[r],
+      deltaText: delta == null ? "" : `${delta >= 0 ? "▲" : "▼"} ${Math.abs(delta)}${isLps ? " pts" : ""} vs prior week`,
+      deltaStyle: { fontSize: 12, fontWeight: 600, color: delta == null ? "transparent" : (cur.id === "cust" ? delta <= 0 : delta >= 0) ? "#166534" : "#be123c" },
+      chartLabel: `${cur.label} trend`, gridLines: ch.grid, hasGoal: goal != null, goalY: ch.goalY,
+      linePath: ch.line, areaPath: ch.area,
+      points: ch.pts.map((p, i) => { const step = slots > 1 ? 720 / (slots - 1) : 720; return { ...p, r: s.hover === i ? (slots > 7 ? 5 : 6) : (slots > 7 ? 3 : 4), fill: s.hover === i ? "#212322" : "#ffffff", hx: p.x - step / 2, hw: step,
+        enter: () => this.setState({ hover: i }), leave: () => this.setState((st) => (st.hover === i ? { hover: null } : null)) }; }),
+      hasHover: hp != null, hover: hp ? { x: hp.x, label: hpLabel, value: fmt(hp.v) } : { x: 0, label: "", value: "" },
+      tipStyle: hp ? { position: "absolute", left: `calc(24px + (100% - 48px) * ${(hp.x / 760).toFixed(4)})`, top: 8 + hp.y, transform: `translate(${hp.x > 600 ? "-100%" : hp.x < 80 ? "0" : "-50%"}, calc(-100% - 12px))`, padding: "8px 10px", background: "#ffffff", border: "1px solid #e2e2e2", borderRadius: 8, boxShadow: "0 4px 12px rgba(33,35,34,0.10)", pointerEvents: "none", zIndex: 2 } : {},
+      yLabels, xLabels: xl,
+      xAxisStyle: { display: "grid", gridTemplateColumns: `repeat(${xl.length},minmax(0,1fr))`, margin: "6px -12px 0 -12px", paddingRight: 40 },
+      hasList, weeks, missingCount,
+    };
+  }
+}
+</script>
+
+
+<script src="assets/qnet-glue.js"></script><link rel="stylesheet" href="assets/qnet-mobile.css"><script src="assets/qnet-mobile.js"></script>
+</body></html>

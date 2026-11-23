@@ -1,0 +1,1377 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>HealthWink Nursing Station</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: two separate apps. Station = live board (status tiles that filter, wing-grouped beds, needs-attention queue) with Trends/Inventory split into their own tabs.
+   Caregiver tablet = side rail nav, task-first "To do" list with big actions, my-beds grid, performance tab. Client green/red palette; status always = color + icon + word. */
+:root{
+  --bg:#f6f8fb; --surface:#ffffff; --surface-2:#f8fafc; --line:#e5e7eb; --ink:#111827; --muted:#6b7280; --faint:#9ca3af;
+  --brand:#7cc928; --brand-2:#108a5b; --brand-ink:#1f6e2c; --brand-soft:#effbe2; --lime:#8ad81e; --teal:#0b7a52;
+  --dry:#3a8526; --dry-bg:#eafbe1; --dry-line:#94d47f;
+  --red:#c62f2f; --red-bg:#fdf0f0; --red-bg2:#fdf0f0; --red-line:#e79393; --red-solid:#c62f2f;
+  --amber:#c25a00; --amber-bg:#fff3e6; --amber-line:#f4b57a;
+  --blue:#3651c9; --blue-bg:#eef2ff; --blue-line:#c7d1f8;
+  --bezel:#1f2421;
+  --shadow:0 1px 2px rgb(20 30 20 / .05),0 6px 20px rgb(20 30 20 / .06);
+  --f:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --fm:"Inter",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1210; --surface:#171b18; --surface-2:#1e231f; --line:#2b322d; --ink:#e7ece8; --muted:#a3aca6; --faint:#6f7872;
+  --brand:#8ad81e; --brand-2:#14a06a; --brand-ink:#a6e36a; --brand-soft:#1b2e17;
+  --dry:#92d67f; --dry-bg:#17271a; --dry-line:#2f5a2c;
+  --red:#f3807a; --red-bg:#311a19; --red-bg2:#4a201e; --red-line:#6d2e2b; --red-solid:#c63a35;
+  --amber:#e8b44f; --amber-bg:#2e2512; --amber-line:#5c4a1c;
+  --blue:#93a6ff; --blue-bg:#1c2140; --blue-line:#34407a;
+  --bezel:#000; --shadow:0 1px 2px rgb(0 0 0 / .4),0 6px 20px rgb(0 0 0 / .3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1210; --surface:#171b18; --surface-2:#1e231f; --line:#2b322d; --ink:#e7ece8; --muted:#a3aca6; --faint:#6f7872;
+  --brand:#8ad81e; --brand-2:#14a06a; --brand-ink:#a6e36a; --brand-soft:#1b2e17;
+  --dry:#92d67f; --dry-bg:#17271a; --dry-line:#2f5a2c;
+  --red:#f3807a; --red-bg:#311a19; --red-bg2:#4a201e; --red-line:#6d2e2b; --red-solid:#c63a35;
+  --amber:#e8b44f; --amber-bg:#2e2512; --amber-line:#5c4a1c;
+  --blue:#93a6ff; --blue-bg:#1c2140; --blue-line:#34407a;
+  --bezel:#000; --shadow:0 1px 2px rgb(0 0 0 / .4),0 6px 20px rgb(0 0 0 / .3); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:13.5px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.num{font-family:var(--fm);font-variant-numeric:tabular-nums}
+.pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.ip{padding-left:22px;padding-right:22px}
+.grad{background:linear-gradient(160deg,var(--brand),var(--brand-2));color:#fff}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+.switcher{display:flex;flex-direction:column;align-items:center;gap:6px;padding-block:16px 0}
+.switcher p{margin:0;font-size:12px;color:var(--muted)}
+.app[hidden]{display:none}
+.frame{max-width:1440px;margin:16px auto 28px;background:var(--bg);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.frame.tablet{max-width:1220px;border-radius:28px;border:12px solid var(--bezel);box-shadow:0 18px 50px rgb(0 0 0 / .16)}
+
+/* shared header */
+header{background:var(--surface);border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:16px;padding-block:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center}
+.word{font-weight:700;font-size:20px;letter-spacing:-.02em;color:var(--ink)}
+.word b{color:inherit;font-weight:700}
+.unit{display:flex;flex-direction:column;border-left:1px solid var(--line);padding-left:14px;margin-left:4px;line-height:1.3}
+.unit strong{font-size:13px}.unit span{font-size:12px;color:var(--muted)}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);font-weight:600}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.ib{height:36px;min-width:36px;padding:0 11px;border-radius:9px;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600}
+.ib[aria-pressed="true"]{background:var(--brand-soft);border-color:var(--dry-line);color:var(--brand-ink)}
+.user{display:flex;align-items:center;gap:10px}
+.user .who{text-align:right;line-height:1.2}.user .who b{display:block;font-size:13px}.user .who span{font-size:11.5px;color:var(--muted)}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12.5px;flex:none}
+.tnav{display:flex;gap:4px;overflow-x:auto;padding-bottom:10px}
+.tnav button{border:0;background:none;padding:8px 14px;border-radius:8px;font-weight:500;color:var(--muted);white-space:nowrap;display:inline-flex;gap:8px;align-items:center}
+.tnav button[aria-selected="true"]{background:linear-gradient(160deg,var(--brand),var(--brand-2));color:#fff}
+.count{background:var(--red-solid);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:0 7px;line-height:19px}
+.tnav button[aria-selected="true"] .count{background:#fff;color:var(--red-solid)}
+main{padding-block:18px 28px}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--faint);padding-block:12px;border-top:1px solid var(--line);background:var(--surface)}
+
+/* status tiles = filters */
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.tile{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 13px;text-align:left;display:flex;flex-direction:column;gap:2px;position:relative}
+.tile .lab{font-size:12px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:6px}
+.tile .val{font-size:24px;font-weight:600;line-height:1.15}
+.tile .sub{font-size:11.5px;color:var(--faint)}
+.tile[aria-pressed="true"]{border-color:var(--brand-2);box-shadow:inset 0 0 0 1px var(--brand-2);background:var(--brand-soft)}
+.tile.t-over:not(.zero) .val,.tile.t-over:not(.zero) .lab,.tile.t-wet .val,.tile.t-wet .lab .si{color:var(--amber)}
+.tile.t-soil .lab .si,.tile.t-wet .lab .si{color:var(--red)}
+.tile.t-dry .lab .si{color:var(--dry)}
+
+/* status icons */
+.si{width:14px;height:14px;flex:none}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.rail{display:flex;flex-direction:column;gap:16px;min-width:0}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line)}
+.search{position:relative;flex:1 1 200px;max-width:300px}
+.search input{width:100%;height:38px;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:0 10px 0 34px}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint)}
+.tb-r{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tb-r label{font-size:12.5px;color:var(--muted)}
+select{height:36px;border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:0 8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;height:34px;padding:0 13px;color:var(--muted);font-weight:600;font-size:12.5px;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand-ink)}
+.filterline{display:flex;align-items:center;gap:10px;padding:10px 16px 0;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.filterline b{color:var(--ink)}
+.linkbtn{border:0;background:none;color:var(--brand-ink);font-weight:700;padding:0;font-size:12.5px}
+
+/* bed board */
+.board{padding:12px 16px 18px;display:flex;flex-direction:column;gap:16px}
+.wing h3{margin:0 0 9px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;gap:8px;align-items:center}
+.wing h3 .ln{flex:1;height:1px;background:var(--line)}
+.wing h3 .wc{letter-spacing:0;text-transform:none;font-weight:600;color:var(--faint)}
+.beds{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:9px}
+.bed{position:relative;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 9px;text-align:left;display:flex;flex-direction:column;gap:2px;min-height:82px;min-width:0;transition:transform .12s,box-shadow .12s}
+.bed:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.bed .r1{display:flex;justify-content:space-between;align-items:center;gap:4px}
+.bed .bno{font-weight:600;font-size:15px;letter-spacing:-.01em}
+.bed .nur{font-size:10px;font-weight:700;color:var(--faint)}
+.bed .bname{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bed .bst{margin-top:auto;display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600}
+.bed .bst .t{font-weight:600}
+.bed.dry{background:var(--surface)}
+.bed.dry .bst{color:var(--muted);font-weight:500}
+.bed.dry .bst .si{color:var(--dry)}
+.bed.wet,.bed.soiled{background:var(--amber-bg);border-color:var(--amber-line)}
+.bed.wet .bno,.bed.wet .bst,.bed.soiled .bno,.bed.soiled .bst{color:var(--amber)}
+.bed.na{border-style:dashed;background:var(--surface)}
+.bed.na .bst{color:var(--faint)}
+.bed.over{background:var(--red-bg);border:2px solid var(--red-solid);padding:7px 8px;animation:beacon 2.2s ease-out infinite}
+.bed.over .bno,.bed.over .bst{color:var(--red)}
+@keyframes beacon{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--red-solid) 55%,transparent)}70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.bed.over{animation:none}.bed{transition:none}}
+
+#tip{position:fixed;z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;width:240px;pointer-events:none;font-size:12.5px;display:flex;flex-direction:column;gap:6px}
+#tip .tt{font-weight:700;font-size:13.5px}
+#tip .row{display:flex;justify-content:space-between;color:var(--muted)}
+#tip .row b{color:var(--ink);font-weight:600}
+#tip .hint{color:var(--brand-ink);font-weight:700;padding-top:5px;border-top:1px solid var(--line)}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:99px;font-size:12px;font-weight:500;white-space:nowrap}
+.pill.dry,.pill.low{background:var(--dry-bg);color:var(--dry)}
+.pill.high{background:var(--red-bg);color:var(--red)}
+.pill.wet,.pill.soiled{background:var(--amber-bg);color:var(--amber)}
+.pill.medium{background:var(--amber-bg);color:var(--amber)}
+.pill.na{background:var(--surface-2);color:var(--muted)}
+.pill.over{background:var(--red-bg);color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red-solid)}
+
+/* queue */
+.ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.ph h2{margin:0;font-size:14.5px;font-weight:600;display:flex;gap:8px;align-items:center}
+.ph .meta{font-size:12px;color:var(--muted)}
+.queue{display:flex;flex-direction:column;max-height:470px;overflow-y:auto}
+.q{display:grid;grid-template-columns:50px minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+.q:last-child{border-bottom:0}
+.q .qb{grid-row:span 2;font-weight:600;font-size:16px;border-radius:9px;text-align:center;padding:9px 0;background:var(--amber-bg);color:var(--amber)}
+.q.over .qb{background:var(--red-bg);color:var(--red)}
+.q.over .qb{box-shadow:inset 0 0 0 2px var(--red-solid)}
+.q .qn{min-width:0;font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border:0;background:none;padding:0;text-align:left}
+.q .qn:hover{text-decoration:underline}
+.q .qt{font-size:15px;font-weight:600;text-align:right}
+.q.over .qt{color:var(--red)}
+.q .qs{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);flex-wrap:wrap;min-width:0}
+.q .qs .st{display:inline-flex;align-items:center;gap:4px;color:var(--amber);font-weight:700}
+.q.over .qs .st{color:var(--red)}
+.btn{height:36px;padding:0 14px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn.pri{background:linear-gradient(160deg,var(--brand),var(--brand-2));border-color:transparent;color:#fff}
+.btn.pri:disabled{opacity:.4;cursor:not-allowed}
+.btn.sm{height:30px;padding:0 11px;font-size:12px}
+.btn.lg{height:48px;padding:0 20px;font-size:15px;border-radius:11px}
+.empty{padding:30px 16px;text-align:center;color:var(--muted);font-size:13px}
+.empty b{display:block;color:var(--dry);font-size:15px;margin-bottom:3px}
+.trend{display:flex;flex-direction:column}
+.crew{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:12px 16px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left}
+.crew:last-child{border-bottom:0}
+.crew:hover{background:var(--surface-2)}
+.crew.on{background:var(--brand-soft)}
+.crew .cn{min-width:0;line-height:1.3}.crew .cn b{display:block;font-weight:600;font-size:13.5px}.crew .cn span{font-size:12px;color:var(--muted)}
+.crew .cw{text-align:right;line-height:1.3}.crew .cw b{display:block;font-size:13px;font-weight:600}.crew .cw b{color:var(--amber)}.crew .cw b.r{color:var(--red)}.crew .cw b.ok{color:var(--muted);font-weight:500;display:inline-flex;gap:4px;align-items:center}.crew .cw b.ok .si{color:var(--dry)}
+.crew .cw>span{font-size:11.5px;color:var(--muted)}
+.tr{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);border-left:0;border-right:0;border-top:0;background:none;text-align:left;width:100%}
+.tr:last-child{border-bottom:0}
+.tr:hover{background:var(--surface-2)}
+.tr .tb{font-weight:700;text-align:center;border-radius:8px;padding:6px 0;background:var(--surface-2)}
+.tr .ti{min-width:0;line-height:1.3}.tr .ti b{display:block;font-size:13px}.tr .ti span{font-size:12px;color:var(--muted)}
+
+/* tables */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr.rl{cursor:pointer}tr.rl:hover td{background:var(--surface-2)}
+td .pn{font-weight:700}td .pm{font-size:12px;color:var(--faint)}
+
+/* analytics pages */
+.grid2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;align-items:start}
+.pb{padding:16px;display:flex;flex-direction:column;gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:12px}
+.kpi span{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.kpi b{font-size:22px;font-weight:700}
+.kv{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--muted)}.kv b{font-weight:600}
+.big{font-size:30px;font-weight:700;line-height:1.1}
+.biglab{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.insight,.clin,.alertbox{border:1px solid;border-radius:10px;padding:12px 14px;font-size:13px}
+.insight{border-color:var(--amber-line);background:var(--amber-bg)}
+.clin{border-color:var(--blue-line);background:var(--blue-bg)}
+.alertbox{border-color:var(--red-line);background:var(--red-bg)}
+.insight h4,.clin h4,.alertbox h4{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.insight h4{color:var(--amber)}.clin h4{color:var(--blue)}.alertbox h4{color:var(--red)}
+.insight p,.clin p,.alertbox p{margin:0}
+.bar{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2));border-radius:99px}
+.bar.crit i{background:var(--red-solid)}
+.up{color:var(--brand-ink);font-weight:700;font-size:12px}.dn{color:var(--red);font-weight:700;font-size:12px}
+svg text{fill:var(--muted);font-family:var(--f)}
+
+/* drawer */
+#scrim{position:fixed;inset:0;background:rgb(10 16 12 / .35);z-index:50}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--surface);z-index:51;box-shadow:-10px 0 40px rgb(0 0 0 / .18);overflow-y:auto;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) 0}
+.dh{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:16px 20px;display:flex;flex-direction:column;gap:12px;z-index:2}
+.dh .r1{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.dh h2{margin:0;font-size:21px;font-weight:700;letter-spacing:-.01em}
+.dh .mrn{font-size:12.5px;color:var(--muted)}
+.dstatus{display:flex;align-items:center;gap:12px;border-radius:12px;padding:12px 14px}
+.dstatus.red{background:var(--amber-bg);color:var(--amber)}
+.dstatus.over{background:var(--red-bg);color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red-solid)}
+.dstatus.dry{background:var(--surface-2);color:var(--ink)}
+.dstatus.dry .si{color:var(--dry)}
+.dstatus.na{background:var(--surface-2);color:var(--muted)}
+.dstatus .w{font-weight:700;font-size:15px;line-height:1.2}
+.dstatus .w span{display:block;font-weight:600;font-size:12px;opacity:.85}
+.dstatus .tm{margin-left:auto;font-size:22px;font-weight:600}
+.dsec{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.dsec h3{margin:0;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.dsec h3 small{font-weight:600;color:var(--muted);font-size:12px;margin-left:auto}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fact{background:var(--surface-2);border-radius:10px;padding:10px 12px;min-width:0}
+.fact span{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+.fact b{font-size:15px;font-weight:600}
+.hist{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.hist div{border:1px solid var(--line);border-radius:9px;padding:8px 4px;text-align:center}
+.hist span{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.hist b{font-size:13.5px}
+.reslist div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.reslist div:last-child{border-bottom:0}
+.reslist span{color:var(--muted)}
+
+/* leaderboard */
+.lbrow{display:grid;grid-template-columns:40px minmax(150px,1.3fr) repeat(4,minmax(80px,.8fr)) minmax(240px,2.4fr);gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);min-width:960px}
+.av.ph,.pav.ph{overflow:hidden;padding:0;background:none;box-shadow:0 0 0 1px var(--line)}
+.av.ph svg,.pav.ph svg{display:block}
+.lbtip{display:flex;flex-direction:column;gap:2px;font-size:12.5px;line-height:1.35;white-space:normal}
+.lbtip b{font-weight:600;color:var(--ink)}.lbtip.good b{color:var(--brand-ink)}
+.lbtip span{color:var(--muted)}
+.lbrow.h{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:700;padding-block:10px}
+.lbrow:last-child{border-bottom:0}
+.lbrow.me{background:var(--brand-soft)}
+.rank{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--surface-2)}
+.rank.r1{background:linear-gradient(160deg,var(--brand),var(--brand-2));color:#fff}
+.lbname{display:flex;gap:10px;align-items:center;font-weight:700}
+.lbname .av{width:30px;height:30px;font-size:11.5px}
+.you{font-size:11px;font-weight:700;color:var(--brand-ink);background:var(--brand-soft);padding:1px 7px;border-radius:99px;border:1px solid var(--dry-line)}
+.stars{color:#e4a72a;letter-spacing:2px;font-size:14px}
+.stars i{color:var(--line);font-style:normal}
+
+/* caregiver tablet */
+.tabapp{display:grid;grid-template-columns:96px minmax(0,1fr);min-height:760px}
+.srail{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:16px 10px}
+.srail .mark{margin:0 auto 12px}
+.srail button{border:0;background:none;border-radius:12px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--muted);position:relative;min-height:64px}
+.srail button[aria-selected="true"]{background:var(--brand-soft);color:var(--brand-ink)}
+.srail button .count{position:absolute;top:6px;right:12px}
+.srail .sp{flex:1}
+.tmain{min-width:0;display:flex;flex-direction:column}
+.thead{background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:14px 22px;flex-wrap:wrap}
+.thead h1{margin:0;font-size:20px;font-weight:700}
+.thead .s{font-size:13px;color:var(--muted)}
+.tbody{padding:18px 22px 24px;display:flex;flex-direction:column;gap:18px}
+.summary{display:flex;gap:10px;flex-wrap:wrap}
+.chipstat{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font-weight:500;font-size:13.5px}
+.chipstat.red{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber)}
+.chipstat.over{background:var(--red-bg);border:1.5px solid var(--red-solid);color:var(--red)}
+.chipstat.dry .si{color:var(--dry)}
+.tasks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.task.over{border:2px solid var(--red-solid)}
+.task .h{display:flex;align-items:center;gap:12px}
+.task .bn{font-size:26px;font-weight:600;min-width:62px;text-align:center;border-radius:12px;padding:6px 8px;background:var(--amber-bg);color:var(--amber)}
+.task.over .bn{background:var(--red-bg);color:var(--red)}
+.task.over .bn{box-shadow:inset 0 0 0 2px var(--red-solid)}
+.task .who{min-width:0;flex:1}
+.task .who b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task .who span{font-size:13px;color:var(--amber);font-weight:700;display:inline-flex;align-items:center;gap:5px}
+.task .tm{text-align:right}
+.task .tm b{display:block;font-size:22px;font-weight:600}
+.task .tm span{font-size:11.5px;color:var(--muted)}
+.task.over .tm b,.task.over .who span{color:var(--red)}
+.task .acts{display:grid;grid-template-columns:1fr auto;gap:8px}
+.mybeds{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.mybeds .bed{min-height:96px;padding:11px}
+.mybeds .bed .bno{font-size:20px}
+.mybeds .bed .bname{font-size:12.5px}
+.mybeds .bed .bst{font-size:12.5px}
+.twocol{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+.sh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sh h2{margin:0;font-size:15px;font-weight:700}
+
+/* settings */
+.sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.set{padding:18px;display:flex;flex-direction:column;gap:14px}
+.set h3{margin:0;font-size:15px;font-weight:700}
+.set p{margin:0;color:var(--muted);font-size:13px}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13.5px}
+.srow label{font-weight:600}
+input[type=range]{accent-color:var(--brand);width:100%}
+input[type=number]{width:110px;height:36px;border:1px solid var(--line);border-radius:9px;padding:0 8px;background:var(--surface)}
+.switch{position:relative;width:42px;height:24px;flex:none}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.switch i{position:absolute;inset:0;border-radius:99px;background:var(--line)}
+.switch i{pointer-events:none}
+.switch input{z-index:1}
+.switch i::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgb(0 0 0 / .2)}
+.switch input:checked+i{background:var(--brand)}
+.switch input:checked+i::after{transform:translateX(18px)}
+.switch input:focus-visible+i{outline:3px solid var(--brand);outline-offset:2px}
+
+/* resident page */
+#drawer{position:fixed;inset:0;width:auto;background:var(--bg);z-index:51;overflow-y:auto;box-shadow:none;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.rp{max-width:1080px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px}
+.rp-bar{display:flex;align-items:center;gap:10px}
+.back{display:inline-flex;align-items:center;gap:8px;border:0;background:none;font-weight:600;padding:6px 0;color:var(--ink)}
+.rp-head{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.rp-who{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.pav{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:600;flex:none}
+.rp-who .t{flex:1;min-width:200px}
+.rp-who h2{margin:0;font-size:22px;font-weight:600}
+.rp-who .m{color:var(--muted);font-size:13px;margin-top:2px}
+.rp-who .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.rp-act{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
+.rtiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.rti{background:var(--surface-2);border-radius:10px;padding:10px 12px;min-width:0}
+.rti small{display:block;font-size:11.5px;color:var(--muted);font-weight:500}
+.rti b{font-size:14px;font-weight:600}
+.rti select{width:100%;height:30px;margin-top:2px}
+.cyc{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.cyc-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cyc-h h3{margin:0;font-size:14.5px;font-weight:600}
+.cyc-h span{font-size:12px;color:var(--muted)}
+.steps{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.steps::before{content:"";position:absolute;left:12.5%;right:12.5%;top:16px;height:2px;background:var(--line)}
+.steps .bar{position:absolute;left:12.5%;top:16px;height:2px;background:var(--brand-2);transition:width .3s}
+.step{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:12px;color:var(--muted)}
+.step .c{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:2px solid var(--line);color:var(--faint);font-weight:600;font-size:13px;z-index:1}
+.step.done .c{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+.step.cur .c{border-color:var(--amber);color:var(--amber);box-shadow:0 0 0 4px var(--amber-bg)}
+.step.cur.urgent .c{border-color:var(--red-solid);color:var(--red);box-shadow:0 0 0 4px var(--red-bg)}
+.step b{font-weight:600;color:var(--ink);font-size:12.5px}
+.step small{font-size:11.5px}
+.cyc-ok{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:var(--brand-soft);border:1px solid var(--dry-line)}
+.cyc-ok .ok{width:32px;height:32px;border-radius:50%;border:2px solid var(--brand-2);color:var(--brand-2);display:grid;place-items:center;flex:none}
+.cyc-ok b{display:block;font-weight:600}.cyc-ok span{font-size:12.5px;color:var(--muted)}
+.rtabs{position:sticky;top:0;z-index:5;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.rtabs button{height:36px;border:0;border-radius:8px;background:none;font-weight:500;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.rtabs button[aria-selected="true"]{background:linear-gradient(160deg,var(--brand),var(--brand-2));color:#fff}
+.rtabs .count{background:var(--amber)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.notef{display:flex;flex-direction:column;gap:10px}
+.qchips{display:flex;gap:6px;flex-wrap:wrap}
+.qchip{height:32px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font-size:12.5px;font-weight:500}
+.qchip[aria-pressed="true"]{background:var(--brand-soft);border-color:var(--dry-line);color:var(--brand-ink)}
+.notef textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);resize:vertical}
+.nlist{display:flex;flex-direction:column}
+.nitem{padding:12px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.nitem:last-child{border-bottom:0}
+.nitem .h{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
+.nitem .h b{color:var(--ink);font-weight:600}
+.nitem p{margin:0;font-size:13.5px}
+.nitem .tg{display:flex;gap:6px;flex-wrap:wrap}
+.pend{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--amber-bg);border:1px solid var(--amber-line);font-size:13px}
+.pend .btn{margin-left:auto}
+.ackline{font-size:12.5px;color:var(--brand-ink);font-weight:600;display:flex;align-items:center;gap:6px}
+@media (max-width:760px){.rtiles{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:minmax(0,1fr)}.rtabs{grid-template-columns:repeat(2,minmax(0,1fr))}.steps .step small{display:none}}
+/* footer compliance */
+.hipaa{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:99px;background:var(--brand-soft);border:1px solid var(--dry-line);color:var(--brand-ink);font-weight:600;font-size:12px}
+.foot .l{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.foot .disc{flex-basis:100%;margin:0;padding-top:8px;border-top:1px solid var(--line);font-size:11.5px;color:var(--faint);text-align:center}
+
+/* stat cards: compact filters */
+.tile{flex-direction:row;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;border-width:1px;min-height:58px}
+.tile .ico{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--surface-2);color:var(--muted);flex:none}
+.tile.t-wet .ico{background:var(--amber-bg);color:var(--amber)}
+.tile.t-over:not(.zero) .ico{background:var(--red-bg);color:var(--red)}
+.tile.t-dry .ico{background:var(--dry-bg);color:var(--dry)}
+.tile .lab{font-size:13px;color:var(--ink);font-weight:500;flex:1;min-width:0;line-height:1.25}
+.tile .val{font-size:24px;font-weight:600;margin:0}
+.tile:hover{border-color:var(--faint)}
+.tile[aria-pressed="true"]{background:var(--brand-soft);border-color:var(--brand-2);box-shadow:inset 0 0 0 1px var(--brand-2)}
+.tile.t-over:not(.zero) .val{color:var(--red)}
+.tile.t-over:not(.zero) .lab{color:var(--ink)}
+.tilehint{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--faint);margin:-6px 0 12px}
+/* labeled toolbar */
+.tbx{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.trow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.trow .k{width:56px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.trow .search{max-width:none;flex:1}
+.clear{border:0;background:none;color:var(--muted);font-weight:600;height:36px;padding:0 6px}
+.clear:hover{color:var(--ink)}
+.cnt{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.cnt b{color:var(--ink)}
+@media (max-width:700px){.trow .k{width:100%}}
+
+/* ===== triage look (station) ===== */
+.frame.flat{max-width:none;margin:0;border:0;border-radius:0;background:var(--bg)}
+.thdr{background:var(--surface);border-bottom:1px solid var(--line)}
+.thdr-in{display:flex;align-items:center;gap:14px 20px;flex-wrap:wrap;padding-block:14px}
+.tlogo{display:flex;align-items:center;gap:18px}
+.tmark{display:flex;flex-direction:column;align-items:center;gap:4px;padding-right:18px;border-right:1px solid var(--line)}
+.tmark span{font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--ink)}
+.tmark .mark{width:34px;height:34px;border-radius:10px}
+.tlogo h1{margin:0;font-size:22px;font-weight:500;letter-spacing:-.01em}
+.tlogo p{margin:0;color:var(--muted);font-size:14px}
+.gsearch{margin-left:auto;display:flex;align-items:center;gap:8px;width:min(260px,100%);height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--muted)}
+.gsearch input{border:0;background:transparent;outline:0;min-width:0;flex:1}
+.thdr .live span{font-size:12.5px}
+.upill{display:flex;align-items:center;gap:10px;padding:6px 8px 6px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:right;color:var(--muted)}
+.upill b{display:block;font-weight:500;font-size:14px;color:var(--ink)}
+.upill small{font-size:12px}
+.upill .av{width:38px;height:38px;font-size:14px;box-shadow:0 4px 10px color-mix(in srgb,var(--brand) 35%,transparent)}
+.tnav2{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--surface-2) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);box-shadow:0 2px 6px rgb(15 23 42 / .04)}
+.tnav2-in{display:flex;flex-wrap:wrap;gap:4px 16px;padding-block:10px;overflow-x:auto}
+.tnav2 button{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border:0;border-radius:8px;background:transparent;font-weight:500;color:var(--ink);white-space:nowrap}
+.tnav2 button:hover{background:color-mix(in srgb,var(--line) 50%,transparent)}
+.tnav2 button[aria-selected="true"]{background:linear-gradient(160deg,var(--brand),var(--brand-2));color:#fff;box-shadow:0 4px 10px color-mix(in srgb,var(--brand) 35%,transparent)}
+.tnav2 .count{background:color-mix(in srgb,var(--line) 80%,var(--surface-2));color:var(--muted);font-weight:600}
+.tnav2 button[aria-selected="true"] .count{background:#fff;color:var(--brand-2);font-weight:700}
+#station main{padding-block:20px 32px}
+/* status cards */
+.scards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.scard{text-align:left;padding:16px 18px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .15s,border-color .15s}
+.scard:hover{box-shadow:0 6px 18px rgb(15 23 42 / .06)}
+.scard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.scard .lbl{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:14px}
+.scard .sub{font-size:12.5px;color:var(--muted)}
+.scard .lbl svg{color:var(--faint)}
+.scard .n{font-size:30px;font-weight:500;line-height:1.2;margin-top:4px}
+.scard .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--surface-2);color:var(--muted);flex:none}
+.scard .ico .si{width:22px;height:22px}
+.scard .upd{border-top:1px solid var(--line);padding-top:12px;margin-top:10px;color:var(--muted);font-size:13px}
+.scard[aria-pressed="true"]{border:2px solid var(--brand);padding:15.5px 17.5px;box-shadow:0 6px 20px color-mix(in srgb,var(--brand) 14%,transparent)}
+.scard[aria-pressed="true"] .ico{background:linear-gradient(160deg,var(--brand),var(--brand-2));color:#fff;box-shadow:0 8px 18px color-mix(in srgb,var(--brand) 35%,transparent)}
+/* toolbar */
+.tools2{display:flex;flex-direction:column;gap:14px;margin-top:20px}
+.trow2{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.trow2+.trow2{padding-top:14px;border-top:1px solid var(--line)}
+.trow2 .k{width:70px;font-size:13px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.search2{flex:1;min-width:220px;display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted)}
+.search2 input{flex:1;min-width:0;border:0;outline:0;background:transparent}
+.trow2 select{height:44px;min-width:180px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.clear{border:0;background:transparent;color:var(--muted);font-weight:500;min-height:44px;padding:0 6px}
+.clear:hover{color:var(--ink)}
+.cnt{margin-left:auto;font-size:13px;color:var(--muted)}
+.sgbtn{display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 14px;border:1px solid var(--dry-line);border-radius:10px;background:var(--brand-soft);color:var(--brand-ink);font-weight:600;white-space:nowrap}
+.sgbtn:hover{border-color:var(--brand-2)}
+.vt{display:flex;gap:4px;padding:3px;border-radius:10px;background:color-mix(in srgb,var(--line) 60%,var(--surface-2))}
+.vt button{width:40px;height:36px;border:0;border-radius:8px;background:transparent;color:var(--muted);display:grid;place-items:center}
+.vt button[aria-pressed="true"]{background:var(--surface);color:var(--brand-2);box-shadow:0 1px 3px rgb(0 0 0 / .08)}
+.bigcard{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 30px rgb(15 23 42 / .06);overflow:hidden}
+.bigcard .board{padding:22px 24px 26px}
+.bigcard .beds{grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:12px}
+.bigcard .bed{border-radius:12px;padding:12px;min-height:92px}
+.bigcard .bed .bno{font-size:17px;font-weight:600}
+.bigcard .bed .bname{font-size:12.5px}
+.bigcard .bed .bst{font-size:12.5px}
+.bigcard .tw{padding:0 20px 10px;max-height:max(420px,calc(100vh - 200px));overflow:auto;overscroll-behavior:contain}
+.bigcard thead th{position:sticky;top:0;z-index:2;background:var(--surface)}
+.bigcard .board{max-height:max(420px,calc(100vh - 200px));overflow-y:auto;overscroll-behavior:contain}
+.bigcard table{font-size:14.5px;min-width:900px}
+.bigcard th{font-size:14.5px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink);padding:18px 12px}
+.bigcard td{padding:14px 12px}
+.bigcard td .pm{font-size:13px}
+/* outlined tags like triage */
+.pill{border-radius:7px;border:1px solid transparent;height:26px;font-size:13px;font-weight:500}
+.pill.dry,.pill.low{border-color:var(--dry-line)}
+.pill.wet,.pill.soiled,.pill.medium{border-color:var(--amber-line)}
+.pill.high{border-color:var(--red-line)}
+.pill.na{border-color:var(--line)}
+#st-live .rail{position:sticky;top:76px}
+@media (max-width:1150px){#st-live .rail{position:static}}
+@media (min-width:1151px){#st-live .layout{align-items:stretch}#st-live .rail{align-self:start;position:static}#stBoard{position:relative;min-height:420px}#stBoard>.board,#stBoard>.tw,#stBoard>.empty{position:absolute;inset:0;max-height:none;overflow:auto}}
+/* caregivers page */
+.crewgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;padding:16px}
+.crewgrid .crew{border:1px solid var(--line);border-radius:12px}
+.crewgrid .crew:last-child{border-bottom:1px solid var(--line)}
+@media (max-width:1100px){.scards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.gsearch{margin-left:0;width:100%}}
+@media (max-width:700px){.trow2 .k{width:100%}.trow2 select{min-width:0;flex:1 1 140px}.tlogo .tmark{display:none}.upill div:first-child{display:none}}
+
+/* ===== sign in (web portal) ===== */
+#login{position:fixed;inset:0;z-index:80;overflow-y:auto;background:#fff;color:#111827;font-family:"Inter",var(--f);display:grid;grid-template-columns:1.05fr 1fr}
+.wl-side{position:relative;overflow:hidden;background:#8ad81e;color:#fff;display:flex;flex-direction:column;padding:40px clamp(28px,5vw,64px);min-height:100vh}
+.wl-side .blob{position:absolute;pointer-events:none;border-radius:50%;filter:blur(60px)}
+.wl-side .b1{width:80%;height:55%;right:-20%;top:28%;background:radial-gradient(closest-side,#d6ff3c,#9ff04a 45%,transparent 75%);opacity:.95;transform:rotate(-14deg)}
+.wl-side .b2{width:75%;height:50%;right:-30%;bottom:-22%;background:radial-gradient(closest-side,#07714f,#0f9a62 45%,transparent 78%)}
+.wl-side .b3{width:50%;height:36%;left:-10%;bottom:-10%;background:radial-gradient(closest-side,#0b7a52,#108a5b 40%,transparent 80%);opacity:.75}
+.wl-side>*{position:relative}
+.wl-mark{display:flex;align-items:center;gap:12px;font-weight:600;font-size:24px;letter-spacing:-.02em}
+.wl-mark .hwtile{width:40px;height:40px;border:2px solid rgb(255 255 255 / .7)}
+.wl-mid{margin:auto 0;padding:48px 0;max-width:520px}
+.wl-eye{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:99px;background:rgb(255 255 255 / .2);font-size:13px;font-weight:600;letter-spacing:.02em}
+.wl-mid h2{margin:18px 0 12px;font-size:clamp(34px,3.6vw,50px);line-height:1.06;letter-spacing:-.025em;font-weight:600;color:#fbfdf9}
+.wl-mid>p{margin:0 0 30px;font-size:17px;line-height:1.5;color:rgb(255 255 255 / .92);max-width:44ch}
+.wl-feats{display:flex;flex-direction:column;gap:14px;margin:0;padding:0;list-style:none}
+.wl-feats li{display:flex;gap:14px;align-items:flex-start}
+.wl-feats .ic{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:rgb(255 255 255 / .2);border:1px solid rgb(255 255 255 / .3);backdrop-filter:blur(6px)}
+.wl-feats b{display:block;font-size:15px;font-weight:600}
+.wl-feats span{font-size:13.5px;color:rgb(255 255 255 / .88)}
+.wl-sfoot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:rgb(255 255 255 / .9)}
+.wl-sfoot .hp{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;background:rgb(255 255 255 / .2);font-weight:600}
+.wl-main{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;background:#f7f9f6}
+.wl-card{width:100%;max-width:440px;background:#fff;border:1px solid #e5e9e3;border-radius:20px;padding:clamp(26px,4vw,40px);box-shadow:0 20px 50px rgb(16 60 30 / .08);display:flex;flex-direction:column;gap:18px}
+.wl-tag{align-self:flex-start;display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#1f6e2c;background:#effbe2;border:1px solid #cdeeb0;padding:4px 10px;border-radius:99px}
+.wl-card h1{margin:0;font-size:28px;font-weight:600;letter-spacing:-.02em}
+.wl-card .lead{margin:-10px 0 0;font-size:14.5px;color:#6b7280}
+.lg-f{display:flex;flex-direction:column;gap:6px}
+.lg-f label{font-size:13px;font-weight:500;color:#374151}
+.lg-f .row{display:flex;align-items:center;gap:8px;height:46px;padding:0 12px;border:1px solid #d1d5db;border-radius:11px;background:#fff;color:#9ca3af}
+.lg-f .row:focus-within{border-color:#3f9131;box-shadow:0 0 0 3px rgb(108 192 74 / .25)}
+.lg-f input,.lg-f select{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#111827;font-size:14.5px;font-family:inherit;height:100%}
+.lg-eye{width:36px;height:36px;margin-right:-6px;border:0;background:transparent;border-radius:8px;color:#6b7280;display:grid;place-items:center}
+.lg-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:#4b5563;flex-wrap:wrap}
+.lg-meta label{display:inline-flex;align-items:center;gap:8px}
+.lg-meta input{accent-color:#3f9131;width:16px;height:16px}
+.lg-meta a{color:#2b6a27;font-weight:500;text-decoration:none}
+.lg-btn{height:48px;border:0;border-radius:12px;background:linear-gradient(160deg,#6cc04a,#2f8a2a);color:#fff;font-weight:600;font-size:15px;box-shadow:0 10px 24px rgb(47 138 42 / .28)}
+.lg-btn:hover{filter:brightness(1.05)}
+.lg-or{position:relative;text-align:center;font-size:12px;color:#6b7280}
+.lg-or::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px solid #e5e7eb}
+.lg-or span{position:relative;background:#fff;padding:0 10px}
+.lg-alt{height:46px;border:1px solid #d1d5db;border-radius:12px;background:#fff;font-weight:500;color:#111827;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.lg-alt:hover{background:#f7f9f6}
+.wl-notice{display:flex;gap:10px;padding:12px 14px;border-radius:12px;background:#f3f6f2;font-size:12.5px;line-height:1.45;color:#4b5563}
+.wl-notice svg{flex:none;color:#1f6e2c;margin-top:1px}
+.wl-legal{margin:18px 0 0;font-size:12px;color:#9ca3af;text-align:center}
+@media (max-width:900px){#login{grid-template-columns:1fr}.wl-side{min-height:0;padding:28px 24px}.wl-mid{padding:28px 0 8px}.wl-feats,.wl-sfoot{display:none}}
+
+/* brand */
+.hwlogo{display:flex;align-items:center;gap:10px;padding-right:18px;border-right:1px solid var(--line)}
+.hwtile{width:36px;height:36px;border-radius:10px;flex:none;background:radial-gradient(circle at 70% 35%,#d6ff3c 0,transparent 45%),radial-gradient(circle at 80% 90%,#0b7a52 0,transparent 55%),radial-gradient(circle at 30% 80%,#38e02f 0,transparent 50%),#8ad81e;box-shadow:0 4px 12px rgb(16 138 91 / .25)}
+.hwword{font-weight:600;font-size:21px;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
+.hwunit h1{margin:0;font-size:18px;font-weight:500}
+.hwunit p{margin:0;color:var(--muted);font-size:13.5px}
+.grad,.tnav2 button[aria-selected="true"],.btn.pri,.scard[aria-pressed="true"] .ico,.rank.r1{background:linear-gradient(135deg,var(--lime,#8ad81e) 0%,var(--brand) 35%,var(--brand-2) 100%)}
+.scard[aria-pressed="true"]{border-color:var(--brand)}
+@media (max-width:700px){.hwunit{display:none}.hwlogo{border-right:0}}
+
+/* status model additions */
+.bed.issue{background:var(--surface-2);border-style:dashed;border-color:var(--faint)}
+.bed.issue .bst{color:var(--ink)}
+.bed.away{background:var(--surface-2)}
+.bed.away .bno,.bed.away .bname,.bed.away .bst{color:var(--muted)}
+.bed .bst .badge{margin-left:auto;display:inline-flex;color:var(--amber)}
+.bed .bst .badge.nb{color:var(--muted)}
+.bed .bst .ackm{display:inline-flex;color:var(--brand-2)}
+.bed.over .bst .ackm{color:var(--brand-2)}
+.pill.issue{background:var(--surface-2);color:var(--ink);border:1px dashed var(--faint)}
+.pill.away{background:var(--surface-2);color:var(--muted);border-color:var(--line)}
+.pill.batt{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-line)}
+.sys{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid var(--line);border-radius:99px;background:var(--surface);font-size:12.5px;font-weight:500;color:var(--ink);white-space:nowrap}
+.sys:hover{background:var(--surface-2)}
+.sys>i{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.sys.warn>i{background:var(--amber);box-shadow:0 0 0 3px var(--amber-bg)}
+.sys .num{color:var(--muted);padding-left:8px;border-left:1px solid var(--line)}
+.modal{position:fixed;inset:0;z-index:70;background:rgb(15 23 42 / .42);display:grid;place-items:center;padding:16px}
+.modal[hidden]{display:none}
+.mbox{width:min(720px,100%);max-height:calc(100vh - 32px);overflow-y:auto;background:var(--surface);color:var(--ink);border-radius:18px;box-shadow:0 30px 80px rgb(0 0 0 / .25)}
+.mh{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
+.mh h2{margin:0;font-size:17px;font-weight:600}
+.mh .x{margin-left:auto;width:36px;height:36px;border:0;border-radius:8px;background:none;display:grid;place-items:center;color:var(--muted)}
+.mh .x:hover{background:var(--surface-2)}
+.mb{padding:18px 20px 22px;display:flex;flex-direction:column;gap:20px}
+.msec h3{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.gw{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.gwc{border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13px;display:flex;flex-direction:column;gap:2px}
+.gwc b{display:flex;align-items:center;gap:7px;font-weight:600}
+.gwc b i{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.gwc span{color:var(--muted);font-size:12px}
+.isl{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.isl .q{grid-template-columns:48px minmax(0,1fr) auto;padding:10px 14px}
+.isl .q .qb{grid-row:auto;background:var(--surface-2);color:var(--ink);padding:7px 0;font-size:15px}
+.isx{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--muted)}
+.sgr{display:grid;grid-template-columns:42px 170px minmax(0,1fr);gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.sgr:last-child{border-bottom:0}
+.sgr b{font-weight:600}
+.sgr p{margin:0;color:var(--muted)}
+.sgr p em{font-style:normal;color:var(--ink);font-weight:500}
+.sgm{width:42px;height:34px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;background:var(--surface);color:var(--muted)}
+.sgm.dry{color:var(--dry)}
+.sgm.wet,.sgm.soiled{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber)}
+.sgm.over{background:var(--red-bg);border:2px solid var(--red-solid);color:var(--red)}
+.sgm.ack{color:var(--brand-2)}
+.sgm.note{color:var(--ink)}
+.sgm.battery{color:var(--amber)}
+.sgm.issue{background:var(--surface-2);border-style:dashed;border-color:var(--faint);color:var(--ink)}
+.sgm.away{background:var(--surface-2)}
+.sgm.na{border-style:dashed;color:var(--faint)}
+.pair{width:min(460px,100%)}
+.pst{display:flex;flex-direction:column;gap:12px}
+.pstep{display:flex;gap:12px;align-items:flex-start;font-size:14px;font-weight:500}
+.pstep .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12.5px;font-weight:600;background:var(--surface-2);color:var(--muted);flex:none;border:1px solid var(--line)}
+.pstep.ok .n{background:var(--brand-2);border-color:var(--brand-2);color:#fff}
+.pstep span{color:var(--muted);font-size:12.5px;font-weight:400;display:block;margin-top:2px}
+.nfc{position:relative;width:140px;height:140px;margin:0 auto;display:grid;place-items:center}
+.nfc .core{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand-ink);position:relative;z-index:1}
+.nfc .core .si{width:34px;height:34px}
+.nfc .ring{position:absolute;inset:20px;border-radius:50%;border:2px solid var(--brand);opacity:0}
+.nfc.scan .ring{animation:nfc 1.4s ease-out infinite}
+.nfc.scan .ring:nth-child(2){animation-delay:.5s}
+.nfc.ok .core{background:linear-gradient(135deg,var(--lime,#8ad81e),var(--brand-2));color:#fff}
+@keyframes nfc{0%{transform:scale(.75);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.nfc.scan .ring{animation:none;opacity:.5}}
+.pmsg{text-align:center;font-size:13.5px;color:var(--muted)}
+.pmsg b{display:block;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.pacts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:620px){.gw{grid-template-columns:minmax(0,1fr)}.sgr{grid-template-columns:42px minmax(0,1fr)}.sgr p{grid-column:2}}
+
+/* resident details as a side drawer */
+#drawer{position:fixed;inset:0 0 0 auto;width:min(620px,100%);background:var(--surface);z-index:60;overflow-y:auto;border-left:1px solid var(--line);box-shadow:-18px 0 50px rgb(15 23 42 / .16);padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) 0;animation:din .18s ease-out}
+@keyframes din{from{transform:translateX(28px);opacity:.5}}
+@media (prefers-reduced-motion:reduce){#drawer{animation:none}}
+#drawer .rp{max-width:none;margin:0;padding:0 20px 32px;gap:14px}
+#drawer .rp-bar{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:10px;margin:0 -20px;padding:12px 16px 12px 20px;background:var(--surface);border-bottom:1px solid var(--line)}
+#drawer .rp-bar b{font-weight:600;font-size:15px}
+#drawer .rp-bar .rpk{font-size:12px;color:var(--faint)}
+#drawer .rp-bar .x{margin-left:auto;width:36px;height:36px;border:0;border-radius:8px;background:none;display:grid;place-items:center;color:var(--muted)}
+#drawer .rp-bar .x:hover{background:var(--surface-2)}
+#drawer .two{grid-template-columns:minmax(0,1fr)}
+#drawer .rtiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+#drawer .rtabs{top:61px}
+#drawer .rp-who h2{font-size:20px}
+#drawer .pav{width:52px;height:52px;font-size:17px}
+#tip[hidden]{display:none}
+.q .sr2{display:flex;flex-direction:column;gap:2px;white-space:normal}
+.q .sr2 b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.isa{font-size:12px;color:var(--muted);text-align:right}
+
+/* full-height pages, page headers */
+#station .frame.flat{min-height:100vh;display:flex;flex-direction:column}
+#station main{flex:1;width:100%}
+.phd{margin:0 0 18px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.phd h2{margin:0;font-size:22px;font-weight:600;letter-spacing:-.01em}
+.phd p{margin:0;color:var(--muted);font-size:14px;flex-basis:100%}
+#st-inventory .grid2{align-items:stretch}
+/* user menu */
+.umenu-w{position:relative}
+.upill{font:inherit;cursor:pointer}
+.upill:hover{background:var(--surface-2)}
+.umenu{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:240px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgb(15 23 42 / .14);padding:6px}
+.umenu .umh{padding:10px 12px 8px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.umenu .umh b{display:block;font-weight:600}.umenu .umh span{font-size:12.5px;color:var(--muted)}
+.umenu button{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;border-radius:8px;background:none;text-align:left;font-size:14px;color:var(--ink)}
+.umenu button:hover{background:var(--surface-2)}
+.umenu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+.umenu .danger{color:var(--red)}
+/* sensor issues panel */
+.sysline{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.sysline i{width:7px;height:7px;border-radius:50%;background:var(--brand);flex:none}
+.ph h2 .count{font-size:11px}
+
+/* resident portraits */
+.pav.pic{background:var(--surface-2);overflow:hidden;padding:0;box-shadow:0 0 0 1px var(--line)}
+.pav.pic svg{display:block;width:100%;height:100%}
+
+#toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;z-index:60;width:min(440px,calc(100% - 32px))}
+.toast{background:var(--ink);color:var(--surface);border-radius:12px;padding:11px 14px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow);display:flex;gap:10px;align-items:center}
+.toast i{width:9px;height:9px;border-radius:50%;flex:none}
+.toast button{margin-left:auto;border:0;background:none;color:var(--brand);font-weight:700;padding:2px 4px}
+
+@media (max-width:1150px){.layout,.grid2,.twocol{grid-template-columns:minmax(0,1fr)}.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){.ip{padding-left:14px;padding-right:14px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.unit,.user .who,.ib span,.live span{display:none}.tb-r{margin-left:0}.search{max-width:none}.beds{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+  .frame.tablet{border-width:6px;border-radius:16px}.tabapp{grid-template-columns:minmax(0,1fr)}.srail{flex-direction:row;border-right:0;border-bottom:1px solid var(--line);padding:8px;overflow-x:auto}.srail .mark,.srail .sp{display:none}.srail button{flex:1;min-width:72px}.thead,.tbody{padding-left:14px;padding-right:14px}.kpis{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+<section id="login" aria-label="Sign in to the HealthWink Nursing Station">
+  <aside class="wl-side">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+    <div class="wl-mark"><span class="hwtile"></span>Health wink</div>
+    <div class="wl-mid">
+      <span class="wl-eye"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Nursing Station</span>
+      <h2>Your whole unit, at a glance.</h2>
+      <p>Live continence status for every bed, so the charge nurse can see what needs attention and who is on it.</p>
+      <ul class="wl-feats">
+        <li><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><div><b>Live bed board</b><span>Dry, needs change and overdue, updated in real time.</span></div></li>
+        <li><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></span><div><b>Escalation &amp; workload</b><span>Spot overdue changes and rebalance caregivers.</span></div></li>
+        <li><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-6"/></svg></span><div><b>Trends &amp; inventory</b><span>Change volume, response times and liner stock.</span></div></li>
+      </ul>
+    </div>
+    <div class="wl-sfoot"><span class="hp"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>HIPAA compliant</span><span>Patient Monitoring and Analytics System</span></div>
+  </aside>
+  <main class="wl-main">
+    <form class="wl-card" id="lgForm" novalidate>
+      <span class="wl-tag"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Nursing Station portal</span>
+      <h1>Welcome back</h1>
+      <p class="lead">Sign in to monitor your unit.</p>
+      <div class="lg-f"><label for="lgUnit">Unit</label><div class="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M10 21v-5h4v5"/></svg><select id="lgUnit"><option>3 West · Long-term care</option><option>2 East · Memory care</option><option>4 North · Rehab</option></select></div></div>
+      <div class="lg-f"><label for="lgUser">Staff ID or email</label><div class="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><input id="lgUser" autocomplete="username" value="charge.nurse@3west.demo"></div></div>
+      <div class="lg-f"><label for="lgPass">Password</label><div class="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="lgPass" type="password" autocomplete="current-password" value="demo-password"><button type="button" class="lg-eye" id="lgEye" aria-label="Show password"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div class="lg-meta"><label><input type="checkbox" id="lgKeep" checked> Keep me signed in</label><a href="#login" onclick="return false">Forgot password?</a></div>
+      <button class="lg-btn" type="submit">Sign in</button>
+      <div class="lg-or"><span>or</span></div>
+      <button class="lg-alt" type="button" id="lgSSO"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Continue with hospital SSO</button>
+      <div class="wl-notice"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg><span>Shared workstation? Sessions lock after 15 minutes idle. Sign out when you leave the desk. <b>Demo:</b> any staff ID and password work.</span></div>
+    </form>
+    <p class="wl-legal">© 2026 Healthwink · Privacy · Terms</p>
+  </main>
+</section>
+<div class="switcher pad" hidden>
+  <div class="seg" role="group" aria-label="Choose prototype" style="box-shadow:var(--shadow)"><button id="toStation" aria-pressed="true">Nursing Station Portal</button><button id="toCare" aria-pressed="false">Caregiver Tablet</button></div>
+  <p>Two separate apps sharing the same live sensor data. Demonstration data only.</p>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-dry" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="m8 12.5 3 3 5-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-wet" viewBox="0 0 24 24"><path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-soil" viewBox="0 0 24 24"><path d="M12 3 2 20h20z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-over" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 9v4l2.5 2M9 2h6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-all" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-away" viewBox="0 0 24 24"><path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-issue" viewBox="0 0 24 24"><path d="M2 8.5a15 15 0 0 1 4-2.6M9.5 4.9A15 15 0 0 1 22 8.5M5 12a10 10 0 0 1 3-1.8M13.5 9.8A10 10 0 0 1 19 12M8.5 15.5a5 5 0 0 1 7 0M12 19h.01M3 3l18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="17" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M22 11v2M6 10v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-nfc" viewBox="0 0 24 24"><path d="M6 8.3a6 6 0 0 0 0 7.4M9.5 6a10 10 0 0 0 0 12M2.5 10.5a3 3 0 0 0 0 3M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-ack" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="2" fill="currentColor"/><path d="M9 21l2.5-6 2.5 2v4M8 12l2-4 3.5 1.5L16 13l2 1M10.5 8l-1.5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-na" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-dasharray="3 3"/></symbol>
+</svg>
+
+<!-- ============ NURSING STATION ============ -->
+<section class="app" id="station"><div class="frame flat">
+<header class="thdr"><div class="ip thdr-in">
+  <div class="tlogo"><div class="hwlogo" aria-label="Health wink"><span class="hwtile" aria-hidden="true"></span><span class="hwword">Health wink</span></div>
+    <div class="hwunit"><h1>Nursing Station</h1><p>3 West · Long-term care</p></div></div>
+  <div class="gsearch"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="gSearch" type="search" placeholder="Global search" aria-label="Global search"></div>
+  <span class="live" title="Live sensor feed"><i></i><span class="num" id="clock"></span></span>
+  <button class="ib" id="sndBtn" aria-pressed="true" title="Alert sound"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg><span id="sndLab" class="sr">Sound on</span></button>
+  <span id="privBtn" hidden></span>
+  <div class="umenu-w"><button class="upill" id="uBtn" aria-haspopup="menu" aria-expanded="false"><div><b>Charge Nurse, RN</b><small>Day shift</small></div><div class="av ph" data-av="charge"></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button><div class="umenu" id="uMenu" role="menu" hidden><div class="umh"><b>Charge Nurse, RN</b><span>charge.nurse@3west.demo</span></div><button role="menuitem" data-sg="guide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg>Status guide</button><button role="menuitem" data-goto="settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Settings</button><hr><button role="menuitem" class="danger" data-signout><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign out</button></div></div>
+</div></header>
+<nav class="tnav2" role="tablist" data-app="st"><div class="ip tnav2-in">
+  <button data-t="live" aria-selected="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Dashboard <span class="count" id="stCount" hidden></span></button>
+  <button data-t="trends" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Trends <span class="count" id="trCount" hidden></span></button>
+  <button data-t="inventory" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg>Inventory</button>
+  <button data-t="leader" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21c1-4 4-6 7-6s6 2 7 6M17 11l2 2 4-4"/></svg>Caregivers</button>
+  <button data-t="settings" aria-selected="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Settings</button>
+</div></nav>
+<main class="ip">
+  <!-- LIVE -->
+  <section id="st-live"><div class="phd"><h2>Live board</h2><p>Real-time status for every bed on 3 West</p></div>
+    <div class="scards" id="tiles" role="group" aria-label="Filter by status"></div>
+    <div class="tools2">
+      <div class="trow2"><span class="k">Search</span><div class="search2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="stQ" type="search" placeholder="Search residents, bed number, MRN..." aria-label="Search residents, bed number or MRN"></div></div>
+      <div class="trow2"><span class="k">Filters</span>
+        <select id="stStatus" aria-label="Status"><option value="all">Select status</option><option value="needs">Needs change</option><option value="over">Overdue</option><option value="dry">Dry</option><option value="issue">Sensor issue</option><option value="away">Away</option><option value="na">Not monitored</option></select>
+        <select id="stNurse" aria-label="Caregiver"><option value="">Select caregiver</option></select>
+        <select id="stSort" aria-label="Order"><option value="bed">Bed order</option><option value="pri">Most urgent first</option></select>
+        <button class="clear" id="clearF">Clear Filters</button>
+        <button class="sgbtn" data-sg="guide"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg>Status guide</button>
+        <span class="cnt" id="stCnt"></span>
+        <div class="vt" role="group" aria-label="View">
+          <button id="stList" aria-pressed="false" aria-label="List view"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></button>
+          <button id="stGrid" aria-pressed="true" aria-label="Board view"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="layout" style="margin-top:18px">
+      <div class="bigcard" id="stBoard" style="margin-top:0;min-width:0"></div>
+      <aside class="rail"><div class="panel"><div class="ph"><h2>Caregivers on shift</h2><span class="meta">Tap for details</span></div><div id="stCrew"></div></div><div class="panel"><div class="ph"><h2>Sensor issues <span class="count" id="sensN" hidden></span></h2><span class="meta">Check these in person</span></div><div id="stSens"></div><div class="sysline"><i></i>Gateways online · PointClickCare synced 1 min ago</div></div></aside>
+    </div>
+  </section>
+  <!-- RESIDENTS -->
+  <section id="st-residents" hidden>
+    <div class="panel">
+      <div class="toolbar"><div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="stQ2" type="search" placeholder="Find a resident or bed" aria-label="Find a resident"></div><span class="tb-r" style="font-size:12.5px;color:var(--muted)" id="ptMeta"></span></div>
+      <div id="stPts"></div>
+    </div>
+  </section>
+  <!-- TRENDS -->
+  <section id="st-trends" hidden><div class="phd"><h2>Trends</h2><p>Change volume and voiding variance across the unit</p></div>
+    <div class="grid2">
+      <div class="panel"><div class="ph"><h2>Change volume · whole unit</h2><div class="seg" id="trSeg" role="group" aria-label="Period"></div></div><div class="pb" id="trVol"></div></div>
+      <div class="panel"><div class="ph"><h2>Voiding variance alerts</h2><span class="meta">Residents 30%+ off their expected pattern</span></div><div class="trend" id="trList"></div></div>
+    </div>
+  </section>
+  <!-- INVENTORY -->
+  <section id="st-inventory" hidden><div class="phd"><h2>Inventory</h2><p>Liner stock, daily usage and the order recommendation</p></div><div class="grid2"><div class="panel"><div class="ph"><h2>Liner stock</h2></div><div class="pb" id="invMain"></div></div><div class="panel"><div class="ph"><h2>Order recommendation</h2></div><div class="pb" id="invOrder"></div></div></div><div class="panel" style="margin-top:18px"><div class="ph"><h2>Daily liner usage</h2><span class="meta">Last 14 days · one liner per change</span></div><div class="pb" id="invUse"></div></div></section>
+  <!-- LEADER -->
+  <section id="st-leader" hidden><div class="phd"><h2>Caregivers</h2><p>Live workload and response ranking for this shift</p></div><div class="panel" style="margin-bottom:18px"><div class="ph"><h2>Live workload</h2><span class="meta">Tap a caregiver for details</span></div><div class="crewgrid" id="stCrew2"></div></div><div class="panel"><div class="ph"><h2>Caregiver response ranking</h2><div class="seg" id="stLbSeg" role="group" aria-label="Period"></div></div><p style="margin:12px 18px 4px;font-size:13px;color:var(--muted)">Average time from a wet or soiled alert to the change. On time means changed within <b id="lbThr"></b> minutes.</p><div class="tw" id="stLb"></div></div></section>
+  <!-- SETTINGS -->
+  <section id="st-settings" hidden><div class="phd"><h2>Settings</h2><p>Alerts, display and inventory settings for this station</p></div>
+    <div class="sets">
+      <div class="panel set"><h3>Account</h3><p>Signed in as Charge Nurse, RN · charge.nurse@3west.demo</p><button class="btn" data-signout>Sign out</button></div>
+      <div class="panel set"><h3>Overdue threshold</h3><p>A wet or soiled bed turns solid red and moves to the top of the list after this long.</p>
+        <div class="srow"><label for="thr">Mark overdue after</label><b class="num" id="thrV"></b></div><input type="range" id="thr" min="5" max="30"></div>
+      <div class="panel set"><h3>Station screen</h3>
+        <div class="srow"><label for="sSnd">Alert sound</label><span class="switch"><input type="checkbox" id="sSnd"><i></i></span></div>
+        <div class="srow"><label for="sPriv">Privacy mode (initials only)</label><span class="switch"><input type="checkbox" id="sPriv"><i></i></span></div></div>
+      <div class="panel set"><h3>Inventory</h3><p>Used to work out the order quantity.</p>
+        <div class="srow"><label for="par">Monthly par level</label><input type="number" id="par" min="100" step="50" class="num"></div>
+        <div class="srow"><label for="cs">Units per case</label><input type="number" id="cs" min="10" step="10" class="num"></div></div>
+      <div class="panel set"><h3>Demo</h3><p>Simulates sensor events so you can watch alerts arrive.</p>
+        <div class="srow"><label for="sim">Simulate sensor events</label><span class="switch"><input type="checkbox" id="sim"><i></i></span></div>
+        <button class="btn" id="fire">Send a test wet alert</button></div>
+    </div>
+  </section>
+</main>
+<div class="foot ip"><span class="l"><span class="hipaa"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>HIPAA compliant</span>© 2026 Healthwink · Patient Monitoring and Analytics System</span><span>Version 0.5</span><p class="disc">Decision support only. Demonstration data, not real patients. Always confirm with a clinical assessment.</p></div>
+</div></section>
+
+<!-- ============ CAREGIVER TABLET ============ -->
+<section class="app pad" id="care" hidden><div class="frame tablet"><div class="tabapp">
+  <nav class="srail" role="tablist" aria-label="Caregiver sections" data-app="cg">
+    <div class="mark grad" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 10h.01M15.5 10h.01M8.5 14.5c1.8 1.8 5.2 1.8 7 0"/></svg></div>
+    <button data-t="todo" aria-selected="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>To do<span class="count" id="cgCount" hidden></span></button>
+    <button data-t="beds" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>My beds</button>
+    <button data-t="perf" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7"/></svg>Ranking</button>
+    <span class="sp"></span>
+    <button data-t="settings" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Settings</button>
+  </nav>
+  <div class="tmain">
+    <div class="thead"><div><h1 id="cgTitle">To do</h1><div class="s">Sarah James · Beds 01–20 · Day shift</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px"><span class="live"><i></i><span>Live</span></span><div class="av ph" data-av="sarah"></div></div></div>
+    <div class="tbody">
+      <section id="cg-todo">
+        <div class="summary" id="cgSummary"></div>
+        <div class="twocol" style="margin-top:16px">
+          <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+            <div class="tasks" id="cgTasks"></div>
+          </div>
+          <aside class="panel">
+            <div class="ph"><h2>My shift</h2><button class="linkbtn" data-gocg="perf">Ranking</button></div>
+            <div class="pb" id="cgShift"></div>
+          </aside>
+        </div>
+      </section>
+      <section id="cg-beds" hidden>
+        <div class="sh"><div class="summary" id="cgBedsSum"></div><div class="seg" role="group" aria-label="Order"><button id="cgOBed" aria-pressed="true">Bed order</button><button id="cgOPri" aria-pressed="false">Most urgent</button></div></div>
+        <div class="mybeds" id="cgGrid"></div>
+      </section>
+      <section id="cg-perf" hidden>
+        <div class="twocol">
+          <div class="panel"><div class="ph"><h2>Leaderboard</h2><div class="seg" id="cgLbSeg" role="group" aria-label="Period"></div></div><div class="tw" id="cgLb"></div></div>
+          <div class="panel"><div class="ph"><h2>Your response ranking</h2></div><div class="pb" id="cgRank"></div></div>
+        </div>
+      </section>
+      <section id="cg-settings" hidden>
+        <div class="sets">
+          <div class="panel set"><h3>How alerts reach you</h3><p>Only for patients assigned to you.</p>
+            <div class="srow"><label for="cgVis">Banner on screen</label><span class="switch"><input type="checkbox" id="cgVis"><i></i></span></div>
+            <div class="srow"><label for="cgSnd">Sound</label><span class="switch"><input type="checkbox" id="cgSnd"><i></i></span></div>
+            <div class="srow"><label for="cgHap">Vibration (supported devices)</label><span class="switch"><input type="checkbox" id="cgHap"><i></i></span></div></div>
+          <div class="panel set"><h3>Your assignment</h3><p>Beds 01–20 this shift. Your charge nurse changes assignments from the nursing station.</p></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div></div></section>
+
+<div id="tip" hidden></div>
+<div id="scrim" hidden></div>
+<section id="drawer" hidden aria-label="Resident page"></section>
+<div id="sg" class="modal" hidden></div>
+<div id="pairM" class="modal" hidden></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+(function(){
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R=rng(7),pick=a=>a[Math.floor(R()*a.length)],now=()=>Date.now(),MIN=6e4;
+const FIRST=["James","Andrew","Emily","Olivia","Margaret","Robert","Dorothy","William","Helen","Frank","Ruth","George","Betty","Harold","Joan","Walter","Evelyn","Arthur","Gloria","Eugene","Lois","Ray","Shirley","Carl","Irene","Donald","Marjorie","Henry","Alice","Louis","Edna","Paul","Rose","Jack","Vera"];
+const LAST=["Williams","Davis","Johnson","Grace","Miller","Thompson","Garcia","Martinez","Clark","Lewis","Walker","Hall","Allen","Young","King","Wright","Scott","Green","Baker","Adams","Nelson","Hill","Campbell","Mitchell","Roberts","Carter","Phillips","Evans","Turner","Torres","Parker","Collins","Edwards","Stewart","Morris"];
+const NURSES=[{id:"sarah",name:"Sarah James",ini:"SJ",me:1},{id:"chris",name:"Chris Ortega",ini:"CO"},{id:"madison",name:"Madison Lee",ini:"ML"},{id:"claire",name:"Claire Dubois",ini:"CD"},{id:"ryan",name:"Ryan Patel",ini:"RP"},{id:"lucas",name:"Lucas Reed",ini:"LR"},{id:"olivia",name:"Olivia Rhye",ini:"OR"}];
+const NB={};NURSES.forEach(n=>NB[n.id]=n);
+const AV={sarah:{bg:"#dff3d0",sk:"#f1c7a5",h:"#6b3e26",sc:"#2f9e6f",st:"long"},chris:{bg:"#dbeafe",sk:"#c68a5e",h:"#2b1d14",sc:"#3b6fd8",st:"short"},madison:{bg:"#fde7d6",sk:"#f6d3b8",h:"#d9a54c",sc:"#7c5cd6",st:"bun"},claire:{bg:"#e9e3fb",sk:"#8d5a3b",h:"#1c120c",sc:"#0e9f8e",st:"curly"},ryan:{bg:"#fff1c9",sk:"#b07752",h:"#1f1a17",sc:"#4b6584",st:"short"},lucas:{bg:"#d6f5ec",sk:"#f0c2a0",h:"#a0522d",sc:"#2563eb",st:"short"},olivia:{bg:"#fde2e7",sk:"#e3a983",h:"#3a2418",sc:"#c2417a",st:"long"},charge:{bg:"#e2f6d5",sk:"#d9a07a",h:"#4a3426",sc:"#1f6e2c",st:"bun"}};
+function avSVG(k){const a=AV[k];if(!a)return"";const H=a.h,FR=`<path d="M21 30c0-9 5-14 11-14s11 5 11 14c-3-6-7-8-11-8.5-4 .5-8 2.5-11 8.5z" fill="${H}"/>`;
+  const back={long:`<path d="M18 30c0-11 6-17 14-17s14 6 14 17v16H18z" fill="${H}"/>`,bun:`<circle cx="32" cy="13" r="6" fill="${H}"/>`,curly:`<g fill="${H}"><circle cx="22" cy="24" r="6"/><circle cx="27" cy="18" r="6"/><circle cx="35" cy="17" r="6"/><circle cx="42" cy="23" r="6"/><circle cx="20" cy="32" r="5"/><circle cx="44" cy="32" r="5"/></g>`,short:""}[a.st];
+  const front={long:FR,bun:FR,curly:`<path d="M21.5 27c2-6 6-9 10.5-9s8.5 3 10.5 9c-3-3-6-4-10.5-4s-7.5 1-10.5 4z" fill="${H}"/>`,short:`<path d="M20.5 29c-1-9 5-15 11.5-15s13 5 11.5 15c-2-5-6-8-11.5-8.5C26.5 21 22.5 24 20.5 29z" fill="${H}"/>`}[a.st];
+  return `<svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true"><rect width="64" height="64" fill="${a.bg}"/>${back}<path d="M10 64c2-12 11-18 22-18s20 6 22 18z" fill="${a.sc}"/><path d="M26 42h12v7a6 6 0 0 1-12 0z" fill="${a.sk}"/><path d="M27 48l5 5 5-5" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-linejoin="round"/><ellipse cx="32" cy="30" rx="11" ry="13" fill="${a.sk}"/>${front}<circle cx="27.5" cy="31" r="1.4" fill="#2a1d17"/><circle cx="36.5" cy="31" r="1.4" fill="#2a1d17"/><path d="M28.5 36.5q3.5 2.6 7 0" fill="none" stroke="#7a3e2e" stroke-width="1.4" stroke-linecap="round"/></svg>`}
+const avatar=(k,cls="av",style="")=>`<span class="${cls} ph" ${style?`style="${style}"`:""}>${avSVG(k)}</span>`;
+document.querySelectorAll("[data-av]").forEach(el=>el.innerHTML=avSVG(el.dataset.av));
+const BASE={sarah:265,chris:310,madison:380,claire:242,ryan:455,lucas:170,olivia:205},PER_DAY={sarah:12,chris:11,madison:10,claire:13,ryan:9,lucas:12,olivia:11};
+const S={nurseF:null,app:"station",stTab:"live",cgTab:"todo",filter:"all",stSort:"bed",stView:"grid",stQ:"",stQ2:"",cgOrder:"bed",trP:"week",
+  stLbP:"week",cgLbP:"week",thr:10,priv:false,sound:true,sim:true,par:1200,cs:50,onHand:860,restock:now()-15*864e5,
+  cgVis:true,cgSnd:true,cgHap:true,sel:null,log:[],snooze:{},undo:{},overToday:3};
+const updTxt=()=>{const x=Math.round((now()-(S.lastEvt||now()))/1000);return x<5?"just now":x<60?`${x}s ago`:`${Math.round(x/60)} min ago`};
+const nurseFor=n=>n<=20?"sarah":n<=35?"chris":n<=50?"madison":n<=60?"claire":"ryan";
+const P=[];
+for(let n=1;n<=70;n++){
+  const exp=pick([5,6,6,7,8]);let avg=exp+Math.round((R()-.5)*3);if(R()<.1)avg=Math.max(1,Math.round(exp*.35));if(R()<.06)avg=Math.round(exp*1.6);
+  const hist=[];for(let d=0;d<14;d++)hist.push(Math.max(0,Math.round(avg+(R()-.5)*3)));
+  const p={id:"p"+n,n,bed:String(n).padStart(2,"0"),first:FIRST[(n*3)%FIRST.length],last:LAST[(n*7)%LAST.length],mrn:"IP"+(110000+n*13),
+    nurse:nurseFor(n),cond:"dry",since:null,lastChange:now()-Math.floor(R()*180+12)*MIN,exp,avg,hist,sensor:true,resp:[]};
+  const r=R();
+  if(r<.12){p.cond="soiled";p.since=now()-Math.floor(R()*20*60)*1000}
+  else if(r<.25){p.cond="wet";p.since=now()-Math.floor(R()*14*60)*1000}
+  else if(r<.31){p.cond="na";p.sensor=false}
+  for(let i=0;i<4;i++)p.resp.push({t:now()-(i+1)*(3+R()*3)*36e5,secs:Math.round(120+R()*700),nurse:p.nurse});
+  p.notes=[];p.ack=null;p.pend=null;
+  if(R()<.5)p.notes.push({t:p.resp[0].t+60000,by:p.nurse,text:pick(["Skin intact, no redness.","Resident comfortable, repositioned.","Mild redness on sacrum, barrier cream applied.","Two-person assist used.","Resident asleep, changed without waking."]),tags:[]});
+  P.push(p)}
+NURSES.forEach(n=>{for(let j=0;j<6;j++)S.log.push({nurse:n.id,secs:Math.round(BASE[n.id]*(.5+R())),t:now()-R()*8*36e5})});
+const ISS={7:"battery",17:"signal",26:"signal",44:"unpaired",61:"battery"},AWAY={12:"At hospital",52:"In activities"};
+P.forEach(p=>{p.issue=null;p.away=null;p.liner="HW-"+(48000+p.n*37);if(ISS[p.n]||AWAY[p.n]){p.sensor=true;p.cond="dry";p.since=null}if(ISS[p.n])p.issue=ISS[p.n];if(AWAY[p.n])p.away=AWAY[p.n]});
+
+const $=id=>document.getElementById(id);
+const needs=p=>p.cond==="wet"||p.cond==="soiled";
+const el=p=>p.since?Math.max(0,Math.floor((now()-p.since)/1000)):null;
+const over=p=>needs(p)&&el(p)>=S.thr*60;
+const pri=p=>p.cond==="na"?"na":(p.cond==="soiled"||over(p))?"high":p.cond==="wet"?"medium":"low";
+const fmt=s=>{if(s==null)return"—";const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}h ${String(m).padStart(2,"0")}m`:`${m}:${String(x).padStart(2,"0")}`};
+const short=s=>{const m=Math.round(s/60);return m<1?`${Math.round(s)}s`:m<60?`${m} min`:`${Math.floor(m/60)}h ${m%60}m`};
+const msec=s=>`${Math.floor(s/60)}m ${String(Math.round(s%60)).padStart(2,"0")}s`;
+const ago=t=>short((now()-t)/1000)+" ago";
+const nm=p=>S.priv&&S.app==="station"?`${p.first[0]}. ${p.last[0]}.`:`${p.first} ${p.last}`;
+const nmS=p=>S.priv&&S.app==="station"?`${p.first[0]}.${p.last[0]}.`:`${p.first[0]}. ${p.last}`;
+const ic=(k,sz=14)=>`<svg class="si" width="${sz}" height="${sz}" aria-hidden="true"><use href="#i-${k}"/></svg>`;
+const unknown=p=>p.issue==="signal"||p.issue==="unpaired";
+const stKey=p=>p.away?"away":over(p)?"over":p.cond==="soiled"?"soil":p.cond==="wet"?"wet":unknown(p)?"issue":p.cond==="dry"?"dry":"na";
+const stWord=p=>p.away?"Away":over(p)?"Overdue":p.cond==="soiled"?"Soiled":p.cond==="wet"?"Wet":unknown(p)?(p.issue==="signal"?"Signal lost":"Not paired"):p.cond==="dry"?"Dry":"No sensor";
+const condWord=p=>p.away?"Away":unknown(p)&&!needs(p)?(p.issue==="signal"?"Signal lost":"Not paired"):({dry:"Dry",wet:"Wet",soiled:"Soiled",na:"No sensor"})[p.cond];
+const issueText=p=>p.issue==="battery"?"Low battery · still monitoring":p.issue==="signal"?"Signal lost · check in person":p.issue==="unpaired"?"Not paired · not being monitored":"";
+const PRI={high:"High",medium:"Medium",low:"Low"};
+const statusPill=p=>`<span class="pill ${over(p)?"over":p.away?"away":unknown(p)&&!needs(p)?"issue":p.cond}">${ic(stKey(p),12)} ${condWord(p)}${over(p)?" · overdue":""}</span>`;
+const priPill=p=>{if(p.away)return `<span class="pill away">Paused</span>`;if(unknown(p)&&!needs(p))return `<span class="pill issue">Check in person</span>`;const r=pri(p);return r==="na"?`<span class="pill na">Manual</span>`:`<span class="pill ${r}">${PRI[r]}</span>`};
+const variance=p=>(p.avg-p.exp)/p.exp;
+function vinfo(p){const v=variance(p),a=Math.abs(v);return{v,flag:a>=.3,sev:a>=.5?"High":a>=.3?"Moderate":"Low",
+  head:v<=-.3?"Low output":v>=.3?"High frequency":"Within expected range",
+  text:v<=-.3?"Possible causes include dehydration or urinary retention. Review fluid intake, and tell the charge nurse if this continues for another 24 hours.":v>=.3?"Possible causes include a urinary tract infection or diuretic timing. Consider a UTI screen and review medications with the care team.":"Voiding matches this resident's usual pattern. The routine care schedule is working."}}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const match=(p,q)=>{if(!q)return true;q=q.toLowerCase();return (p.first+" "+p.last).toLowerCase().includes(q)||p.bed.startsWith(q)||String(p.n)===q||p.mrn.toLowerCase().includes(q)};
+const urg=(a,b)=>(over(b)-over(a))||((b.cond==="soiled")-(a.cond==="soiled"))||(needs(b)-needs(a))||((el(b)||0)-(el(a)||0))||a.n-b.n;
+const avgR=l=>l.length?Math.round(l.reduce((a,b)=>a+b.secs,0)/l.length):0;
+const usage=()=>P.reduce((a,p)=>a+(p.sensor?p.avg:0),0);
+function counts(list){const c={dry:0,wet:0,soiled:0,na:0,over:0,issue:0,away:0,batt:0};list.forEach(p=>{if(p.away)c.away++;else if(unknown(p)&&!needs(p))c.issue++;else c[p.cond]++;if(over(p))c.over++;if(p.issue==="battery")c.batt++});c.red=c.wet+c.soiled;return c}
+const flagged=()=>P.filter(p=>p.sensor&&vinfo(p).flag).sort((a,b)=>Math.abs(variance(b))-Math.abs(variance(a)));
+
+let AC;function beep(strong){const on=S.app==="station"?S.sound:S.cgSnd;if(!on)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=strong?880:660;g.gain.setValueAtTime(.0001,AC.currentTime);g.gain.exponentialRampToValueAtTime(.16,AC.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+.35);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+.4)}catch(e){}}
+function toast(m,c,o={}){if(!o.force&&S.app==="care"&&!S.cgVis)return;const t=document.createElement("div");t.className="toast";t.innerHTML=`<i style="background:${c||"var(--brand)"}"></i><span>${m}</span>${o.undo?`<button data-undo="${o.undo}">Undo</button>`:""}`;$("toasts").appendChild(t);setTimeout(()=>t.remove(),o.undo?6000:4000);while($("toasts").children.length>3)$("toasts").firstChild.remove()}
+
+/* ---------- components ---------- */
+/* ---------- illustrated portraits (stand-ins for EHR / staff directory photos) ---------- */
+const FEM=new Set(["Emily","Olivia","Margaret","Dorothy","Helen","Ruth","Betty","Joan","Evelyn","Gloria","Lois","Shirley","Irene","Marjorie","Alice","Edna","Rose","Vera"]);
+const FEMN=new Set(["sarah","madison","claire","olivia","cn"]);
+const FACE_CACHE={};
+function hsh(t){let h=2166136261;for(const c of String(t))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
+function face(seed,kind,fem){const key=seed+kind+fem;if(FACE_CACHE[key])return FACE_CACHE[key];
+  if(kind==="staff"&&fem===undefined)fem=FEMN.has(seed);
+  const q=rng(hsh(seed+"·"+kind)),pk=a=>a[Math.floor(q()*a.length)];
+  const senior=kind==="res";
+  const skin=pk(["#f6d7bf","#eec4a3","#e0aa83","#c98d62","#a66b45","#7d4c30"]);
+  const shade=`color-mix(in srgb,${skin} 82%,#5a3220)`;
+  const hair=senior?pk(["#e9e6e1","#d6d2cb","#bdb7ae","#9e978d","#f2efe9"]):pk(["#2b211c","#3d2b20","#5a3b24","#8a5a33","#c7a26a","#1d1d1f","#6b3a2a"]);
+  const bg=pk(["#e7f6d8","#dff1ec","#e6ecfb","#f6ecdf","#efe6f7","#e3f2f7","#f3efe0"]);
+  const cloth=kind==="staff"?pk(["#2f8f83","#3b6fb6","#4f9a3c","#5b5fb0","#2c7a9c"]):pk(["#c9b8a6","#9fb4c7","#b7a3c6","#a9c2a3","#d2a9a0","#8fa3b8","#c7c0a1"]);
+  const glasses=senior?q()<.55:q()<.18;
+  const style=fem?(senior?pk(["curl","bob","bun"]):pk(["long","pony","bob","bun"])):(senior?pk(["thin","side","short"]):pk(["short","crop","wave"]));
+  let back="",front="";
+  if(style==="long"||style==="pony")back=`<path d="M17 31c0-12 6.5-19 15-19s15 7 15 19v${style==="long"?18:6}c-3 2-6 2-8 0H25c-2 2-5 2-8 0z" fill="${hair}"/>`;
+  if(style==="bob")back=`<path d="M18 33c-1-13 6-20 14-20s15 7 14 20c0 3-1 5-3 5l-1-9H22l-1 9c-2 0-3-2-3-5z" fill="${hair}"/>`;
+  if(style==="bun")back=`<circle cx="32" cy="11.5" r="5.2" fill="${hair}"/>`;
+  if(style==="curl")back=[[22,20],[27,15.5],[32,14],[37,15.5],[42,20],[20,26],[44,26]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="${hair}"/>`).join("");
+  if(style==="long"||style==="pony"||style==="bob")front=`<path d="M20 27c1-8 6-12.5 12-12.5S43 19 44 27c-3-3-6-4.5-9-7-2 3-9 5-15 7z" fill="${hair}"/>`;
+  if(style==="bun")front=`<path d="M20 28c0-9 5-14 12-14s12 5 12 14c-3-4-6-6-12-6s-9 2-12 6z" fill="${hair}"/>`;
+  if(style==="short"||style==="crop")front=`<path d="M20 27c0-9 5-14.5 12-14.5S44 18 44 27c-${style==="crop"?1:2}-4-5-6.5-12-6.5S22 23 20 27z" fill="${hair}"/>`;
+  if(style==="wave")front=`<path d="M19.5 28c-1-10 5-16 12.5-16s14 6 12.5 16c-2-5-4-6-6-6-2 2-4 1-6.5-1-2.5 2-5 3-7 1-2 0-4 2-5.5 6z" fill="${hair}"/>`;
+  if(style==="side")front=`<path d="M19.5 31c-1.5-5 0-9 2.5-10l1.4 8zM44.5 31c1.5-5 0-9-2.5-10l-1.4 8z" fill="${hair}"/><path d="M24 17.5c3-2 13-2 16 0" stroke="${hair}" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/>`;
+  if(style==="thin")front=`<path d="M20 28c0-9 5-14 12-14s12 5 12 14c-2-3-3-4-4-4-3-2-13-2-16 0-1 0-2 1-4 4z" fill="${hair}"/>`;
+  const brow=senior?"#9a9188":(hair==="#c7a26a"?"#8a6a3a":hair);
+  const collar=kind==="staff"?`<path d="M26 47l6 7 6-7" fill="none" stroke="rgb(0 0 0 / .22)" stroke-width="1.6" stroke-linejoin="round"/><rect x="38.5" y="52" width="6" height="4" rx="1" fill="#fff" opacity=".9"/>`:`<path d="M27 47.5c1.5 3 3 4.5 5 4.5s3.5-1.5 5-4.5" fill="none" stroke="rgb(255 255 255 / .55)" stroke-width="1.6"/><path d="M32 52v12" stroke="rgb(0 0 0 / .12)" stroke-width="1.4"/>`;
+  const svg=`<svg viewBox="10 9 44 46" width="100%" height="100%" aria-hidden="true" focusable="false"><rect width="64" height="64" fill="${bg}"/>${back}
+  <path d="M9 66c1-12 10-19 23-19s22 7 23 19z" fill="${cloth}"/>${collar}
+  <rect x="27.5" y="37" width="9" height="11" rx="4" fill="${shade}"/>
+  <circle cx="20" cy="30" r="2.7" fill="${shade}"/><circle cx="44" cy="30" r="2.7" fill="${shade}"/>
+  <ellipse cx="32" cy="28.5" rx="12" ry="13.8" fill="${skin}"/>${front}
+  <path d="M25.2 25.6c1.4-.9 3.2-.9 4.6 0M34.2 25.6c1.4-.9 3.2-.9 4.6 0" stroke="${brow}" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+  <circle cx="27.5" cy="29.4" r="1.35" fill="#2a2420"/><circle cx="36.5" cy="29.4" r="1.35" fill="#2a2420"/>
+  <circle cx="24.6" cy="33.6" r="2.2" fill="#e27d6b" opacity=".18"/><circle cx="39.4" cy="33.6" r="2.2" fill="#e27d6b" opacity=".18"/>
+  <path d="M32 30.5v3.2l-1.2.6" stroke="${shade}" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+  <path d="M28.6 36c2 1.8 4.8 1.8 6.8 0" stroke="#8b4a3c" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  ${senior?`<path d="M24.6 31.8c.8.5 1.6.6 2.4.4M37 32.2c.8.2 1.6.1 2.4-.4" stroke="${shade}" stroke-width=".8" fill="none" opacity=".8"/>`:""}
+  ${glasses?`<g fill="none" stroke="#4b4f56" stroke-width="1.1"><rect x="23.6" y="26.4" width="7.6" height="6" rx="2.6"/><rect x="32.8" y="26.4" width="7.6" height="6" rx="2.6"/><path d="M31.2 28.8h1.6M23.6 28.6l-3.3-.8M40.4 28.6l3.3-.8"/></g>`:""}
+  </svg>`;
+  return FACE_CACHE[key]=svg}
+/* initials instead of portraits */
+const INI_SVG=(t,res)=>`<svg viewBox="0 0 64 64" role="img" aria-label="${t}"><circle cx="32" cy="32" r="32" style="fill:${res?"var(--surface-2)":"var(--brand-soft)"}"/><text x="32" y="33.5" text-anchor="middle" dominant-baseline="central" style="fill:${res?"var(--ink)":"var(--brand-ink)"};font:600 23px var(--f);letter-spacing:.02em">${t}</text></svg>`;
+const resFace=p=>S.priv&&S.app==="station"?INI_SVG("··",1):INI_SVG((p.first[0]+p.last[0]).toUpperCase(),1);
+const iniOf=k=>{const n=NURSES.find(x=>x.id===k);return n?n.ini:k==="charge"?"CN":String(k).slice(0,2).toUpperCase()};
+face=(seed,kind)=>INI_SVG(kind==="res"?String(seed).slice(0,2).toUpperCase():iniOf(seed),kind==="res");
+avSVG=k=>INI_SVG(iniOf(k),0);
+document.querySelectorAll("[data-av]").forEach(el=>el.innerHTML=avSVG(el.dataset.av));
+
+function bedCard(p,showNurse){const k=stKey(p);let right="";
+  if(needs(p))right=`${p.ack?`<span class="ackm" title="Caregiver on the way">${ic("ack",12)}</span>`:""}<span class="t num" data-el="${p.id}">${fmt(el(p))}</span>`;
+  const word=p.away?p.away:needs(p)?"":unknown(p)?(p.issue==="signal"?"Signal lost":"Not paired"):p.cond==="dry"?"Dry":"No sensor";
+  const badge=p.issue==="battery"?`<span class="badge" title="Low battery">${ic("battery",14)}</span>`:p.pend&&!needs(p)&&!unknown(p)?`<span class="badge nb" title="Care note due">${ic("note",13)}</span>`:"";
+  return `<button class="bed ${p.away?"away":unknown(p)&&!needs(p)?"issue":p.cond} ${over(p)?"over":""}" data-id="${p.id}" aria-label="Bed ${p.bed}, ${esc(nm(p))}, ${stWord(p)}${needs(p)?`, waiting ${fmt(el(p))}`:""}${p.ack&&needs(p)?", caregiver on the way":""}${p.issue==="battery"?", low battery":""}${p.pend&&!needs(p)?", care note due":""}"><span class="r1"><span class="bno">${p.bed}</span></span><span class="bname">${esc(nmS(p))}</span><span class="bst">${ic(k,13)}${word}${right}${badge}</span></button>`}
+function bars(data,h=110,labelEvery=0,W=320){const w=W,pad=24,max=Math.max(...data)*1.15||1,bw=(w-pad)/data.length,t=[0,Math.round(max/2),Math.round(max)];
+  return `<svg viewBox="0 0 ${w} ${h+18}" width="100%" role="img" aria-label="Changes per day">${t.map(v=>{const y=h-v/max*h+2;return `<line x1="${pad}" x2="${w}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-dasharray="2 3"/><text x="${pad-5}" y="${y+3}" text-anchor="end" font-size="9">${v}</text>`}).join("")}${data.map((v,i)=>`<rect x="${pad+i*bw+1.5}" y="${h-v/max*h+2}" width="${Math.max(1,bw-3)}" height="${v/max*h}" rx="2" fill="${i===data.length-1?"var(--brand-2)":"color-mix(in srgb,var(--brand) 38%,var(--surface-2))"}"/>`).join("")}<text x="${pad}" y="${h+16}" font-size="9">${data.length} days ago</text><text x="${w}" y="${h+16}" text-anchor="end" font-size="9">Today</text></svg>`}
+function queueRows(list){
+  if(!list.length)return `<div class="empty"><b>Every monitored bed is dry</b>New alerts appear here, most urgent first.</div>`;
+  return list.map(p=>`<div class="q ${over(p)?"over":""}"><div class="qb">${p.bed}</div>
+    <button class="qn" data-open="${p.id}">${esc(nm(p))}</button><div class="qt num" data-el="${p.id}">${fmt(el(p))}</div>
+    <div class="qs"><span class="st">${ic(stKey(p),12)}${stWord(p)}</span><span>· ${NB[p.nurse].name.split(" ")[0]}</span></div>
+    <button class="btn sm pri" data-done="${p.id}">Changed</button></div>`).join("")}
+function table(list,o){
+  if(!list.length)return `<div class="empty"><b>No residents match</b>Try a different name or bed number.</div>`;
+  return `<div class="tw"><table><thead><tr><th>Resident</th><th>Bed</th><th>Status</th><th>Waiting</th><th>Priority</th>${o.nurse?"<th>Caregiver</th>":""}<th>Last change</th>${o.variance?"<th>Changes / day</th>":""}<th><span class="sr">Action</span></th></tr></thead><tbody>
+  ${list.map(p=>{const v=variance(p),f=vinfo(p).flag;return `<tr class="rl" data-open="${p.id}"><td><div class="pn">${esc(nm(p))}</div><div class="pm">${p.mrn}</div></td><td class="num">${p.bed}</td>
+  <td>${statusPill(p)}${p.ack&&needs(p)?' <span class="ackline" style="display:inline-flex">On the way</span>':""}${p.pend?' <button class="btn sm" data-docnote="'+p.id+'">Add note</button>':""}</td><td class="num" ${needs(p)?`data-el="${p.id}"`:""} style="${over(p)?"color:var(--red);font-weight:700":""}">${needs(p)?fmt(el(p)):"—"}</td><td>${priPill(p)}</td>
+  ${o.nurse?`<td>${NB[p.nurse].name.split(" ")[0]}</td>`:""}<td>${p.sensor?ago(p.lastChange):"—"}</td>
+  ${o.variance?`<td class="num">${p.sensor?`${p.avg} <span style="color:var(--faint)">/ ${p.exp} expected</span>${f?` <span class="${v<0?"dn":"up"}" style="${v>0?"color:var(--amber)":""}">${v>0?"+":""}${Math.round(v*100)}%</span>`:""}`:"—"}</td>`:""}
+  <td>${needs(p)?`<button class="btn sm pri" data-done="${p.id}">Changed</button>`:""}</td></tr>`}).join("")}</tbody></table></div>`}
+function lbRows(period){const days={day:1,week:7,month:30,quarter:91,year:365}[period];
+  return NURSES.map((n,i)=>{const live=S.log.filter(x=>x.nurse===n.id);let count,avg,ok;
+    if(period==="day"){count=live.length;avg=avgR(live);ok=live.filter(x=>x.secs<S.thr*60).length}
+    else{const d=1+((i*7+days)%5-2)*.04;count=Math.round(PER_DAY[n.id]*days*d)+live.length;avg=Math.round(BASE[n.id]*d);ok=Math.round(count*Math.max(.45,Math.min(.98,1-(avg-140)/650)))}
+    return{n,count,avg,ok,over:count-ok}}).sort((a,b)=>a.avg-b.avg)}
+function coach(r,rows){const i=rows.indexOf(r),ua=rows.reduce((a,x)=>a+x.avg,0)/rows.length,pct=r.count?r.ok/r.count:1,gap=r.avg-rows[0].avg;
+  if(i===0)return{t:"Fastest on the unit",d:"Pair them with a slower teammate so others can learn their rounding routine.",good:1};
+  if(pct<.75)return{t:`${Math.round((1-pct)*100)}% of changes were late`,d:`Tap On my way as soon as an alert arrives and clear the oldest alert first. Reaching 85% on time would avoid about ${Math.max(1,Math.round(r.count*(.85-pct))).toLocaleString()} overdue changes.`};
+  if(r.avg>ua*1.1)return{t:`${msec(r.avg-ua)} slower than the unit average`,d:"Check the bed assignment. Beds spread far apart add walking time, so a tighter block of rooms may help."};
+  return{t:`${msec(gap)} behind the fastest`,d:`Mostly on time. Answering soiled alerts first would bring the remaining ${r.over.toLocaleString()} overdue down.`}}
+function lbTable(period){const rows=lbRows(period),best=rows[0].avg;
+  return `<div class="lbrow h"><span>#</span><span>Caregiver</span><span>Avg response</span><span>Handled</span><span>On time</span><span>Overdue</span><span>How to improve</span></div>`+rows.map((r,i)=>`<div class="lbrow ${r.n.me&&S.app==="care"?"me":""}"><span class="rank ${i===0?"r1":""}">${i+1}</span><span class="lbname">${avatar(r.n.id)}${r.n.name}${r.n.me&&S.app==="care"?' <span class="you">You</span>':""}</span><span class="num" style="font-weight:600">${msec(r.avg)}</span><span class="num">${r.count.toLocaleString()}</span><span class="num">${r.ok.toLocaleString()}</span><span class="num" style="color:${r.over?"var(--red)":"inherit"}">${r.over.toLocaleString()}</span>${(c=>`<span class="lbtip ${c.good?"good":""}"><b>${c.t}</b><span>${c.d}</span></span>`)(coach(r,rows))}</div>`).join("")}
+const PERIODS=[["day","Today"],["week","Week"],["month","Month"],["quarter","Quarter"],["year","Year"]];
+const segHTML=(cur,attr,opts=PERIODS)=>opts.map(([k,l])=>`<button ${attr}="${k}" aria-pressed="${cur===k}">${l}</button>`).join("");
+
+/* ---------- STATION ---------- */
+function crewHTML(){return NURSES.slice(0,5).map(n=>{const mineP=P.filter(p=>p.nurse===n.id),w=mineP.filter(needs),ov=w.filter(over).length,old=w.length?Math.max(...w.map(el)):null,today=avgR(S.log.filter(x=>x.nurse===n.id)),beds=mineP.map(p=>p.n);
+      return `<button class="crew ${S.nurseF===n.id?"on":""}" data-nurse="${n.id}" aria-pressed="${S.nurseF===n.id}">${avatar(n.id)}<span class="cn"><b>${n.name}</b><span>Beds ${String(Math.min(...beds)).padStart(2,"0")}–${String(Math.max(...beds)).padStart(2,"0")} · avg ${short(today)} today</span></span>
+      <span class="cw">${w.length?`<b class="${ov?"r":""}">${w.length} waiting</b><span class="num">${ov?`${ov} overdue · `:""}oldest <span data-oldest="${n.id}">${fmt(old)}</span></span>`:`<b class="ok">${ic("dry",12)} All dry</b>`}</span></button>`}).join("")}
+function renderStation(){
+  const c=counts(P),fl=flagged();
+  $("stCount").hidden=!c.over;$("stCount").textContent=c.over;
+  $("trCount").hidden=!fl.length;$("trCount").textContent=fl.length;
+  if(S.stTab==="live"){
+    const CARDS=[["all","All residents",P.length,"all","Every bed on the unit"],["needs","Needs change",c.red,"wet","Wet or soiled, waiting for a change"],["over",`Overdue (>${S.thr} min)`,c.over,"over","Waiting longer than the overdue threshold"],["dry","Dry",c.dry,"dry","Monitored beds with a dry liner"]];
+    $("tiles").innerHTML=CARDS.map(([k,l,n,icn,tipT])=>`<button class="scard c-${k} ${n?"hot":""}" data-filter="${k}" aria-pressed="${S.filter===k}"><span class="top"><span><span class="lbl">${l} <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="${tipT}"><title>${tipT}</title><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></span><span class="n num" style="display:block">${n}</span></span><span class="ico">${ic(icn,28)}</span></span><span class="sub">${{all:`${P.length-c.na} monitored · updated <span data-upd>${updTxt()}</span>`,needs:`${c.soiled} soiled · ${c.wet} wet`,over:n?"Change these first":"None right now",dry:`${Math.round(c.dry/Math.max(1,P.length-c.na)*100)}% of monitored beds`}[k]}</span></button>`).join("");
+    $("stStatus").value=S.filter;
+    $("stCrew").innerHTML=crewHTML();
+    {const iss=P.filter(p=>p.issue&&!needs(p)).sort((a,b)=>(unknown(b)-unknown(a))||a.n-b.n);$("sensN").hidden=!iss.length;$("sensN").textContent=iss.length;
+     $("stSens").innerHTML=iss.length?`<div class="isl" style="border:0;border-radius:0">${iss.map(sensRow).join("")}</div>`:`<div class="empty" style="padding:18px"><b>All liners reporting</b>Sensor problems will show up here.</div>`;}
+    const fx={all:()=>true,needs:needs,over:over,dry:p=>p.cond==="dry"&&!unknown(p)&&!p.away,na:p=>p.cond==="na",issue:p=>!!p.issue,away:p=>!!p.away}[S.filter]||(()=>true);
+    const list=P.filter(p=>match(p,S.stQ)&&fx(p)&&(!S.nurseF||p.nurse===S.nurseF));
+    const fName={all:"beds",needs:"beds that need a change",over:"overdue beds",dry:"dry beds",na:"beds without a sensor",issue:"beds with a sensor issue",away:"residents away"}[S.filter]||"beds";
+    const filtered=S.filter!=="all"||S.stQ||S.nurseF;$("stCnt").innerHTML=`${list.length} resident${list.length===1?"":"s"}`;$("clearF").hidden=!filtered;$("stNurse").value=S.nurseF||"";
+    void (filtered?`Showing <b>${list.length}</b> ${fName}${S.nurseF?` for ${NB[S.nurseF].name}`:""}${S.stQ?` matching “${esc(S.stQ)}”`:""} `:"");
+    if(S.stView==="list")$("stBoard").innerHTML=table(list.slice().sort(S.stSort==="pri"?urg:(a,b)=>a.n-b.n),{nurse:1});
+    else if(!list.length)$("stBoard").innerHTML=`<div class="empty"><b>Nothing here right now</b>No beds match this filter.</div>`;
+    else if(S.stSort==="pri")$("stBoard").innerHTML=`<div class="board"><div class="beds">${list.slice().sort(urg).map(p=>bedCard(p,1)).join("")}</div></div>`;
+    else{const w=[["East wing","Beds 01–35",list.filter(p=>p.n<=35)],["West wing","Beds 36–70",list.filter(p=>p.n>35)]];
+      $("stBoard").innerHTML=`<div class="board">${w.filter(x=>x[2].length).map(([k,r,a])=>{const cc=counts(a);return `<div class="wing"><h3>${k} <span class="wc">${r}</span><span class="ln"></span></h3><div class="beds">${a.map(p=>bedCard(p,1)).join("")}</div></div>`}).join("")}</div>`}
+    }
+  if(S.stTab==="leader"){
+    $("stCrew2").innerHTML=crewHTML();
+  }
+  if(S.stTab==="residents"){const list=P.filter(p=>match(p,S.stQ2)).sort((a,b)=>a.n-b.n);$("ptMeta").textContent=`${list.length} of ${P.length} residents`;$("stPts").innerHTML=table(list,{nurse:1,variance:1})}
+  if(S.stTab==="trends")renderTrends(fl);
+  if(S.stTab==="inventory")renderInv();
+  if(S.stTab==="leader"){$("lbThr").textContent=S.thr;$("stLbSeg").innerHTML=segHTML(S.stLbP,"data-slb");$("stLb").innerHTML=lbTable(S.stLbP)}
+}
+function trRow(p){const v=variance(p);return `<button class="tr" data-open="${p.id}"><span class="tb num">${p.bed}</span><span class="ti"><b>${esc(nm(p))}</b><span>${vinfo(p).head} · ${p.avg}/day vs ${p.exp} expected</span></span><span class="pill ${v<0?"high":"medium"}">${v>0?"+":""}${Math.round(v*100)}%</span></button>`}
+function renderTrends(fl){
+  $("trSeg").innerHTML=segHTML(S.trP,"data-trp",[["week","2 weeks"],["month","Month"]]);
+  const days=S.trP==="week"?14:30;const h=[];for(let i=0;i<days;i++){const k=i-(days-14);h.push(P.reduce((a,p)=>a+(p.sensor?(k>=0?p.hist[k]:Math.max(0,Math.round(p.avg+((p.n*7+i)%5-2)*.5))):0),0))}
+  const avg=Math.round(h.slice(-8,-1).reduce((a,b)=>a+b,0)/7),prev=Math.round(h.slice(-14,-7).reduce((a,b)=>a+b,0)/7),d=avg-prev;
+  $("trVol").innerHTML=`<div class="kpis"><div class="kpi"><span>Average per day</span><b class="num">${avg}</b> <span class="${d>=0?"up":"dn"}" style="display:inline">${d>=0?"▲":"▼"}${Math.abs(d)} vs last week</span></div><div class="kpi"><span>Normal range</span><b class="num">${Math.round(prev*.95)}–${Math.round(prev*1.05)}</b></div><div class="kpi"><span>Per resident</span><b class="num">${(avg/P.filter(p=>p.sensor).length).toFixed(1)}</b></div></div>
+    ${bars(h,150,0,720)}
+    <div>${[["Past 24 hours",h[h.length-1]],["Week",h.slice(-7).reduce((a,b)=>a+b,0)],["Month",avg*30],["Quarter",avg*91],["Year",avg*365],["12-month rolling",avg*365]].map(([k,v])=>`<div class="kv"><span>${k}</span><b class="num">${v.toLocaleString()} changes</b></div>`).join("")}</div>
+    <div class="clin"><h4>What this means</h4><p>${Math.abs(d)/prev<.05?"Unit change volume is steady week over week, which is consistent with routine care.":d>0?"Change volume is rising. Check the variance alerts for residents changing more often than usual.":"Change volume is falling. Check the variance alerts for residents with low output."}</p></div>`;
+  $("trList").innerHTML=fl.length?fl.map(trRow).join(""):`<div class="empty"><b>No variance alerts</b></div>`;
+}
+function renderInv(){const use=usage(),below=S.par-S.onHand,pct=Math.min(100,S.onHand/S.par*100),days=S.onHand/use,safe=use*2,order=below>0?Math.ceil((below+safe)/S.cs)*S.cs:0;
+  $("invMain").innerHTML=`<div class="kpis"><div class="kpi"><span>On hand</span><b class="num">${S.onHand.toLocaleString()}</b></div><div class="kpi"><span>Days of supply</span><b class="num" style="color:${days<2?"var(--red)":"inherit"}">${days.toFixed(1)}</b></div><div class="kpi"><span>Avg daily usage</span><b class="num">${use}</b></div></div>
+    <div><div class="bar ${pct<50?"crit":""}"><i style="width:${pct}%"></i></div><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-top:6px"><span style="color:var(--muted)">${Math.round(pct)}% of monthly par (${S.par.toLocaleString()})</span>${below>0?`<span class="dn">${below.toLocaleString()} below par</span>`:`<span class="up">At par</span>`}</div></div>
+    <div><div class="kv"><span>Safety buffer</span><b>2 days (${safe} units)</b></div><div class="kv"><span>Last restocked</span><b>${ago(S.restock)}</b></div><div class="kv"><span>Units per case</span><b class="num">${S.cs}</b></div></div>`;
+  {const dU=[];for(let i=0;i<14;i++)dU.push(P.reduce((a,p)=>a+(p.sensor?p.hist[i]:0),0));$("invUse").innerHTML=bars(dU,150,0,1100)+`<div class="kpis"><div class="kpi"><span>Used past 7 days</span><b class="num">${dU.slice(-7).reduce((a,b)=>a+b,0).toLocaleString()}</b></div><div class="kpi"><span>Projected this month</span><b class="num">${(use*30).toLocaleString()}</b></div><div class="kpi"><span>Par covers</span><b class="num">${(S.par/use).toFixed(1)} days</b></div></div>`}
+  $("invOrder").innerHTML=order?`<div class="insight"><h4>Order now</h4><p style="font-size:15px"><b class="num">${order.toLocaleString()}</b> liners · ${order/S.cs} cases</p><p style="margin-top:4px">Brings stock back to par with a 2-day safety buffer at current usage.</p></div><button class="btn pri" id="restockBtn" data-q="${order}">Mark ${order.toLocaleString()} as received</button>`:`<div class="clin"><h4>No order needed</h4><p>Stock is at or above par.</p></div>`}
+
+/* ---------- CAREGIVER ---------- */
+const mine=()=>P.filter(p=>p.nurse==="sarah");
+function renderCare(){
+  const my=mine(),c=counts(my),pending=my.filter(needs).sort(urg),active=pending.filter(p=>!(S.snooze[p.id]>now()));
+  $("cgCount").hidden=!pending.length;$("cgCount").textContent=pending.length;
+  $("cgTitle").textContent={todo:"To do",beds:"My beds",perf:"Ranking",settings:"Settings"}[S.cgTab];
+  const sumHTML=`${c.over?`<span class="chipstat over">${ic("over",14)}${c.over} overdue</span>`:""}<span class="chipstat ${c.red?"red":""}">${ic("wet",14)}${c.red} need changing</span><span class="chipstat dry">${ic("dry",14)}${c.dry} dry</span>`;
+  if(S.cgTab==="todo"){
+    $("cgSummary").innerHTML=sumHTML;
+    $("cgTasks").innerHTML=pending.length?pending.map(p=>{const sn=S.snooze[p.id]>now();return `<div class="task ${over(p)?"over":""}" style="${sn?"opacity:.6":""}">
+      <div class="h" data-open="${p.id}" style="cursor:pointer"><span class="bn num">${p.bed}</span><div class="who"><b>${esc(nm(p))}</b><span>${ic(stKey(p),13)}${stWord(p)}${sn?" · reminder set":""}</span></div><div class="tm"><b class="num" data-el="${p.id}">${fmt(el(p))}</b><span>waiting</span></div></div>
+      <div class="acts"><button class="btn pri lg" data-done="${p.id}">${ic("dry",18)} Changed</button><button class="btn lg" data-snooze="${p.id}" ${sn?"disabled":""}>Remind me in 2 min</button></div>
+</div>`}).join(""):`<div class="panel empty" style="grid-column:1/-1;padding:40px"><b style="font-size:18px">You're all caught up</b>All ${c.dry} monitored patients are dry. New alerts will appear here.</div>`;
+    const rows=lbRows("week"),ri=rows.findIndex(r=>r.n.me),me=rows[ri],today=S.log.filter(x=>x.nurse==="sarah");
+    $("cgShift").innerHTML=`<div class="kpis" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="kpi"><span>Changes today</span><b class="num">${today.length}</b></div><div class="kpi"><span>Avg response</span><b class="num">${short(avgR(today))}</b></div></div>
+      <div class="kv"><span>On time today</span><b class="num">${today.filter(x=>x.secs<S.thr*60).length} of ${today.length}</b></div>
+      <div class="kv"><span>Rank this week</span><b class="num">#${ri+1} of ${rows.length}</b></div>
+      <div class="kv"><span>Week average</span><b class="num">${msec(me.avg)}</b></div>`;
+  }
+  if(S.cgTab==="beds"){$("cgBedsSum").innerHTML=sumHTML;$("cgOBed").setAttribute("aria-pressed",S.cgOrder==="bed");$("cgOPri").setAttribute("aria-pressed",S.cgOrder==="pri");
+    $("cgGrid").innerHTML=my.slice().sort(S.cgOrder==="pri"?urg:(a,b)=>a.n-b.n).map(p=>bedCard(p,0)).join("")}
+  if(S.cgTab==="perf"){
+    $("cgLbSeg").innerHTML=segHTML(S.cgLbP,"data-clb",[["week","This week"],["month","This month"],["year","This year"]]);$("cgLb").innerHTML=lbTable(S.cgLbP);
+    const rows=lbRows(S.cgLbP),ri=rows.findIndex(r=>r.n.me),me=rows[ri],stars=Math.max(1,5-Math.floor(ri/1.5)),word={week:"week",month:"month",year:"year"}[S.cgLbP];
+    $("cgRank").innerHTML=`<div style="display:flex;align-items:center;gap:12px">${avatar("sarah","av","width:52px;height:52px")}<div><div style="font-weight:700;font-size:16px">Sarah James</div><div class="stars" aria-label="${stars} of 5 stars">${"★".repeat(stars)}<i>${"★".repeat(5-stars)}</i></div></div>
+      <div style="margin-left:auto;text-align:right"><div class="big num">#${ri+1}</div><div style="font-size:12px;color:var(--muted)">of ${rows.length} caregivers</div></div></div>
+      <div style="font-weight:700">${ri<3?`You're in the top 3 this ${word}.`:`${msec(me.avg-rows[ri-1].avg)} behind #${ri} this ${word}.`}</div>
+      <div><div class="kv"><span>Average response time</span><b class="num">${msec(me.avg)}</b></div><div class="kv"><span>Responses handled</span><b class="num">${me.count.toLocaleString()}</b></div><div class="kv"><span>On time (under ${S.thr} min)</span><b class="num">${me.ok.toLocaleString()}</b></div><div class="kv"><span>Overdue</span><b class="num" style="color:${me.over?"var(--red)":"inherit"}">${me.over.toLocaleString()}</b></div></div>
+      <span class="up">▲ 12% faster than last ${word}</span>`;
+  }
+}
+
+/* ---------- drawer ---------- */
+let lastFocus=null;
+function openD(id,tab){lastFocus=document.activeElement;if(S.sel!==id){S.noteTags=[];S.noteDraft=""}S.sel=id;S.selC=null;S.rpTab=tab||"overview";renderD();$("drawer").hidden=false;$("drawer").scrollTop=0;hideTip();$("dClose").focus()}
+function closeD(){S.sel=null;S.selC=null;$("drawer").hidden=true;try{lastFocus&&lastFocus.focus()}catch(e){}}
+function initials(p){return S.priv&&S.app==="station"?"··":(p.first[0]+p.last[0])}
+function stepState(p){
+  if(needs(p))return p.ack?2:1;
+  if(p.pend)return 3;
+  return 4}
+function renderD(){const p=P.find(x=>x.id===S.sel);if(!p)return;{const ta=$("noteTxt");if(ta)S.noteDraft=ta.value;}const v=vinfo(p),wk=p.hist.slice(-7).reduce((a,b)=>a+b,0),ar=avgR(p.resp);
+  const tab=S.rpTab||"overview",st=stepState(p),urgent=over(p);
+  const pill=statusPill(p)+(p.issue==="battery"?`<span class="pill batt">${ic("battery",12)} Low battery</span>`:"");
+  const acts=(unknown(p)&&!needs(p)?`<button class="btn pri lg" data-pair="${p.id}">${ic("nfc",18)} Pair liner</button>`:"")+(!needs(p)&&p.sensor?`<button class="btn lg" data-away="${p.id}">${ic("away",16)} ${p.away?"Mark returned":"Mark away"}</button>`:"")+(needs(p)?`${p.ack?"":`<button class="btn lg" data-ack="${p.id}">On my way</button>`}<button class="btn pri lg" data-done="${p.id}">${ic("dry",18)} Mark as changed</button>`:p.pend?`<button class="btn pri lg" data-rptab="notes">Add care note</button>`:"");
+  const lastResp=p.resp[0];
+  const S1=needs(p)?`${fmt(el(p))} ago`:lastResp?new Date(lastResp.t-lastResp.secs*1000).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}):"—";
+  const S2=p.ack?`${NB[p.ack.by].name.split(" ")[0]} · ${short((now()-p.ack.t)/1000)} ago`:needs(p)?"Waiting":lastResp?"Done":"—";
+  const S3=needs(p)?(p.ack?"Next step":"Pending"):lastResp?`${msec(lastResp.secs)} · ${p.issue==="unpaired"?"liner not paired":"liner paired"}`:"—";
+  const S4=st===4?(p.notes[0]?"Note saved":"Done"):st===3?"Add a care note":"Pending";
+  const cls=i=>i<st?"done":i===st?`cur ${urgent?"urgent":""}`:"";
+  const steps=[["Alert",S1],["Acknowledged",S2],["Changed",S3],["Documented",S4]];
+  const cycle=!p.sensor?"":`<div class="panel cyc"><div class="cyc-h"><h3>Current care cycle</h3><span>${needs(p)?(urgent?`Overdue · over ${S.thr} min`:"In progress"):p.pend?"Waiting for documentation":"Complete"}</span></div>
+    <div class="steps"><span class="bar" style="width:${Math.min(3,st)*25}%"></span>${steps.map(([l,sub],i)=>`<div class="step ${cls(i)}"><span class="c">${i<st?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>':i+1}</span><b>${l}</b><small>${sub}</small></div>`).join("")}</div>
+    ${st===4&&lastResp?`<div class="cyc-ok"><span class="ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div><b>Care cycle complete</b><span>Changed ${ago(p.lastChange)} by ${NB[lastResp.nurse].name} in ${msec(lastResp.secs)}</span></div></div>`:""}
+    ${st===3?`<div class="pend">${ic("wet",14)} Changed ${ago(p.lastChange)}. Add a care note to finish this cycle.<button class="btn sm" data-rptab="notes">Add note</button></div>`:""}</div>`;
+  const T=[["overview","Overview"],["history","Change history"],["trends","Voiding trends"],["notes",`Care notes${p.pend?' <span class="count">1</span>':""}`]];
+  let body="";
+  if(tab==="overview"){
+    body=`<div class="two">
+      <div class="panel pb"><h3 style="margin:0;font-size:14.5px;font-weight:600">Voiding variance</h3>${p.sensor?`
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span class="big num" style="color:${v.flag?(v.v<0?"var(--red)":"var(--amber)"):"var(--ink)"}">${v.v>0?"+":""}${Math.round(v.v*100)}%</span><span style="color:var(--muted)">${v.v<0?"below":"above"} expected · ${p.avg}/day vs ${p.exp}/day</span></div>
+        <div class="${v.flag?"alertbox":"clin"}"><h4>${v.head}${v.flag?` · ${v.sev} severity`:""}</h4><p>${v.text}</p></div>
+        <button class="linkbtn" data-rptab="trends" style="align-self:flex-start">See voiding trends →</button>`:`<div class="clin"><h4>No HealthWink liner</h4><p>This resident is on manual checks. Fit a sensor liner to include them in alerts and trending.</p></div>`}</div>
+      <div class="panel pb"><h3 style="margin:0;font-size:14.5px;font-weight:600">Recent changes</h3><div class="reslist">${p.resp.slice(0,4).map(r=>`<div><span>${new Date(r.t).toLocaleString(undefined,{weekday:"short",hour:"numeric",minute:"2-digit"})} · ${NB[r.nurse].name.split(" ")[0]}</span><b class="num" style="color:${r.secs>=S.thr*60?"var(--red)":"inherit"}">${msec(r.secs)}</b></div>`).join("")||"<div><span>No changes yet</span></div>"}</div>
+        <button class="linkbtn" data-rptab="history" style="align-self:flex-start">Full change history →</button>
+        ${p.notes[0]?`<div class="nitem" style="border-top:1px solid var(--line);padding-top:12px"><div class="h"><b>Latest note</b> · ${NB[p.notes[0].by].name.split(" ")[0]} · ${ago(p.notes[0].t)}</div><p>${esc(p.notes[0].text)}</p></div>`:""}</div></div>`;
+  } else if(tab==="history"){
+    body=`<div class="panel"><div class="tw"><table><thead><tr><th>Changed</th><th>Caregiver</th><th>Response time</th><th>Result</th></tr></thead><tbody>${p.resp.map(r=>`<tr><td>${new Date(r.t).toLocaleString(undefined,{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${NB[r.nurse].name}</td><td class="num">${msec(r.secs)}</td><td>${r.secs>=S.thr*60?'<span class="pill high">Overdue</span>':'<span class="pill low">On time</span>'}</td></tr>`).join("")||'<tr><td colspan="4">No changes recorded yet.</td></tr>'}</tbody></table></div></div>`;
+  } else if(tab==="trends"){
+    body=p.sensor?`<div class="two"><div class="panel pb"><div style="display:flex;justify-content:space-between;gap:10px"><div><div class="biglab">Average per day</div><div class="big num">${p.avg}</div></div><div style="text-align:right"><div class="biglab">Normal range</div><div style="font-weight:600;margin-top:6px" class="num">${Math.max(1,p.exp-1)}–${p.exp+1} / day</div></div></div>${bars(p.hist,120)}
+      <div class="${v.flag?"alertbox":"clin"}"><h4>${v.flag?"Trending alert":"What this means"}</h4><p>${v.flag?`${Math.abs(Math.round(v.v*100))}% ${v.v<0?"below":"above"} this resident's expected ${p.exp} changes a day. ${v.text}`:"Daily changes are inside this resident's normal range."}</p></div></div>
+      <div class="panel pb"><h3 style="margin:0;font-size:14.5px;font-weight:600">Historical trend</h3><div>${[["Past 24 hours",p.hist[13]],["Week",wk],["Month",p.avg*30],["Quarter",p.avg*91],["Year",p.avg*365],["12-month rolling",p.avg*365]].map(([k,x])=>`<div class="kv"><span>${k}</span><b class="num">${x.toLocaleString()} changes</b></div>`).join("")}</div><p style="margin:0;font-size:11.5px;color:var(--faint)">Decision support only. Confirm with a clinical assessment.</p></div></div>`:`<div class="panel pb"><div class="clin"><h4>No sensor data</h4><p>Trends appear once a HealthWink liner is fitted.</p></div></div>`;
+  } else {
+    const chips=["Skin intact","Redness noted","Barrier cream applied","Repositioned","Two-person assist","Resident refused"];
+    S.noteTags=S.noteTags||[];
+    body=`<div class="two"><div class="panel pb notef"><h3 style="margin:0;font-size:14.5px;font-weight:600">${p.pend?"Document this change":"Add a care note"}</h3>
+      <div class="qchips">${chips.map(c=>`<button class="qchip" data-chip="${c}" aria-pressed="${S.noteTags.includes(c)}">${c}</button>`).join("")}</div>
+      <label for="noteTxt" class="sr">Note</label><textarea id="noteTxt" placeholder="Anything the next caregiver should know">${esc(S.noteDraft||"")}</textarea>
+      <button class="btn pri" data-savenote="${p.id}">Save note${p.pend?" and finish cycle":""}</button></div>
+      <div class="panel pb"><h3 style="margin:0;font-size:14.5px;font-weight:600">Notes</h3><div class="nlist">${p.notes.map(n=>`<div class="nitem"><div class="h"><b>${NB[n.by].name}</b>· ${ago(n.t)}</div>${n.tags.length?`<div class="tg">${n.tags.map(t=>`<span class="pill na">${esc(t)}</span>`).join("")}</div>`:""}${n.text?`<p>${esc(n.text)}</p>`:""}</div>`).join("")||'<div class="nitem"><p style="color:var(--muted)">No notes yet.</p></div>'}</div></div></div>`;
+  }
+  $("drawer").innerHTML=`<div class="rp">
+    <div class="rp-bar"><b>Resident details</b><span class="rpk">Esc to close</span><button class="x" id="dClose" aria-label="Close resident details">${XSVG}</button></div>
+    <div class="panel rp-head">
+      <div class="rp-who"><div class="pav ${S.priv&&S.app==="station"?"grad":"pic"}">${S.priv&&S.app==="station"?"··":resFace(p)}</div><div class="t"><h2>${esc(nm(p))}</h2><div class="m num">Bed ${p.bed} · ${p.mrn} · ${p.n<=35?"East":"West"} wing${p.sensor?` · Liner ${unknown(p)&&!needs(p)?"not paired":p.liner}`:""}</div><div class="tags">${pill}${needs(p)?`<span class="pill na num" data-el="${p.id}">${fmt(el(p))}</span>`:""}${p.ack&&needs(p)?`<span class="ackline">${ic("dry",13)} ${NB[p.ack.by].name.split(" ")[0]} is on the way</span>`:""}</div></div><div class="rp-act">${acts}</div></div>
+      <div class="rtiles">
+        <div class="rti"><small>Assigned caregiver</small>${S.app==="station"?`<select id="reassign" aria-label="Assigned caregiver">${NURSES.slice(0,5).map(n=>`<option value="${n.id}" ${n.id===p.nurse?"selected":""}>${n.name}</option>`).join("")}</select>`:`<b>${NB[p.nurse].name}</b>`}</div>
+        <div class="rti"><small>Last changed</small><b>${p.sensor?ago(p.lastChange):"—"}</b></div>
+        <div class="rti"><small>Avg time to change</small><b class="num">${ar?msec(ar):"—"}</b></div>
+        <div class="rti"><small>Changes today</small><b class="num">${p.sensor?p.hist[13]:"—"}</b></div>
+      </div>
+    </div>
+    ${cycle}
+    <div class="rtabs" role="tablist" aria-label="Resident sections">${T.map(([k,l])=>`<button role="tab" data-rptab="${k}" aria-selected="${tab===k}">${l}</button>`).join("")}</div>
+    ${body}
+  </div>`}
+
+function openC(id){lastFocus=document.activeElement;S.sel=null;S.selC=id;renderC();$("drawer").hidden=false;$("drawer").scrollTop=0;hideTip();$("dClose").focus()}
+function renderC(){const id=S.selC,n=NB[id];if(!n)return;
+  const mineP=P.filter(p=>p.nurse===id).sort((a,b)=>a.n-b.n),w=mineP.filter(needs).sort(urg),ov=w.filter(over).length,today=S.log.filter(x=>x.nurse===id),rows=lbRows("week"),ri=rows.findIndex(r=>r.n.id===id),me=rows[ri],iss=mineP.filter(p=>p.issue&&!needs(p)),pend=mineP.filter(p=>p.pend&&!needs(p)),bn=mineP.map(p=>p.n),on=S.nurseF===id;
+  const rng=mineP.length?`Beds ${String(Math.min(...bn)).padStart(2,"0")}–${String(Math.max(...bn)).padStart(2,"0")}`:"No beds assigned";
+  const fu=[...iss.map(sensRow),...pend.map(p=>`<div class="q"><div class="qb">${p.bed}</div><button class="qn sr2" data-open="${p.id}"><b>${esc(nm(p))}</b><span class="isx">${ic("note",13)}Care note due</span></button><button class="btn sm" data-docnote="${p.id}">Add note</button></div>`)];
+  $("drawer").innerHTML=`<div class="rp">
+    <div class="rp-bar"><b>Caregiver details</b><span class="rpk">Esc to close</span><button class="x" id="dClose" aria-label="Close caregiver details">${XSVG}</button></div>
+    <div class="panel rp-head"><div class="rp-who">${avatar(n.id,"pav")}<div class="t"><h2>${n.name}</h2><div class="m">${rng} · ${mineP.length} residents · Day shift</div><div class="tags">${w.length?`<span class="pill wet">${ic("wet",12)} ${w.length} waiting</span>`:`<span class="pill dry">${ic("dry",12)} All dry</span>`}${ov?`<span class="pill over">${ic("over",12)} ${ov} overdue</span>`:""}${iss.length?`<span class="pill issue">${ic("issue",12)} ${iss.length} sensor issue${iss.length>1?"s":""}</span>`:""}</div></div>
+      <div class="rp-act"><button class="btn ${on?"":"pri"}" data-filternurse="${id}">${on?"Show all beds":"Show their beds on board"}</button></div></div>
+      <div class="rtiles"><div class="rti"><small>Residents assigned</small><b class="num">${mineP.length}</b></div><div class="rti"><small>Waiting now</small><b class="num">${w.length}</b></div><div class="rti"><small>Changes today</small><b class="num">${today.length}</b></div><div class="rti"><small>Avg response today</small><b class="num">${today.length?short(avgR(today)):"—"}</b></div></div></div>
+    <div class="panel"><div class="ph"><h2>Waiting for a change</h2><span class="meta">Most urgent first</span></div>${w.length?queueRows(w):`<div class="empty"><b>All of ${n.name.split(" ")[0]}'s beds are dry</b>New alerts for these beds appear here.</div>`}</div>
+    ${fu.length?`<div class="panel"><div class="ph"><h2>Needs follow-up</h2><span class="meta">Sensor issues and care notes</span></div><div class="isl" style="border:0;border-radius:0">${fu.join("")}</div></div>`:""}
+    <div class="panel pb"><h3 style="margin:0;font-size:14.5px;font-weight:600">This week</h3><div><div class="kv"><span>Response ranking</span><b class="num">#${ri+1} of ${rows.length}</b></div><div class="kv"><span>Average response</span><b class="num">${msec(me.avg)}</b></div><div class="kv"><span>Changes handled</span><b class="num">${me.count.toLocaleString()}</b></div><div class="kv"><span>On time (under ${S.thr} min)</span><b class="num">${me.ok.toLocaleString()}</b></div><div class="kv"><span>Overdue</span><b class="num">${me.over.toLocaleString()}</b></div></div>${(c=>`<div class="clin"><h4>How to improve</h4><p><b>${c.t}.</b> ${c.d}</p></div>`)(coach(me,rows))}</div>
+    <div class="panel pb"><h3 style="margin:0;font-size:14.5px;font-weight:600">Assigned beds</h3><div class="beds">${mineP.map(p=>bedCard(p,0)).join("")}</div></div>
+  </div>`}
+
+const tip=$("tip");
+function showTip(c){const p=P.find(x=>x.id===c.dataset.id);
+  tip.innerHTML=`<div class="tt">Bed ${p.bed} · ${esc(nm(p))}</div><div class="row"><span>Status</span><b>${stWord(p)}</b></div>
+  ${needs(p)?`<div class="row"><span>Waiting</span><b class="num" data-el="${p.id}">${fmt(el(p))}</b></div>`:`<div class="row"><span>Last change</span><b>${p.sensor?ago(p.lastChange):"—"}</b></div>`}
+  <div class="row"><span>Caregiver</span><b>${NB[p.nurse].name}</b></div>${p.ack&&needs(p)?`<div class="row"><span>Acknowledged</span><b>${short((now()-p.ack.t)/1000)} ago</b></div>`:""}<div class="hint">Click for details →</div>`;
+  tip.hidden=false;const r=c.getBoundingClientRect(),th=tip.offsetHeight;let x=r.right+8;if(x+240>innerWidth-8)x=r.left-248;tip.style.left=Math.max(8,x)+"px";tip.style.top=Math.max(8,Math.min(r.top,innerHeight-th-8))+"px"}
+function hideTip(){tip.hidden=true}
+
+/* ---------- actions ---------- */
+let uid=0;
+function done(id){const p=P.find(x=>x.id===id);if(!p||!needs(p))return;const s=el(p),key="u"+(++uid);
+  S.undo[key]={id,cond:p.cond,since:p.since,lastChange:p.lastChange,escd:p.escd,ack:p.ack,pend:p.pend,issue:p.issue};p.issue="unpaired";p.ack=null;p.pend={t:now(),key};S.lastEvt=now();
+  S.log.push({nurse:p.nurse,secs:s,t:now(),key});p.resp.unshift({t:now(),secs:s,nurse:p.nurse,key});p.cond="dry";p.since=null;p.lastChange=now();p.hist[13]++;p.escd=false;S.onHand=Math.max(0,S.onHand-1);delete S.snooze[id];
+  toast(`Bed ${p.bed} marked changed · ${msec(s)}`,s>=S.thr*60?"var(--amber)":"var(--brand)",{force:true,undo:key});render();openPair(id)}
+function undo(key){const u=S.undo[key];if(!u)return;const p=P.find(x=>x.id===u.id);if(p.cond!=="dry")return;
+  if(S.pairId===u.id){$("pairM").hidden=true;S.pairId=null}
+  Object.assign(p,{cond:u.cond,since:u.since,lastChange:u.lastChange,escd:u.escd,ack:u.ack,pend:u.pend,issue:u.issue});p.hist[13]--;S.onHand++;
+  S.log=S.log.filter(x=>x.key!==key);p.resp=p.resp.filter(x=>x.key!==key);delete S.undo[key];toast(`Bed ${p.bed} restored to ${p.cond}`,"var(--faint)",{force:true});render()}
+function alertForC(p,msg,strong){alertFor(p,msg,strong,"var(--amber)")}
+function alertFor(p,msg,strong,col){if(S.app==="care"&&p.nurse!=="sarah")return;beep(strong);toast(msg,col||"var(--red-solid)");if(S.app==="care"&&S.cgHap){try{navigator.vibrate&&navigator.vibrate([120,60,120])}catch(e){}}}
+function ack(id,by){const p=P.find(x=>x.id===id);if(!p||!needs(p)||p.ack)return;p.ack={t:now(),by:by||p.nurse};S.lastEvt=now();toast(`Bed ${p.bed} acknowledged · ${NB[p.ack.by].name.split(" ")[0]} is on the way`,"var(--brand)",{force:true});render()}
+function saveNote(id){const p=P.find(x=>x.id===id);const txt=($("noteTxt")||{}).value||"";const tags=S.noteTags||[];if(!txt.trim()&&!tags.length){toast("Pick a quick note or type one first","var(--amber)",{force:true});return}
+  p.notes.unshift({t:now(),by:S.app==="care"?"sarah":p.nurse,text:txt.trim(),tags:tags.slice()});const fin=!!p.pend;p.pend=null;S.noteTags=[];S.noteDraft="";toast(fin?`Bed ${p.bed} cycle complete`:"Note saved",null,{force:true});if(fin)S.rpTab="overview";render()}
+function trigger(p,cond){p.cond=cond;p.since=now();p.escd=false;p.ack=null;p.pend=null;S.lastEvt=now();alertForC(p,`Bed ${p.bed} · ${p.first} ${p.last} is ${cond}`,cond==="soiled");render()}
+function simAck(){if(!S.sim)return;P.forEach(p=>{const mineCare=S.app==="care"&&p.nurse==="sarah";if(mineCare)return;if(needs(p)&&!p.ack&&el(p)>90&&R()<.25)p.ack={t:now(),by:p.nurse};if(p.pend&&now()-p.pend.t>60000&&R()<.3){p.notes.unshift({t:now(),by:p.nurse,text:"Skin intact.",tags:["Skin intact"]});p.pend=null}})}
+function simulate(){simAck();if(!S.sim)return;simIssue();const dry=P.filter(p=>p.sensor&&p.cond==="dry"&&!p.issue&&!p.away&&now()-p.lastChange>20*MIN);
+  if(P.filter(needs).length<16&&dry.length){const md=dry.filter(p=>p.nurse==="sarah");trigger(pick(S.app==="care"&&md.length&&R()<.6?md:dry),R()<.7?"wet":"soiled")}}
+
+/* ---------- system health, status guide, pairing ---------- */
+const scopeP=()=>S.app==="care"?P.filter(p=>p.nurse==="sarah"):P;
+const STATES=[["dry","dry","Dry","Liner is dry and being monitored.","No action needed."],
+ ["wet","wet","Wet","The liner detected moisture. The timer shows how long it has waited.","Change soon."],
+ ["soiled","soil","Soiled","The liner detected a soiled change.","Change first."],
+ ["over","over","Overdue",()=>`Wet or soiled for more than ${S.thr} minutes. Escalated to the charge nurse.`,"Change now."],
+ ["ack","ack","On the way","A caregiver tapped On my way.","No need to send someone else."],
+ ["note","note","Note due","Liner changed, but no care note yet.","Add a care note to close the cycle."],
+ ["battery","battery","Low battery","Still monitoring. The liner's battery is running low.","Replace it at the next change."],
+ ["issue","issue","Signal lost / Not paired","HealthWink can't read this liner, so the bed may not be dry.","Check in person, then pair a new liner."],
+ ["away","away","Away","The resident is out of the room or at the hospital.","Alerts are paused until they return."],
+ ["na","na","Not monitored","No HealthWink liner on this resident.","Follow the manual check schedule."]];
+function renderSys(){const iss=scopeP().filter(p=>p.issue).length;document.querySelectorAll(".sys").forEach(b=>{b.classList.toggle("warn",!!iss);const t=b.querySelector("[data-systxt]");if(t)t.textContent=iss?`${iss} sensor issue${iss>1?"s":""}`:"All sensors OK"})}
+const XSVG='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+const CHK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>';
+function renderSG(){$("sg").innerHTML=`<div class="mbox" role="dialog" aria-modal="true" aria-labelledby="sgT"><div class="mh"><div><h2 id="sgT">Status guide</h2><div style="font-size:12.5px;color:var(--muted);margin-top:2px">What each bed status means and what to do</div></div><button class="x" data-sgclose aria-label="Close">${XSVG}</button></div><div class="mb"><div class="sgl" id="sgGuide">${STATES.map(([k,icn,name,mean,act])=>`<div class="sgr"><span class="sgm ${k}">${ic(icn,17)}</span><b>${name}</b><p>${typeof mean==="function"?mean():mean} <em>${act}</em></p></div>`).join("")}</div></div></div>`}
+const sensRow=p=>`<div class="q"><div class="qb">${p.bed}</div><button class="qn sr2" data-open="${p.id}"><b>${esc(nm(p))}</b><span class="isx">${ic(p.issue==="battery"?"battery":"issue",13)}${issueText(p)}</span></button>${p.issue==="battery"?`<span class="isa">Replace at next change</span>`:`<button class="btn sm pri" data-pair="${p.id}">${ic("nfc",14)} Pair liner</button>`}</div>`;
+let sgFocus=null;
+function openSG(sec){sgFocus=document.activeElement;renderSG();$("sg").hidden=false;const box=$("sg").querySelector(".mbox");$("sg").querySelector("[data-sgclose]").focus()}
+function closeSG(){$("sg").hidden=true;try{sgFocus&&sgFocus.focus()}catch(e){}}
+function openPair(id){S.pairId=id;S.pairSt="ready";renderPair();$("pairM").hidden=false;setTimeout(()=>{const b=$("pairGo");b&&b.focus()},0)}
+function closePair(){const p=P.find(x=>x.id===S.pairId);$("pairM").hidden=true;if(p&&unknown(p))toast(`Bed ${p.bed} isn't monitored until a new liner is paired`,"var(--amber)",{force:true});S.pairId=null;S.pairSt=null;render()}
+function renderPair(){const p=P.find(x=>x.id===S.pairId);if(!p)return;const st=S.pairSt;
+  $("pairM").innerHTML=`<div class="mbox pair" role="dialog" aria-modal="true" aria-labelledby="pT"><div class="mh"><div><h2 id="pT">Pair the new liner</h2><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Bed ${p.bed} · ${esc(nm(p))}</div></div><button class="x" id="pairX" aria-label="Close" ${st==="scan"?"disabled":""}>${XSVG}</button></div><div class="mb">
+  <div class="pst"><div class="pstep ok"><span class="n">${CHK}</span><div>Apply the new liner<span>Peel the backing and place it in the undergarment.</span></div></div>
+  <div class="pstep ${st==="ok"?"ok":""}"><span class="n">${st==="ok"?CHK:"2"}</span><div>Hold the liner's tag against the resident's wristband<span>The wristband vibrates once when the liner pairs.</span></div></div></div>
+  <div class="nfc ${st==="scan"?"scan":st==="ok"?"ok":""}" aria-hidden="true"><span class="ring"></span><span class="ring"></span><span class="core">${ic(st==="ok"?"dry":"nfc",34)}</span></div>
+  <div class="pmsg" aria-live="polite">${st==="ready"?"<b>Ready to pair</b>Start pairing, then hold the liner to the wristband.":st==="scan"?"<b>Looking for the liner…</b>Keep it against the wristband.":`<b>Liner ${p.liner} paired</b>Monitoring resumed for bed ${p.bed}.`}</div>
+  ${st==="ok"?`<div class="pacts"><button class="btn lg" id="pairNote">${ic("note",16)} Add care note</button><button class="btn pri lg" id="pairDone">Done</button></div>`:`<div class="pacts"><button class="btn lg" id="pairLater" ${st==="scan"?"disabled":""}>Pair later</button><button class="btn pri lg" id="pairGo" ${st==="scan"?"disabled":""}>${st==="scan"?"Pairing…":"Start pairing"}</button></div>`}
+  </div></div>`}
+function startPair(){S.pairSt="scan";renderPair();setTimeout(()=>{const p=P.find(x=>x.id===S.pairId);if(!p||S.pairSt!=="scan")return;p.issue=null;p.simIss=false;p.liner="HW-"+(48000+Math.floor(Math.random()*9000));S.pairSt="ok";S.lastEvt=now();renderPair();render();const b=$("pairDone");b&&b.focus()},1600)}
+function simIssue(){P.forEach(p=>{if(p.simIss&&now()-p.issueT>150000&&p.issue==="signal"){p.issue=null;p.simIss=false}});
+  if(R()<.12){const pool=P.filter(p=>p.sensor&&p.cond==="dry"&&!p.issue&&!p.away&&(S.app!=="care"||p.nurse==="sarah"));if(pool.length){const p=pick(pool);p.issue="signal";p.simIss=true;p.issueT=now();toast(`Bed ${p.bed} · signal lost. Check in person.`,"var(--faint)")}}}
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("pairM").hidden){if(S.pairSt!=="scan")closePair();e.stopPropagation()}else if(!$("sg").hidden){closeSG();e.stopPropagation()}},true);
+document.addEventListener("pointerdown",e=>{const m=$("uMenu");if(m&&!m.hidden&&!e.target.closest(".umenu-w"))m.hidden=true;if(!(S.sel||S.selC)||$("drawer").hidden)return;if(e.target.closest("#drawer,.modal,#toasts,#login,[data-id],[data-open],[data-done],[data-pair],[data-ack],[data-nurse]"))return;closeD()});
+$("sg").addEventListener("click",e=>{if(e.target.id==="sg")closeSG()});
+$("pairM").addEventListener("click",e=>{if(e.target.id==="pairM"&&S.pairSt!=="scan")closePair()});
+
+function render(){renderSys();
+  document.querySelectorAll("[data-app]").forEach(n=>{const cur=n.dataset.app==="st"?S.stTab:S.cgTab;n.querySelectorAll("button[data-t]").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===cur))});
+  ["live","residents","trends","inventory","leader","settings"].forEach(t=>$("st-"+t).hidden=S.stTab!==t);
+  ["todo","beds","perf","settings"].forEach(t=>$("cg-"+t).hidden=S.cgTab!==t);
+  $("station").hidden=S.app!=="station";$("care").hidden=S.app!=="care";
+  $("toStation").setAttribute("aria-pressed",S.app==="station");$("toCare").setAttribute("aria-pressed",S.app==="care");
+  $("stGrid").setAttribute("aria-pressed",S.stView==="grid");$("stList").setAttribute("aria-pressed",S.stView==="list");
+  $("sndBtn").setAttribute("aria-pressed",S.sound);$("sndLab").textContent=S.sound?"Sound on":"Muted";$("privBtn").setAttribute("aria-pressed",S.priv);
+  if(S.app==="station")renderStation();else renderCare();
+  if(S.sel&&!(document.activeElement&&document.activeElement.id==="noteTxt"))renderD();else if(S.selC)renderC();
+  try{localStorage.setItem("hw4-station",JSON.stringify({app:S.app,stView:S.stView,thr:S.thr,priv:S.priv,sound:S.sound,par:S.par,cs:S.cs,cgSnd:S.cgSnd,cgVis:S.cgVis,cgHap:S.cgHap}))}catch(e){}
+}
+function syncSet(){$("thr").value=S.thr;$("thrV").textContent=S.thr+" min";$("sPriv").checked=S.priv;$("sSnd").checked=S.sound;$("sim").checked=S.sim;$("par").value=S.par;$("cs").value=S.cs;$("cgSnd").checked=S.cgSnd;$("cgVis").checked=S.cgVis;$("cgHap").checked=S.cgHap;$("stSort").value=S.stSort}
+function tick(){
+  $("clock").textContent=new Date().toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit",second:"2-digit"});
+  let crossed=false;
+  P.forEach(p=>{if(over(p)&&!p.escd){p.escd=true;crossed=true;S.overToday++;alertFor(p,`Overdue · Bed ${p.bed} ${p.cond} for ${S.thr}+ min`,true)}});
+  for(const id in S.snooze){if(S.snooze[id]<=now()){delete S.snooze[id];const p=P.find(x=>x.id===id);if(p&&needs(p)&&p.nurse==="sarah"&&S.app==="care"){beep(false);toast(`Reminder · Bed ${p.bed} still ${p.cond}`,"var(--red-solid)")}crossed=true}}
+  if(crossed)return render();
+  document.querySelectorAll("[data-el]").forEach(n=>{const p=P.find(x=>x.id===n.dataset.el);if(p&&needs(p))n.textContent=fmt(el(p))});
+  document.querySelectorAll("[data-upd]").forEach(n=>n.textContent=updTxt());
+  document.querySelectorAll("[data-oldest]").forEach(n=>{const w=P.filter(p=>p.nurse===n.dataset.oldest&&needs(p));if(w.length)n.textContent=fmt(Math.max(...w.map(el)))})}
+
+document.addEventListener("click",e=>{const t=e.target.closest("button,tr.rl,[data-open]");if(!t)return;const d=t.dataset;
+  if(t.closest("#uMenu"))$("uMenu").hidden=true;
+  if(t.id==="uBtn"){const m=$("uMenu");m.hidden=!m.hidden;t.setAttribute("aria-expanded",String(!m.hidden));return}
+  if(d.undo)return undo(d.undo);
+  if(t.closest("#pairM")){if(t.id==="pairGo")return startPair();if(t.id==="pairLater"||t.id==="pairX")return closePair();if(t.id==="pairDone"){S.pairSt=null;return closePair()}if(t.id==="pairNote"){const id=S.pairId;S.pairSt=null;closePair();return openD(id,"notes")}}
+  if(d.sgclose!==undefined)return closeSG();
+  if(d.sg)return openSG(d.sg);
+  if(d.pair){e.stopPropagation();if(!$("sg").hidden)closeSG();return openPair(d.pair)}
+  if(d.away){const p=P.find(x=>x.id===d.away);p.away=p.away?null:"Out of room";toast(p.away?`Bed ${p.bed} marked away · alerts paused`:`Bed ${p.bed} back · monitoring resumed`,null,{force:true});return render()}
+  if(d.open&&!$("sg").hidden)closeSG();
+  if(d.ack){e.stopPropagation();return ack(d.ack,S.app==="care"?"sarah":null)}
+  if(d.rptab){const ta=$("noteTxt");if(ta)S.noteDraft=ta.value;S.rpTab=d.rptab;renderD();return}
+  if(d.chip){const ta=$("noteTxt");if(ta)S.noteDraft=ta.value;S.noteTags=S.noteTags||[];S.noteTags=S.noteTags.includes(d.chip)?S.noteTags.filter(x=>x!==d.chip):[...S.noteTags,d.chip];renderD();return}
+  if(d.savenote)return saveNote(d.savenote);
+  if(d.docnote){e.stopPropagation();return openD(d.docnote,"notes")}
+  if(d.done){e.stopPropagation();return done(d.done)}
+  if(d.snooze){S.snooze[d.snooze]=now()+2*MIN;toast(`We'll remind you about bed ${P.find(p=>p.id===d.snooze).bed} in 2 min`,"var(--faint)",{force:true});return render()}
+  if(d.open)return openD(d.open);
+  if(t.classList.contains("bed"))return openD(d.id);
+  if(d.t){if(t.closest("[data-app]").dataset.app==="st")S.stTab=d.t;else S.cgTab=d.t;return render()}
+  if(d.goto){S.stTab=d.goto;return render()}
+  if(d.gocg){S.cgTab=d.gocg;return render()}
+  if(d.filter){S.filter=S.filter===d.filter&&d.filter!=="all"?"all":d.filter;return render()}
+  if(d.trp){S.trP=d.trp;return render()}
+  if(d.slb){S.stLbP=d.slb;return render()}
+  if(d.clb){S.cgLbP=d.clb;return render()}
+  if(d.filternurse){S.nurseF=S.nurseF===d.filternurse?null:d.filternurse;S.filter="all";S.stTab="live";closeD();scrollTo(0,0);return render()}
+  if(d.nurse)return openC(d.nurse);
+  if(t.id==="clearF"){S.nurseF=null;S.filter="all";S.stQ="";$("stQ").value="";$("gSearch").value="";return render()}
+  if(t.id==="dClose")return closeD();
+  if(t.id==="toStation"||t.id==="toCare"){S.app=t.id==="toStation"?"station":"care";closeD();return render()}
+  if(t.id==="stGrid"||t.id==="stList"){S.stView=t.id==="stGrid"?"grid":"list";return render()}
+  if(t.id==="cgOBed"||t.id==="cgOPri"){S.cgOrder=t.id==="cgOBed"?"bed":"pri";return render()}
+  if(t.id==="sndBtn"){S.sound=!S.sound;syncSet();if(S.sound)beep(false);return render()}
+  if(t.id==="privBtn"){S.priv=!S.priv;syncSet();return render()}
+  if(t.id==="restockBtn"){S.onHand+=+d.q;S.restock=now();toast(`${(+d.q).toLocaleString()} liners added to stock`,null,{force:true});return render()}
+  if(t.id==="fire"){const dry=P.filter(p=>p.sensor&&p.cond==="dry");if(dry.length)trigger(pick(dry),"wet")}
+});
+$("scrim").onclick=closeD;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(S.sel||S.selC))closeD()});
+const on=(id,ev,f)=>$(id).addEventListener(ev,f);
+on("stQ","input",e=>{S.stQ=e.target.value.trim();render()});
+on("stQ2","input",e=>{S.stQ2=e.target.value.trim();render()});
+$("stNurse").innerHTML+=NURSES.slice(0,5).map(n=>`<option value="${n.id}">${n.name}</option>`).join("");
+on("stNurse","change",e=>{S.nurseF=e.target.value||null;render()});
+on("stStatus","change",e=>{S.filter=e.target.value;render()});
+on("gSearch","input",e=>{S.stQ=e.target.value.trim();$("stQ").value=S.stQ;S.stTab="live";render()});
+on("stSort","change",e=>{S.stSort=e.target.value;render()});
+on("thr","input",e=>{S.thr=+e.target.value;$("thrV").textContent=S.thr+" min";P.forEach(p=>p.escd=over(p));render()});
+on("sPriv","change",e=>{S.priv=e.target.checked;render()});
+on("sSnd","change",e=>{S.sound=e.target.checked;render()});
+on("sim","change",e=>{S.sim=e.target.checked});
+on("par","change",e=>{S.par=Math.max(100,+e.target.value||S.par);render()});
+on("cs","change",e=>{S.cs=Math.max(10,+e.target.value||S.cs);render()});
+on("cgSnd","change",e=>{S.cgSnd=e.target.checked});
+on("cgVis","change",e=>{S.cgVis=e.target.checked});
+on("cgHap","change",e=>{S.cgHap=e.target.checked});
+document.addEventListener("change",e=>{if(e.target.id==="reassign"){const p=P.find(x=>x.id===S.sel);p.nurse=e.target.value;toast(`Bed ${p.bed} now assigned to ${NB[p.nurse].name}`,null,{force:true});render()}});
+on("stBoard","mouseover",e=>{const c=e.target.closest(".bed");if(c&&matchMedia("(hover:hover)").matches)showTip(c)});
+on("stBoard","mouseout",e=>{const c=e.target.closest(".bed");if(c&&!c.contains(e.relatedTarget))hideTip()});
+addEventListener("scroll",hideTip,{passive:true});
+
+try{const s=JSON.parse(localStorage.getItem("hw4-station")||"null");if(s)Object.assign(S,s)}catch(e){}
+S.app="station";
+P.forEach(p=>p.escd=over(p));
+syncSet();render();tick();setInterval(tick,1000);
+(function loop(){setTimeout(()=>{simulate();loop()},12000+Math.random()*8000)})();
+})();
+
+/* sign in */
+(function(){
+  const L=document.getElementById("login"),K="hw-station";
+  L.addEventListener("click",e=>{if(e.target.closest("#lgEye")){const p=document.getElementById("lgPass");p.type=p.type==="password"?"text":"password"}if(e.target.closest("#lgSSO"))enter()});
+  function enter(){L.hidden=true;try{if(document.getElementById("lgKeep").checked)sessionStorage.setItem(K,"1")}catch(e){}scrollTo(0,0)}
+  document.getElementById("lgForm").addEventListener("submit",e=>{e.preventDefault();if(!document.getElementById("lgUser").value.trim()){document.getElementById("lgUser").focus();return}enter()});
+  try{if(sessionStorage.getItem(K))L.hidden=true}catch(e){}
+  document.addEventListener("click",e=>{if(e.target.closest("[data-signout]")){try{sessionStorage.removeItem(K)}catch(x){}const m=document.getElementById("uMenu");if(m)m.hidden=true;const dr=document.getElementById("drawer");if(dr)dr.hidden=true;L.hidden=false;scrollTo(0,0)}});
+})();
+</script>
+
+
+</body></html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curo · Patient app</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#eef1f6;--app:#f6f8fb;--card:#fff;--ink:#111827;--ink2:#374151;--ink3:#6b7280;--ink4:#9ca3af;--line:#e5e7eb;--line2:#eef0f3;--blue:#2563eb;--blue2:#1d4ed8;--bsoft:#eef3ff;--bline:#c7d6ff;--green:#15803d;--gsoft:#f0fdf4;--gline:#bbf7d0;--red:#b91c1c;--rsoft:#fef2f2;--rline:#fecaca;--amber:#a16207;--asoft:#fffbeb;--aline:#fde68a;--g0:#cbd5e1;--g1:#facc15;--g2:#fb923c;--g3:#ef4444;--g4:#9f1239;--sh:0 1px 2px rgba(16,24,40,.04),0 4px 14px rgba(16,24,40,.05);--r:20px}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+:focus-visible{outline:3px solid #93b4ff;outline-offset:2px;border-radius:10px}
+h1,h2,h3{margin:0;line-height:1.2;letter-spacing:-.015em;font-weight:600}
+p{margin:0}
+.ic{flex:none;display:block}
+/* stage */
+.wrap{display:flex;justify-content:center;align-items:center;min-height:100svh;padding:20px 16px}
+.stage{width:calc(417px*var(--k,1));height:calc(876px*var(--k,1));flex:none}
+.stage>.phone{transform:scale(var(--k,1));transform-origin:0 0}
+.phone{width:393px;height:852px;box-sizing:content-box;border:12px solid #0f1115;border-radius:67px;overflow:hidden;position:relative;background:var(--app);display:flex;flex-direction:column;box-shadow:0 30px 60px -30px rgba(15,23,42,.45)}
+.phone.big{font-size:17px}
+.sbar{display:flex;justify-content:space-between;align-items:center;height:54px;padding:4px 32px 0 40px;font-weight:600;font-size:17px;position:relative;z-index:3;flex:none}
+.sbar i{width:125px;height:37px;background:#000;border-radius:20px;position:absolute;left:50%;top:11px;transform:translateX(-50%)}
+.hind{position:absolute;left:50%;bottom:8px;width:134px;height:5px;border-radius:3px;background:#111;transform:translateX(-50%);z-index:20;pointer-events:none}
+.sbar.w{color:#fff;background:#3b82f6}
+.scr{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+/* hero */
+.hero{background:linear-gradient(160deg,#3b82f6 0%,#2563eb 45%,#1d4ed8 100%);color:#fff;border-radius:0 0 28px 28px;padding:10px 20px 22px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.08);right:-90px;top:-80px}
+.hero:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.06);right:40px;bottom:-90px}
+.hero>*{position:relative;z-index:1}
+.hrow{display:flex;align-items:center;gap:14px}
+.hrow b{display:block;font-size:20px;font-weight:600;letter-spacing:-.01em}
+.hrow span.s{opacity:.85;font-size:14px}
+.hbtn{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;color:#fff;position:relative;flex:none}
+.hbtn .dot{position:absolute;top:10px;right:11px;width:9px;height:9px;border-radius:50%;background:#fb923c;border:2px solid #2563eb}
+.av{border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;flex:none;border:2px solid rgba(255,255,255,.7)}
+.ptitle{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ptitle h1{font-size:26px}
+.hero p.sub{opacity:.88;margin-top:6px;font-size:14px}
+/* content */
+.sec{padding:18px 18px 110px}
+.sec h2{font-size:17px;margin:22px 4px 10px;display:flex;justify-content:space-between;align-items:center}
+.sec h2:first-child{margin-top:4px}
+.sec h2 small{font-size:13px;color:var(--ink3);font-weight:500}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.card+.card{margin-top:12px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--line2);font-size:14px}
+.kv:first-child{border-top:0;padding-top:0}.kv:last-child{padding-bottom:0}
+.kv span:first-child{color:var(--ink3)}.kv span:last-child{font-weight:500;text-align:right}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--bsoft);color:var(--blue2);font-size:12.5px;font-weight:500}
+.chip.g{background:var(--gsoft);color:var(--green)}.chip.a{background:var(--asoft);color:var(--amber)}.chip.r{background:var(--rsoft);color:var(--red)}.chip.n{background:#f3f4f6;color:var(--ink2)}
+.mut{color:var(--ink3)}
+.small{font-size:13px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:999px;background:var(--blue);color:#fff;font-weight:600;transition:background .15s}
+.btn:hover{background:var(--blue2)}
+.btn.o{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.o:hover{background:#f9fafb}
+.btn.w{width:100%}
+.btn.sm{min-height:38px;padding:0 14px;font-size:14px}
+/* home */
+.task{display:grid;grid-template-columns:76px minmax(0,1fr);gap:14px;align-items:center;text-align:left;width:100%}
+.task .rm{width:76px;height:76px;border-radius:22px;background:linear-gradient(135deg,#fde68a,#bfdbfe);display:grid;place-items:center;overflow:hidden}
+.task b{font-size:16px;font-weight:600;display:block}
+.task p{color:var(--ink3);font-size:13.5px;margin-top:2px}
+.meter{height:8px;border-radius:99px;background:#e8edf6;overflow:hidden;margin-top:10px}
+.meter i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .3s}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12.5px;font-weight:500;color:var(--ink2)}
+.tile span{width:62px;height:62px;border-radius:20px;background:#fff;border:1px solid var(--line);box-shadow:var(--sh);display:grid;place-items:center;color:var(--blue)}
+.tile:hover span{border-color:var(--bline)}
+.upd{display:flex;gap:12px}
+.upd .bub{background:var(--app);border-radius:4px 16px 16px 16px;padding:10px 12px;font-size:14px;color:var(--ink2);margin-top:8px}
+.appt{display:flex;align-items:center;gap:12px}
+.appt .dt{margin-left:auto;text-align:center;background:var(--bsoft);border-radius:14px;padding:6px 12px;color:var(--blue2);font-weight:600;line-height:1.15}
+.appt .dt small{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.ico{width:44px;height:44px;border-radius:14px;background:var(--bsoft);color:var(--blue);display:grid;place-items:center;flex:none}
+.row{display:flex;gap:12px;align-items:center}
+/* nav */
+.pnav{position:absolute;left:16px;right:16px;bottom:24px;height:66px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;box-shadow:0 12px 30px rgba(15,23,42,.12);display:grid;grid-template-columns:repeat(4,1fr);align-items:center;padding:0 8px;z-index:5}
+.pnav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:500;color:var(--ink4);height:54px;justify-content:center;border-radius:999px}
+.pnav button[aria-current]{color:var(--blue);background:var(--bsoft)}
+.fab{position:absolute;right:20px;bottom:104px;width:58px;height:58px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;box-shadow:0 12px 24px rgba(37,99,235,.35);z-index:5}
+/* welcome */
+.welcome{flex:1;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(170deg,#3b82f6,#1e40af);color:#fff;padding:16px 24px 40px;position:relative;overflow:hidden}
+.welcome:before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.07);right:-150px;top:30px}
+.welcome>*{position:relative}
+.welcome h1{font-size:34px;margin:22px 0 10px;letter-spacing:-.02em}
+.welcome p{opacity:.9}
+.wf{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.wf div{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:12px 14px;font-size:14px}
+.lsw{display:inline-flex;background:rgba(255,255,255,.14);border-radius:999px;padding:4px;gap:2px}
+.lsw button{padding:7px 14px;border-radius:999px;font-size:13.5px;font-weight:600;color:#fff;opacity:.85}
+.lsw button[aria-pressed=true]{background:#fff;color:var(--blue2);opacity:1}
+.wbtn{width:100%;min-height:54px;border-radius:999px;background:#fff;color:var(--blue2);font-weight:600;font-size:16px}
+/* chat */
+.ctop{display:flex;align-items:center;gap:6px;padding:6px 12px 8px;flex:none;background:var(--app)}
+.ctop .t{flex:1;display:flex;align-items:center;gap:10px}
+.ctop .t b{display:block;font-size:16px;font-weight:600;line-height:1.2}
+.ctop .t small{color:var(--ink3);font-size:12.5px}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--ink2);flex:none;font-weight:600;font-size:13px}
+.ib:hover{background:#e9edf4}
+.ib.on{background:var(--bsoft);color:var(--blue2)}
+.prog{padding:0 18px 10px;flex:none;background:var(--app);border-bottom:1px solid var(--line2)}
+.prog .meter{margin-top:0;height:6px}
+.prog div.l{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink3);margin-top:7px}
+.chat{flex:1;overflow-y:auto;padding:16px 14px 10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:none}
+.chat::-webkit-scrollbar{display:none}
+.mr{display:flex;gap:8px;align-items:flex-end;max-width:100%}
+.mr .sp{width:34px;flex:none}
+.mr .bub{background:#fff;border:1px solid var(--line);border-radius:18px 18px 18px 6px;padding:10px 13px;max-width:82%;font-size:14.5px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.phone.big .mr .bub{font-size:16.5px}
+.mr.me{justify-content:flex-end}
+.mr.me .bub{background:var(--blue);color:#fff;border-color:var(--blue);border-radius:18px 18px 6px 18px}
+.mr.me .bub img{max-width:180px;border-radius:12px;display:block}
+.bub.alert{background:var(--rsoft);border-color:var(--rline)}
+.bub.done{background:var(--gsoft);border-color:var(--gline)}
+.bub.help{background:var(--asoft);border-color:var(--aline)}
+.bub.sys{background:var(--bsoft);border-color:var(--bline)}
+.bub ul{margin:6px 0 0;padding-left:18px}
+.srow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line2);font-size:14px}
+.srow:first-of-type{margin-top:8px}
+.gp{font-weight:600;color:color-mix(in srgb,var(--c) 70%,#111)}
+.ans{padding:10px 12px 10px;border-top:1px solid var(--line2);background:#fff;flex:none;max-height:56%;overflow-y:auto}
+.qopts{display:flex;flex-direction:column;gap:5px}
+.qopt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:7px 12px;border:1px solid var(--line);border-radius:14px;background:#fff;min-height:44px}
+.qopt:hover{border-color:var(--bline);background:#fafcff}
+.qopt .rd{width:20px;height:20px;border-radius:50%;border:2px solid #cbd5e1;flex:none;display:grid;place-items:center}
+.qopt[aria-pressed=true]{border-color:var(--blue);background:var(--bsoft)}
+.qopt[aria-pressed=true] .rd{border-color:var(--blue);background:var(--blue);box-shadow:inset 0 0 0 3px #fff}
+.qopt .lb{flex:1}
+.qopt .lb b{font-weight:600;font-size:14px}.qopt .lb small{display:inline!important;margin-left:6px}
+.qopt .lb small{color:var(--ink3);font-size:12.5px;display:block;line-height:1.35}
+.qopt .sw{width:12px;height:12px;border-radius:50%;flex:none}
+.qpills{display:flex;flex-wrap:wrap;gap:8px}
+.qpill{padding:10px 16px;border-radius:999px;border:1px solid var(--bline);background:var(--bsoft);color:var(--blue2);font-weight:600;font-size:14px;min-height:44px}
+.qpill:hover{background:#e2eaff}
+.qpill.go{background:var(--blue);border-color:var(--blue);color:#fff}
+.qpill.go[disabled]{opacity:.45;cursor:default}
+.qx{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.qx button{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:#f3f4f6;color:var(--ink2);font-size:12.5px;font-weight:500;min-height:34px}
+.qx button:hover{background:#e9ebef}
+.qx button.same{background:var(--gsoft);color:var(--green)}
+.inbar{display:flex;gap:8px;align-items:flex-end;padding:8px 12px 30px;background:#fff;flex:none}
+.inbar textarea{flex:1;resize:none;height:44px;border:1px solid var(--line);border-radius:22px;padding:11px 16px;background:var(--app);outline:none;font-size:14px}
+.inbar textarea:focus{border-color:var(--bline);background:#fff}
+.inbar .send{width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;flex:none}
+.inbar label{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--ink3);cursor:pointer;flex:none}
+/* notes */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:16px}
+.week button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border-radius:16px;color:#fff;font-size:12px;opacity:.9}
+.week button b{font-size:16px;font-weight:600}
+.week button[aria-pressed=true]{background:#fff;color:var(--blue2);opacity:1}
+.week button i{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.8}
+.seg{display:inline-flex;background:rgba(255,255,255,.16);border-radius:999px;padding:3px}
+.seg button{padding:6px 14px;border-radius:999px;font-size:13px;font-weight:600;color:#fff}
+.seg button[aria-pressed=true]{background:#fff;color:var(--blue2)}
+.seg.l{background:#eef1f6}.seg.l button{color:var(--ink3)}.seg.l button[aria-pressed=true]{color:var(--blue2);box-shadow:var(--sh)}
+.sbox{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:0 6px 0 16px;height:48px;box-shadow:var(--sh)}
+.sbox input{flex:1;border:0;outline:0;background:none}
+.sbox button,.sbox .i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--ink3)}
+.hero .sbox{margin-top:16px;border:0}
+.srch{display:flex;gap:10px;padding:16px 18px 0}
+.srch .sbox{flex:1}
+.fbtn{width:48px;height:48px;border-radius:50%;background:#fff;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink3);flex:none}
+.fbtn[aria-pressed=true]{color:#e11d48;border-color:#fecdd3;background:#fff1f2}
+.note{position:relative}
+.note .dt{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding-right:34px}
+.note p{margin-top:10px;color:var(--ink2)}
+.note img{width:100%;border-radius:14px;margin-top:10px}
+.note .kb{position:absolute;right:10px;top:10px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--ink3)}
+.menu{position:absolute;right:12px;top:46px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 30px rgba(15,23,42,.12);padding:6px;z-index:4;min-width:190px}
+.menu button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;font-size:14px}
+.menu button:hover{background:#f3f4f6}
+.empty{text-align:center;color:var(--ink3);padding:26px 12px;border:1px dashed var(--line);border-radius:var(--r);background:#fff}
+.scrim{position:absolute;inset:0;background:rgba(15,23,42,.35);z-index:8}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:28px 28px 0 0;padding:22px 20px 40px;z-index:9}
+.sheet textarea{width:100%;height:130px;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin:14px 0;resize:none;outline:none;background:var(--app)}
+.sheet .rw{display:flex;gap:10px}.sheet .rw .btn{flex:1}
+/* treatment */
+.med{display:grid;grid-template-columns:60px minmax(0,1fr);gap:12px}
+.med .im{width:60px;height:60px;border-radius:16px;background:var(--app);display:grid;place-items:center}
+.med .im svg{width:44px;height:44px}
+.med b{font-weight:600;display:block}
+.med small{display:block;color:var(--ink3);font-size:13px}
+.med p{font-size:13.5px;color:var(--ink2);margin-top:6px}
+.med.pri{border-color:var(--bline);background:linear-gradient(#fff,#fafcff)}
+/* progress */
+.sym .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sym .top b{font-weight:600}
+.dots{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:12px 0 4px}
+.dots span{height:28px;border-radius:9px;display:grid;place-items:center;font-size:11.5px;font-weight:600}
+.dlab{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;font-size:11px;color:var(--ink4);text-align:center}
+.sym p{font-size:13.5px;color:var(--ink2);margin-top:10px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--ink3);margin:2px 4px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.acc>button{display:flex;justify-content:space-between;align-items:center;width:100%;font-weight:600;min-height:28px;text-align:left;gap:10px}
+.acc p{margin-top:10px;color:var(--ink2);font-size:14px}
+.set{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line2)}
+.set:first-child{border-top:0;padding-top:0}.set:last-child{padding-bottom:0}
+.set b{font-weight:500;display:block}.set small{color:var(--ink3);font-size:12.5px}
+.tg{width:48px;height:28px;border-radius:99px;background:#d1d5db;position:relative;flex:none;transition:background .15s}
+.tg:after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tg[aria-checked=true]{background:var(--blue)}.tg[aria-checked=true]:after{left:23px}
+.foot{font-size:12.5px;color:var(--ink3);margin:14px 4px 0}
+.back{display:flex;align-items:center;gap:4px;padding:4px 10px 6px;flex:none}
+/* side panel */
+.out{display:flex;flex-direction:column;gap:18px;padding-top:6px}
+.out h1{font-size:30px;letter-spacing:-.02em}
+.out>p,.out .lead{color:var(--ink3);max-width:620px}
+.pan{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--sh)}
+.pan h3{font-size:17px}
+.pan h3+small{color:var(--ink3);font-size:13px;display:block;margin-top:2px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+.stats div{background:var(--app);border-radius:16px;padding:12px 14px}
+.stats b{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em}
+.stats small{color:var(--ink3);font-size:12.5px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:12px}
+th{text-align:left;font-weight:500;color:var(--ink3);font-size:12.5px;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line2)}
+td.n,th.n{text-align:right}
+.ochip{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:var(--gsoft);color:var(--green);font-weight:600;font-size:13px;border:1px solid var(--gline)}
+.ochip i{width:8px;height:8px;border-radius:50%;background:#22c55e}
+.ochips{display:flex;gap:8px;flex-wrap:wrap}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;z-index:50}
+@media(max-width:440px){.wrap{padding:0}.stage{width:100%;height:100svh}.stage>.phone{transform:none;width:100%;height:100svh;border:0;border-radius:0;box-sizing:border-box}}
+
+/* ---------- web-portal look: light headers, white cards, blue as accent ---------- */
+:root{--app:#f3f5f8;--r:18px;--sh:0 1px 2px rgba(16,24,40,.04),0 2px 8px rgba(16,24,40,.04)}
+.card{border:1.5px solid var(--line);box-shadow:none}
+.hero{background:var(--app);color:var(--ink);border-radius:0;padding:8px 20px 6px;overflow:visible}
+.hero:before,.hero:after{display:none}
+.hrow b{font-size:22px;font-weight:600}
+.hrow span.s,.hero p.sub{color:var(--ink3);opacity:1}
+.hero .av{border:0}
+.hbtn{background:#fff;border:1.5px solid var(--line);color:var(--ink2)}
+.hbtn .dot{border-color:#fff;top:9px;right:10px}
+.hero .sbox{border:1.5px solid var(--line);box-shadow:none}
+.hero .seg{background:#e8ecf2}
+.hero .seg button{color:var(--ink3)}
+.hero .seg button[aria-pressed=true]{background:#fff;color:var(--blue2);box-shadow:var(--sh)}
+.week button{color:var(--ink2);opacity:1;background:#fff;border:1.5px solid var(--line)}
+.week button[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff}
+.week button i{color:var(--blue)}.week button[aria-pressed=true] i{color:#fff}
+.sec{padding-top:12px}
+.tile span{border:1.5px solid var(--line);box-shadow:none;border-radius:18px}
+.pnav{border:1.5px solid var(--line);box-shadow:0 8px 24px rgba(15,23,42,.08)}
+.ctop,.prog{background:#fff}
+.prog{border-bottom:1.5px solid var(--line2)}
+.mr .bub{border-width:1.5px;box-shadow:none}
+.qopt{border-width:1.5px}
+.task .rm{background:var(--bsoft)}
+.med.pri{background:#fff;border-color:var(--bline)}
+/* language */
+.lpill{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font-weight:600;font-size:13.5px;border:1px solid rgba(255,255,255,.25)}
+.lpill.l{background:#fff;color:var(--ink2);border:1.5px solid var(--line)}
+.lsh{max-height:86%;display:flex;flex-direction:column;padding-bottom:34px}
+.shh{display:flex;justify-content:space-between;align-items:center}
+.shh h2{font-size:20px}
+.llist{overflow-y:auto;margin:10px -6px 0;flex:1;min-height:120px}
+.llist button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:10px 12px;border-radius:14px;text-align:start}
+.llist button:hover{background:#f3f4f6}
+.llist button[aria-pressed=true]{background:var(--bsoft);color:var(--blue2)}
+.llist b{font-weight:600;display:block}.llist small{color:var(--ink3);font-size:12.5px}
+.olang{display:flex;gap:8px;margin-top:10px;padding-top:12px;border-top:1.5px solid var(--line2)}
+.olang input{flex:1;height:44px;border:1.5px solid var(--line);border-radius:999px;padding:0 16px;outline:none;background:var(--app)}
+.trn{display:flex;align-items:center;gap:6px;padding:6px 18px;background:var(--bsoft);color:var(--blue2);font-size:12px;font-weight:500;flex:none}
+.trpill{position:absolute;top:58px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;background:#111827;color:#fff;font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:999px;z-index:12}
+.phone[dir=rtl] .ctop .ib:first-child svg,.phone[dir=rtl] .back svg{transform:scaleX(-1)}
+/* sign in */
+.signin{flex:1;display:flex;flex-direction:column;padding:12px 20px 40px;overflow-y:auto}
+.sih{display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px}
+.brand .lg{width:38px;height:38px;border-radius:12px;background:var(--blue);color:#fff;display:grid;place-items:center}
+.sic{margin-top:auto;margin-bottom:auto;padding:24px}
+.sic h1{font-size:26px}
+.fl{display:block;font-size:13.5px;font-weight:500;color:var(--ink2);margin-bottom:12px}
+.inp{display:flex;align-items:center;gap:10px;height:50px;border:1.5px solid var(--line);border-radius:14px;padding:0 14px;margin-top:6px;color:var(--ink3);background:#fff}
+.inp:focus-within{border-color:var(--blue)}
+.inp input{flex:1;border:0;outline:0;background:none;color:var(--ink);font-size:15px}
+.note2{display:flex;gap:8px;align-items:flex-start;margin-top:16px;padding:10px 12px;border-radius:12px;background:var(--app);font-size:12.5px;color:var(--ink3)}
+.note2 svg{color:var(--green);margin-top:1px}
+.signout{color:var(--red)!important;border-color:var(--rline)!important}
+
+/* Remi task card, as in the original design */
+.tcard{padding:0;overflow:hidden}
+.tcard .task{grid-template-columns:150px minmax(0,1fr);gap:0;align-items:stretch}
+.tcard .task .rm{width:140px;height:auto;min-height:140px;border-radius:0;background:none;display:grid;place-items:center}
+.tcard .rav{box-shadow:0 0 0 12px #eef3ff,0 12px 26px rgba(47,95,216,.28)}
+.wremi{display:flex;justify-content:center;margin-bottom:22px}
+.wremi .rav{background:linear-gradient(150deg,#6d93f7,#3563e0);box-shadow:0 0 0 12px rgba(255,255,255,.14),0 0 0 24px rgba(255,255,255,.07),0 16px 30px rgba(10,30,90,.35)}
+.tcard .task .tx{padding:18px 16px;align-self:center}
+.tcard .tbody{padding:0 16px 16px}
+.tcard .tbody:empty{display:none}
+.tcard .tbody>.btn{margin-top:14px!important}
+
+/* photos */
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.thumbs span{position:relative;width:64px;height:64px;border-radius:12px;overflow:hidden;border:1.5px solid var(--line)}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.thumbs button{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(17,24,39,.75);color:#fff;display:grid;place-items:center}
+.addph{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:999px;border:1.5px dashed var(--bline);color:var(--blue2);font-weight:600;font-size:14px;cursor:pointer;margin-bottom:14px}
+.sheet textarea{margin-bottom:10px}
+.nimgs{display:grid;gap:6px;margin-top:10px;border-radius:14px;overflow:hidden}
+.nimgs.n2{grid-template-columns:1fr 1fr}.nimgs.n3{grid-template-columns:1fr 1fr 1fr}
+.nimgs img{width:100%;aspect-ratio:4/3;object-fit:cover;margin:0;border-radius:10px}
+.nimgs.n1 img{aspect-ratio:auto;max-height:260px}
+/* messages */
+.ni{position:relative;display:block}
+.nb{position:absolute;top:-5px;right:-9px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ef4444;color:#fff;font-size:10.5px;font-style:normal;font-weight:700;display:grid;place-items:center;border:2px solid #fff}
+.pnav{grid-template-columns:repeat(5,1fr)}
+.urg{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--asoft);border:1.5px solid var(--aline);color:#854d0e;font-size:13px}
+.urg svg{margin-top:1px}
+.urg.flat{border-radius:0;border-width:0 0 1.5px;padding:8px 16px;font-size:12px;flex:none}
+.thl{padding:6px;margin-top:12px}
+.th{display:flex;gap:12px;align-items:center;width:100%;text-align:start;padding:12px 10px;border-radius:14px}
+.th+.th{border-top:1.5px solid var(--line2);border-radius:0 0 14px 14px}
+.th:hover{background:#f9fafb}
+.th .b{flex:1;min-width:0}
+.th .r1{display:flex;justify-content:space-between;gap:8px}
+.th .r1 b{font-weight:600}.th .r1 small,.th .rl{color:var(--ink3);font-size:12px}
+.th .rl{display:block}
+.th .pv{display:block;color:var(--ink2);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.th.un .pv{color:var(--ink);font-weight:600}
+.ud{width:10px;height:10px;border-radius:50%;background:var(--blue);flex:none}
+.pick{display:flex;align-items:center;gap:12px;width:100%;padding:10px 4px;border-top:1.5px solid var(--line2);text-align:start;margin-top:8px}
+.pick span{flex:1}.pick b{display:block;font-weight:600}.pick small{color:var(--ink3);font-size:12.5px}
+.dsep{text-align:center;margin:6px 0}
+.dsep span{font-size:11.5px;color:var(--ink3);background:#e9edf3;padding:3px 10px;border-radius:999px}
+.mr .av{border:0}
+.bub img{display:block;max-width:200px;width:100%;border-radius:12px;margin-bottom:6px}
+.bub small.mt{display:block;font-size:11px;opacity:.7;margin-top:4px;text-align:end}
+.typing{display:flex;gap:4px;padding:12px 14px!important}
+.typing i{width:7px;height:7px;border-radius:50%;background:#9ca3af;animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
+.msgbar{flex-direction:column;align-items:stretch}
+.msgbar .thumbs{margin:0 0 4px}
+
+/* Remi chat, as in the design reference */
+.rav{border-radius:50%;background:linear-gradient(150deg,#5b86f5,#2f5fd8);display:grid;place-items:center;flex:none;box-shadow:0 6px 14px rgba(47,95,216,.28)}
+.ctop{padding:8px 14px 10px}
+.ctop .t{gap:12px}
+.ctop .t b{font-size:18px}
+.segs{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.segs i{height:6px;border-radius:99px;background:#e6eaf3}
+.segs i.d{background:#3563e0}
+.segs i.c{background:linear-gradient(90deg,#3563e0 55%,#e6eaf3 55%)}
+.prog .l b{color:var(--ink);font-weight:700}
+.prog{border-bottom:0}
+.chat{background:#fff;padding:14px 18px 10px;gap:10px}
+.mr.rb .bub{background:#f1f3f8;border:0;border-radius:20px;max-width:86%;color:var(--ink)}
+.mr.me .bub{background:linear-gradient(180deg,#4f7cf0,#3563e0);border:0;border-radius:18px;box-shadow:0 4px 12px rgba(53,99,224,.22)}
+.mr.rb .bub.sys{background:var(--bsoft)}
+.mr.rb .bub.help{background:var(--asoft)}
+.mr.rb .bub.alert{background:var(--rsoft)}
+.mr.rb .bub.done{background:var(--gsoft)}
+.ans{border-top:1.5px solid var(--line2)}
+
+.ctop .t small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.menu.cm{right:0;left:auto;top:44px;min-width:210px}
+.menu.cm button{display:flex;align-items:center;gap:10px}
+.menu.cm button span{flex:1}.menu.cm small{color:var(--ink3);font-size:12.5px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" hidden role="status"></div>
+<script>
+{
+const I={home:'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h1M12 14h1M16 14h1M8 17h1M12 17h1',pat:'M12 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM4 20c.5-3.5 3.8-5.5 8-5.5s7.5 2 8 5.5M9 17.5l3 2.5 3-2.5',chart:'M5 20V11M12 20V5M19 20v-6',inbox:'M4 4h16v16H4zM4 14h4l1 2h6l1-2h4M8 8h8M8 11h6',sup:'M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v5H5a1 1 0 0 1-1-1zM20 14h-3v5h2a1 1 0 0 0 1-1z',bell:'M6 16v-5a6 6 0 0 1 12 0v5l2 2H4zM10 21h4',search:'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM21 21l-5-5',down:'M6 9l6 6 6-6',left:'M15 5l-7 7 7 7',right:'M9 5l7 7-7 7',dl:'M12 4v11M7 10l5 5 5-5M5 20h14',dots:'M12 5h.01M12 12h.01M12 19h.01',pill:'M10.5 3.5a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7-7zM7 7l7 7',book:'M12 6c-2-1.5-5-2-8-2v14c3 0 6 .5 8 2 2-1.5 5-2 8-2V4c-3 0-6 .5-8 2zM12 6v14',note:'M6 3h9l4 4v14H6zM9 10h7M9 14h7M9 18h4',rep:'M4 20h16M7 16v-3M12 16V8M17 16v-6M12 4a2 2 0 1 0 0 .01',user:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM5 21c0-4 3-6 7-6s7 2 7 6',plus:'M12 5v14M5 12h14',send:'M4 12 20 4l-6 16-3-7z',img:'M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01',ledit:'M4 6h12M4 11h12M4 16h6M14 20l5-5 2 2-5 5h-2z',spk:'M4 9h4l5-4v14l-5-4H4zM17 9a4 4 0 0 1 0 6M19.5 6.5a8 8 0 0 1 0 11',sl:'M4 7h10M18 7h2M4 17h4M12 17h8M14 5v4M8 15v4',heart:'M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z',clock:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',exp:'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',zin:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 8v8M8 12h8',zout:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12h8',stats:'M4 4v16h16M8 15l3-4 3 2 5-6',bot:'M7 9h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2zM12 5v4M10 14h.01M14 14h.01M3 13v2M21 13v2',logo:'M12 3a3 3 0 0 1 3 3v3h3a3 3 0 0 1 0 6h-3v3a3 3 0 0 1-6 0v-3H6a3 3 0 0 1 0-6h3V6a3 3 0 0 1 3-3z',x:'M6 6l12 12M18 6 6 18',check2:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12l3 3 5-6',warn:'M12 4 2.5 20h19zM12 10v4M12 17h.01',mail:'M4 6h16v12H4zM4 7l8 6 8-6',lock:'M6 11h12v9H6zM9 11V8a3 3 0 0 1 6 0v3',bnot:'M6 16v-5a6 6 0 0 1 9-5.2M18 11v5l2 2H4M10 21h4M19 6h.01'};
+const ic=(n,s=24,w=1.8)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${I[n]}"/></svg>`;
+let uid=0;
+function remi(s){const k='r'+(uid++);return`<svg width="${s}" height="${s}" viewBox="0 0 100 100" aria-label="Remi" role="img" style="flex:none"><defs><clipPath id="${k}"><circle cx="50" cy="50" r="50"/></clipPath><linearGradient id="${k}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd8ff"/><stop offset="1" stop-color="#3a9be0"/></linearGradient></defs><g clip-path="url(#${k})"><rect width="100" height="100" fill="#cfe9df"/><circle cx="18" cy="26" r="34" fill="#f8d35c"/><circle cx="92" cy="88" r="36" fill="#f5a35a"/><path d="M50 18v10M30 22l6 10M70 22l-6 10" stroke="#4a6680" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="16" r="4" fill="#4a6680"/><rect x="24" y="80" width="52" height="30" rx="14" fill="#3a8fd0"/><ellipse cx="50" cy="56" rx="31" ry="27" fill="url(#${k}h)"/><ellipse cx="42" cy="40" rx="12" ry="5" fill="#fff" opacity=".35"/><rect x="29" y="47" width="42" height="20" rx="10" fill="#18263d"/><rect x="36" y="53" width="9" height="6" rx="3" fill="#62f3ff"/><rect x="55" y="53" width="9" height="6" rx="3" fill="#62f3ff"/><circle cx="18" cy="57" r="6" fill="#3a8fd0"/><circle cx="82" cy="57" r="6" fill="#3a8fd0"/></g></svg>`}
+const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2);
+const avc=['#f28a2e','#5a7fc7','#7a5ac7','#5aa58f','#c75a7a','#9a8a4a','#4a8a9a','#8a5a4a','#5a6ac7'];
+const av=(n,s,i=0)=>`<span class="av" style="width:${s}px;height:${s}px;background:${avc[i%avc.length]};font-size:${Math.round(s*.38)}px">${ini(n)}</span>`;
+const VIAL=`<svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true"><rect x="22" y="6" width="16" height="8" rx="2" fill="#c0703a"/><rect x="24" y="13" width="12" height="5" fill="#9aa7b4"/><path d="M20 20h20v28a6 6 0 0 1-6 6h-8a6 6 0 0 1-6-6z" fill="#cfeaf3" stroke="#8fb8c8"/><path d="M20 36h20v12a6 6 0 0 1-6 6h-8a6 6 0 0 1-6-6z" fill="#7fc9e6"/><rect x="23" y="24" width="4" height="22" rx="2" fill="#fff" opacity=".7"/></svg>`;
+const TAB=`<svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true"><ellipse cx="30" cy="34" rx="22" ry="14" fill="#d8dce2"/><ellipse cx="30" cy="30" rx="22" ry="14" fill="#f7f8fa" stroke="#dfe3e8"/><path d="M14 30h32" stroke="#d3d8de" stroke-width="2"/></svg>`;
+const CAP=`<svg viewBox="0 0 60 60" width="56" height="56" aria-hidden="true"><g transform="rotate(-35 30 30)"><rect x="8" y="20" width="44" height="20" rx="10" fill="#f6b51e"/><path d="M30 20h12a10 10 0 0 1 0 20H30z" fill="#f59a0c"/><rect x="12" y="23" width="14" height="4" rx="2" fill="#fff" opacity=".55"/></g></svg>`;
+const rng=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return((h>>>0)%10000)/10000}};
+Object.assign(I,{out:'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10',globe:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3.6 9h16.8M3.6 15h16.8M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z',pause:'M9 5v14M15 5v14',play:'M8 5l11 7-11 7z',info:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5v.5',skip:'M5 5l8 7-8 7M17 5v14',redo:'M4 12a8 8 0 1 0 2.3-5.7M4 4v5h5',check:'M5 12l5 5 9-10',up:'M3 17l6-6 4 4 8-8M15 7h6v6',down2:'M3 7l6 6 4-4 8 8M15 17h6v-6',flat:'M4 12h16',tsize:'M4 18l5-12 5 12M5.8 14h6.4M15 18l3-7 3 7M15.9 16h4.2',phone:'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z',msg:'M4 5h16v11H8l-4 4z',shield:'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z'});
+const TODAY=new Date(2026,10,19,9,40),DAY=864e5;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const same=(a,b)=>a.toDateString()===b.toDateString();
+
+/* ---------- language ---------- */
+const S={msgT:null,msgNew:false,msgDraft:'',msgImgs:[],noteDraft:'',noteImgs:[],lang:'en',ps:'welcome',big:false,speak:false,noteMode:'week',noteDay:new Date(TODAY),noteQ:'',fav:false,menu:null,composer:false,treat:'active',medQ:'',resOpen:0,repOpen:-1,focus:null};
+const L=(en,es)=>({en,es});
+const LD=f=>{const o=S.lang;S.lang='en';const a=f()[0];S.lang='es';const b=f()[1];S.lang=o;return{en:a,es:b}};
+/* languages: English and Spanish are built in; any other language is translated by Claude and cached */
+const LANGS=[['en','English','English','en-US'],['es','Español','Spanish','es-US'],['zh','中文（简体）','Chinese (Simplified)','zh-CN'],['zh-TW','中文（繁體）','Chinese (Traditional)','zh-TW'],['vi','Tiếng Việt','Vietnamese','vi-VN'],['ko','한국어','Korean','ko-KR'],['tl','Tagalog','Tagalog','fil-PH'],['ar','العربية','Arabic','ar',1],['fr','Français','French','fr-FR'],['ht','Kreyòl ayisyen','Haitian Creole','ht-HT'],['ru','Русский','Russian','ru-RU'],['pt','Português','Portuguese','pt-BR'],['hi','हिन्दी','Hindi','hi-IN'],['bn','বাংলা','Bengali','bn-BD'],['ur','اردو','Urdu','ur-PK',1],['pa','ਪੰਜਾਬੀ','Punjabi','pa-IN'],['gu','ગુજરાતી','Gujarati','gu-IN'],['fa','فارسی','Persian (Farsi)','fa-IR',1],['pl','Polski','Polish','pl-PL'],['uk','Українська','Ukrainian','uk-UA'],['ja','日本語','Japanese','ja-JP'],['de','Deutsch','German','de-DE'],['it','Italiano','Italian','it-IT'],['so','Soomaali','Somali','so-SO'],['am','አማርኛ','Amharic','am-ET'],['sw','Kiswahili','Swahili','sw-KE'],['ne','नेपाली','Nepali','ne-NP'],['my','မြန်မာ','Burmese','my-MM'],['km','ខ្មែរ','Khmer','km-KH'],['he','עברית','Hebrew','he-IL',1],['el','Ελληνικά','Greek','el-GR'],['hmn','Hmoob','Hmong','hmn']];
+const LG=()=>LANGS.find(x=>x[0]===S.lang)||[S.lang,S.lang.slice(2),S.lang.slice(2),'en-US'];
+const builtIn=()=>S.lang==='en'||S.lang==='es';
+const TR={},INF=new Set,FAIL=new Set;let trQ=new Set,trT=null,SAMPLE;
+try{Object.assign(TR,JSON.parse(localStorage.getItem('curo-tr')||'{}'))}catch(_){}
+const t=x=>{if(x==null)return'';if(typeof x==='string')return x;if(typeof x==='function')return t(x());if(builtIn())return x[S.lang]??x.en;
+ const m=TR[S.lang]||(TR[S.lang]={});if(m[x.en]!=null)return m[x.en];if(!INF.has(S.lang+'\u0000'+x.en)&&!FAIL.has(S.lang)){trQ.add(x.en);clearTimeout(trT);trT=setTimeout(flushTr,30)}return x.en};
+const pending=()=>!builtIn()&&!FAIL.has(S.lang)&&(trQ.size>0||[...INF].some(k=>k.startsWith(S.lang+'\u0000')));
+function getSample(){if(SAMPLE!==undefined)return SAMPLE;SAMPLE=(window.claude&&claude.use)?claude.use('sample').catch(()=>null):Promise.resolve(null);return SAMPLE}
+async function flushTr(){const lang=S.lang,name=LG()[2],all=[...trQ];trQ=new Set;if(!all.length||builtIn())return;all.forEach(e=>INF.add(lang+'\u0000'+e));render();
+ const sm=await getSample();if(!sm){FAIL.add(lang);all.forEach(e=>INF.delete(lang+'\u0000'+e));toast('Automatic translation isn’t available here, so the app is showing English.');render();return}
+ const chunks=[];for(let i=0;i<all.length;i+=40)chunks.push(all.slice(i,i+40));
+ await Promise.all(chunks.map(async ch=>{try{
+  const out=await sm.json(`You translate interface text for "Curo", a phone app for people having cancer treatment, and the messages of its friendly check-in assistant "Remi". Translate every string in the JSON array below from English into ${name}.
+Rules:
+- Use simple, warm, everyday words that a patient with no medical training understands (about a 6th-grade reading level). Use polite address.
+- Keep the meaning exact, especially symptom questions and answer choices. Do not add or drop information.
+- Keep HTML tags exactly as they are. Keep numbers, times, phone numbers, °F and percentages.
+- Do not translate these names: Curo, Remi, Sarah, Sarah Johnson, Dr. Hart, Dr. Daniel Hart, PRO-CTCAE, Docetaxel, Taxotere, Dexamethasone, Pantoprazole, Ondansetron, Doxorubicin, Cyclophosphamide.
+- Translate dates and month or weekday names into the natural form for ${name}.
+Return only a JSON array of the translated strings, the same length and order as the input.
+
+${JSON.stringify(ch)}`,{modelTier:'quick'});
+  if(!Array.isArray(out)||out.length!==ch.length)throw new Error('bad shape');
+  const m=TR[lang]||(TR[lang]={});ch.forEach((e,i)=>{if(typeof out[i]==='string')m[e]=out[i]})}
+ catch(err){if(err&&(err.code==='not_granted'||err.code==='rate_limited'))FAIL.add(lang);if(!toast.err){toast.err=1;toast(err&&err.code==='rate_limited'?'Translation is busy. Some text is in English for now.':'Some text couldn’t be translated, so it’s in English.')}}
+ finally{ch.forEach(e=>INF.delete(lang+'\u0000'+e))}}));
+ try{localStorage.setItem('curo-tr',JSON.stringify(TR))}catch(_){}
+ if(S.lang===lang)render()}
+const loc=()=>{try{return Intl.DateTimeFormat.supportedLocalesOf([LG()[3]]).length?LG()[3]:'en-US'}catch(_){return'en-US'}};
+const fD=(d,o={month:'short',day:'numeric'})=>d.toLocaleDateString(loc(),o);
+const fLong=d=>fD(d,{weekday:'short',month:'long',day:'numeric'});
+const lst=a=>{a=a.map(t);try{return new Intl.ListFormat(loc(),{type:'conjunction'}).format(a)}catch(_){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+(S.lang==='es'?' y ':' and ')+a.at(-1)}};
+const low=x=>t(x).toLocaleLowerCase(loc());
+
+/* ---------- PRO-CTCAE scales, with plain-language hints ---------- */
+const SEV=[L('None','Nada'),L('Mild','Leve'),L('Moderate','Moderado'),L('Severe','Severo'),L('Very severe','Muy severo')];
+const SEVH=[null,L('A little, easy to ignore','Un poco, fácil de ignorar'),L('I notice it and it bothers me','Lo noto y me molesta'),L('Strong and hard to ignore','Fuerte y difícil de ignorar'),L('The worst it could be','Lo peor posible')];
+const FREQ=[L('Never','Nunca'),L('Rarely','Rara vez'),L('Occasionally','Ocasionalmente'),L('Frequently','Frecuentemente'),L('Almost constantly','Casi constantemente')];
+const FREQH=[null,L('Once or twice','Una o dos veces'),L('A few times','Algunas veces'),L('Most days','La mayoría de los días'),L('Nearly all the time','Casi todo el tiempo')];
+const INT=[L('Not at all','Nada'),L('A little bit','Un poco'),L('Somewhat','Algo'),L('Quite a bit','Bastante'),L('Very much','Muchísimo')];
+const INTH=[null,L('Small changes to my day','Pequeños cambios en mi día'),L('I had to change some plans','Tuve que cambiar algunos planes'),L('I skipped a lot of things','Dejé de hacer muchas cosas'),L('I couldn’t do my usual things','No pude hacer mis cosas de siempre')];
+const SC={sev:[SEV,SEVH],freq:[FREQ,FREQH],int:[INT,INTH],pres:[[L('No','No'),L('Yes','Sí')],[]]};
+const AT={sev:'Severity',freq:'Frequency',int:'Interference',pres:'Presence'};
+const SW=['#cbd5e1','#facc15','#fb923c','#ef4444','#9f1239'];
+const GW=[L('None','Nada'),L('Mild','Leve'),L('Moderate','Moderado'),L('Severe','Severo'),L('Very severe','Muy severo')];
+const GBG=['#f1f5f9','#fef3c7','#ffedd5','#fee2e2','#ffe4e6'],GINK=['#94a3b8','#92400e','#9a3412','#991b1b','#881337'];
+const SN={fat:L('Fatigue','Cansancio'),nau:L('Nausea','Náuseas'),pain:L('Pain','Dolor'),anx:L('Anxiety','Ansiedad'),sad:L('Sad or down','Tristeza'),ins:L('Trouble sleeping','Problemas para dormir'),neu:L('Numbness or tingling','Adormecimiento u hormigueo'),dia:L('Diarrhea','Diarrea'),hair:L('Hair loss','Caída del cabello')};
+const HELP={fat:L('Fatigue means feeling tired, weak or low on energy, even after you rest.','Cansancio quiere decir sentirse agotada, débil o sin energía, incluso después de descansar.'),
+ nau:L('Nausea means feeling sick to your stomach, like you might throw up.','Náuseas quiere decir sentir el estómago revuelto, como si fuera a vomitar.'),
+ pain:L('Any aches or pain in your body, like in your joints, muscles or back.','Cualquier molestia o dolor en el cuerpo, como en las articulaciones, los músculos o la espalda.'),
+ anx:L('Anxiety means feeling worried, nervous or on edge.','Ansiedad quiere decir sentirse preocupada, nerviosa o inquieta.'),
+ sad:L('Feeling sad, down or hopeless.','Sentirse triste, decaída o sin esperanza.'),
+ ins:L('Trouble falling asleep, staying asleep, or waking up too early.','Dificultad para dormirse, para seguir dormida o despertarse muy temprano.'),
+ neu:L('Pins and needles, or less feeling than usual, often in the hands or feet.','Sensación de “alfileres” o menos sensibilidad de lo normal, a menudo en las manos o los pies.'),
+ dia:L('Loose or watery stools (poop), more often than usual.','Heces (popó) blandas o aguadas, más seguido de lo normal.'),
+ hair:L('Hair getting thinner or falling out, on your head or body.','El cabello se vuelve más fino o se cae, en la cabeza o el cuerpo.'),
+ int:L('This asks how much it got in the way of everyday things, like work, chores, cooking or getting dressed.','Esto pregunta cuánto le impidió hacer cosas de todos los días, como trabajar, las tareas de la casa, cocinar o vestirse.'),
+ freq:L('How often it happened in the last 7 days.','Con qué frecuencia pasó en los últimos 7 días.')};
+const ITEMS={fat:2,nau:2,pain:3,anx:3,sad:3,ins:2,neu:2,dia:1,hair:1},FULL=Object.values(ITEMS).reduce((a,b)=>a+b,0);
+const STG=[L('Energy','Energía'),L('Nausea','Náuseas'),L('Pain','Dolor'),L('Mood','Ánimo'),L('Dr. Hart’s questions','Preguntas del Dr. Hart'),L('Notes','Notas'),L('Review','Revisar')];
+
+/* ---------- Sarah's record (same data as the clinician portal) ---------- */
+const ME={name:'Sarah Johnson',first:'Sarah',dob:'12/04/1980',drug:'Docetaxel',brand:'Taxotere',cycle:4,
+ hist:{fat:[1,2,2,3,3,3],pain:[1,1,1,2,2,2],nau:[1,2,1,2,1,1],anx:[0,0,1,1,1,1],neu:[0,1,1,1,1,2]},
+ notes:[[17,'The tingling in my hands and feet has gotten worse this week. I’m also feeling very weak after my last chemo session.'],[15,'Lower back started aching after I carried groceries. The heat pad helps a bit.'],[11,'Slept badly two nights in a row. Kept thinking about the scan results.']].map(([d,x])=>({t:new Date(2026,10,d,8,20),txt:x,fav:false})),
+ sched:{freq:L('Weekly','Semanal'),day:L('Thursdays','los jueves'),time:'9:00 AM',next:new Date(2026,10,26),mods:['neu','dia','hair'],by:'Dr. Daniel Hart'},
+ update:{t:new Date(2026,10,13,14,5),v:L('Keep monitoring','Seguir vigilando'),msg:L('Thanks for the update, Sarah. Let’s talk about the tingling in your hands at your visit on Nov 24. Call the nurse line if it gets worse before then.','Gracias por la información, Sarah. Hablemos del hormigueo en las manos en su cita del 24 de noviembre. Llame a la línea de enfermería si empeora antes.')},
+ lastAt:new Date(2026,10,12,9,12)};
+const wkDates=()=>{const n=ME.hist.fat.length;return Array.from({length:n},(_,i)=>new Date(ME.lastAt-7*(n-1-i)*DAY))};
+const lastG=k=>ME.hist[k]?ME.hist[k].at(-1):null;
+
+/* ---------- Remi check-in engine ---------- */
+let C;
+const fresh=()=>({stage:-1,log:[],p:null,items:[],q:[],painAreas:null,note:'',sent:false,paused:false,started:false,lastQ:null,breaks:0});
+const bot=(h,cls)=>{const m={me:false,h,cls};C.log.push(m);return m};
+const me=(h,img)=>C.log.push({me:true,h,img});
+const ask=(p)=>{C.p=p;C.lastQ=[...C.log].reverse().find(m=>!m.me&&!m.cls)};
+const rec=(s,it,v,flag)=>{C.items=C.items.filter(x=>!(x.s===s&&x.it===it));C.items.push({s,it,v,flag})};
+const nextQ=()=>{const f=C.q.shift();f?f():notesStep()};
+const pend=()=>C.p;
+function gradeC(s){const a=C.items.filter(x=>x.s===s&&x.v!=null);if(!a.length)return null;return Math.min(3,Math.max(...a.map(x=>x.v)))}
+/* scale question: options + plain hints, "same as last week", skip, and an explanation */
+function askScale(s,it,cb){const[o,h]=SC[it],pv=it==='sev'&&lastG(s)!=null?lastG(s):null;
+ ask({scale:true,s,it,opts:o,hints:h,same:pv,cb:(v,flag)=>{rec(s,it,v,flag);cb(v)}})}
+function startChat(){C=fresh();C.started=true;
+ bot(LD(()=>[`Hi ${ME.first}! It’s good to see you again. Let’s check in on how you’re feeling during your treatment with ${ME.drug}.`,`¡Hola, ${ME.first}! Qué gusto verla otra vez. Vamos a ver cómo se ha sentido durante su tratamiento con ${ME.drug}.`]));
+ bot(L('This takes about 2 minutes. You can skip any question, tap “What does this mean?” for simple words, or take a break and finish later.','Toma unos 2 minutos. Puede saltar cualquier pregunta, tocar “¿Qué significa?” para verlo en palabras sencillas, o tomar un descanso y terminar después.'),'sys');
+ readyQ()}
+function readyQ(){bot(L('Ready?','¿Lista?'));ask({opts:[L('Let’s start','Empecemos'),L('Not right now','Ahora no')],cb:i=>{if(i){C.log.pop();readyQ();C.log.pop();C.log.push(C.lastQ);pauseChat();return}fatigue()}})}
+function fatigue(){C.stage=0;bot(L('Let’s start with your energy. Last time you said you were feeling pretty tired. How are you doing now?','Empecemos con su energía. La última vez dijo que se sentía bastante cansada. ¿Cómo está ahora?'));
+ ask({opts:[L('More energy','Con más energía'),L('About the same','Más o menos igual'),L('More tired','Más cansada')],help:'fat',cb:i=>{
+  bot(i===0?L('That’s good news. In the last 7 days, at its worst, how bad was your tiredness?','¡Qué buena noticia! En los últimos 7 días, en su peor momento, ¿qué tan fuerte fue el cansancio?'):L('Thanks for telling me. In the last 7 days, at its worst, how bad was your tiredness?','Gracias por contarme. En los últimos 7 días, en su peor momento, ¿qué tan fuerte fue el cansancio?'));
+  askScale('fat','sev',v=>{if(!v){nausea();return}bot(L('How much did the tiredness get in the way of everyday things, like getting dressed or cooking?','¿Cuánto le impidió el cansancio hacer cosas de todos los días, como vestirse o cocinar?'));
+   askScale('fat','int',w=>{if(w>=2)bot(LD(()=>[`I hear you, ${ME.first}. Tiredness like that makes everything harder. I’ll make sure your care team sees it.`,`La entiendo, ${ME.first}. Un cansancio así hace todo más difícil. Me aseguraré de que su equipo lo vea.`]));nausea()})})}})}
+function nausea(){C.stage=1;bot(L('Now nausea. In the last 7 days, how often did you feel sick to your stomach?','Ahora las náuseas. En los últimos 7 días, ¿con qué frecuencia sintió el estómago revuelto?'));
+ askScale('nau','freq',f=>{if(f==null||f<2){bot(f?L('Good to hear it’s rare.','Qué bueno que fue poco.'):f===0?L('Glad there’s been no nausea.','Me alegra que no haya tenido náuseas.'):L('No problem, let’s move on.','No hay problema, sigamos.'));pain();return}
+  bot(L('At its worst, how bad was the nausea?','En su peor momento, ¿qué tan fuertes fueron las náuseas?'));askScale('nau','sev',v=>{bot(v>=3?L('Thank you. I’ll flag this for your care team. You can take your ondansetron as prescribed.','Gracias. Se lo señalaré a su equipo. Puede tomar su ondansetrón como se lo recetaron.'):L('Thanks. Tell me if it starts getting worse.','Gracias. Avíseme si empieza a empeorar.'));pain()})})}
+function pain(){C.stage=2;bot(L('How about pain? Last time you mentioned your knees and shoulders. Where do you have pain now? Pick all that apply.','¿Y el dolor? La última vez mencionó las rodillas y los hombros. ¿Dónde tiene dolor ahora? Elija todo lo que corresponda.'));
+ const A=[L('Knees','Rodillas'),L('Shoulders','Hombros'),L('Lower back','Parte baja de la espalda'),L('Hands or feet','Manos o pies'),L('Somewhere else','En otro lugar'),L('No pain now','Sin dolor ahora')];
+ ask({multi:true,opts:A,excl:5,sel:new Set(),help:'pain',cb:sel=>{if(sel==null){rec('pain','sev',null,'skip');mood();return}const a=sel.filter(i=>i!==5).map(i=>A[i]);C.painAreas=a;
+  if(!a.length){rec('pain','sev',0);bot(L('That’s great to hear. I’ll note the improvement for your doctor.','¡Qué bueno! Anotaré la mejoría para su médico.'));mood();return}
+  const gone=[0,1].filter(i=>!sel.includes(i)).map(i=>A[i]);if(gone.length)bot(LD(()=>[`Good to hear your ${lst(gone).toLowerCase()} feel better.`,`Qué bueno que ${lst(gone).toLowerCase()} se sienten mejor.`]));
+  bot(L('At its worst, how bad was the pain?','En su peor momento, ¿qué tan fuerte fue el dolor?'));
+  askScale('pain','sev',v=>{if(!v){mood();return}bot(L('How much did the pain get in the way of your usual activities?','¿Cuánto le impidió el dolor hacer sus actividades de siempre?'));askScale('pain','int',()=>mood())})}})}
+function mood(){C.stage=3;bot(L('Now, how have you been feeling emotionally? Compared with last week, do you feel…','Ahora, ¿cómo se ha sentido de ánimo? Comparado con la semana pasada, se siente…'));
+ ask({opts:[L('More worried or nervous','Más preocupada o nerviosa'),L('More sad or down','Más triste o decaída'),L('About the same','Más o menos igual'),L('Better','Mejor')],help:'anx',cb:i=>{
+  if(i===2){rec('anx','sev',lastG('anx'),'same');bot(L('Thanks. I’ll keep last week’s answer.','Gracias. Mantendré la respuesta de la semana pasada.'));drq();return}
+  if(i===3){bot(L('I’m glad. How would you rate any worried feelings this week?','Me alegra. ¿Cómo calificaría cualquier preocupación esta semana?'));askScale('anx','sev',()=>drq());return}
+  const s=i?'sad':'anx';bot(i?LD(()=>[`I’m sorry you’ve been feeling down, ${ME.first}. At their worst, how strong were those feelings?`,`Siento que se haya sentido decaída, ${ME.first}. En su peor momento, ¿qué tan fuertes fueron esos sentimientos?`]):LD(()=>[`I’m sorry to hear that, ${ME.first}. Worry during treatment is very common. At its worst, how strong was it?`,`Siento oír eso, ${ME.first}. Preocuparse durante el tratamiento es muy común. En su peor momento, ¿qué tan fuerte fue?`]));
+  askScale(s,'sev',v=>{if(!v){drq();return}bot(L('Has it been affecting your sleep?','¿Le ha afectado el sueño?'));ask({opts:[L('Yes, I’m having trouble sleeping','Sí, me cuesta dormir'),L('No, sleep is okay','No, duermo bien')],help:'ins',cb:j=>{if(j){drq();return}
+   bot(L('Sleep matters a lot right now. How much did poor sleep get in the way of your day?','Dormir bien es muy importante ahora. ¿Cuánto le afectó el mal sueño durante el día?'));askScale('ins','int',()=>drq())}})})}})}
+const MODQ={neu:[['sev','int'],L('Pins and needles, or less feeling in hands or feet','“Alfileres” o menos sensibilidad en manos o pies')],dia:[['freq'],L('Loose or watery stools','Heces blandas o aguadas')],hair:[['pres'],L('Thinning or falling out','Cabello más fino o que se cae')]};
+function drq(){C.stage=4;bot(L('Dr. Hart asked me to check on a few things your treatment can cause. Have you noticed any of these in the last 7 days?','El Dr. Hart me pidió preguntarle por algunas cosas que su tratamiento puede causar. ¿Ha notado alguna de estas en los últimos 7 días?'));
+ const ks=ME.sched.mods,opts=[...ks.map(k=>SN[k]),L('None of these','Ninguna de estas')];
+ ask({multi:true,opts,hints:[...ks.map(k=>MODQ[k][1]),null],excl:ks.length,sel:new Set(),cb:sel=>{if(sel==null){ks.forEach(k=>rec(k,MODQ[k][0][0],null,'skip'));notesStep();return}const a=sel.filter(i=>i<ks.length).map(i=>ks[i]);
+  ks.filter(k=>!a.includes(k)).forEach(k=>rec(k,MODQ[k][0][0],0));
+  if(!a.length)bot(L('Good to hear.','Qué bueno.'));
+  a.forEach(k=>MODQ[k][0].forEach((it,j)=>C.q.push(()=>{
+   if(it==='pres'){rec(k,'pres',1);bot(LD(()=>[`Thanks. I’ve added ${low(SN[k])} to your report.`,`Gracias. Agregué ${low(SN[k])} a su reporte.`]));nextQ();return}
+   bot(it==='freq'?LD(()=>[`How often did you have ${low(SN[k])} in the last 7 days?`,`¿Con qué frecuencia tuvo ${low(SN[k])} en los últimos 7 días?`]):it==='sev'?LD(()=>[`At its worst, how bad was the ${low(SN[k])}?`,`En su peor momento, ¿qué tan fuerte fue el ${low(SN[k])}?`]):L('How much did it get in the way of your usual activities?','¿Cuánto le impidió hacer sus actividades de siempre?'));
+   askScale(k,it,()=>nextQ())})));nextQ()}})}
+function notesStep(){C.stage=5;bot(L('Almost done. Is there anything else you’d like Dr. Hart to know? Type it below, or tap No notes.','Ya casi terminamos. ¿Hay algo más que quiera que sepa el Dr. Hart? Escríbalo abajo, o toque Sin notas.'));
+ ask({opts:[L('No notes','Sin notas')],text:true,cb:()=>summary()})}
+const touched=()=>[...new Set(C.items.map(x=>x.s))];
+function summary(){C.stage=6;const ts=touched();
+ bot(()=>`<b>${t(L('Here’s a quick summary:','Este es un breve resumen:'))}</b>${ts.map(s=>{const g=gradeC(s),pv=lastG(s),sk=g==null,pr=C.items.some(x=>x.s===s&&x.it==='pres');return`<div class="srow"><span>${t(SN[s])}${s==='pain'&&C.painAreas?.length?' ('+lst(C.painAreas).toLowerCase()+')':''}</span><span class="gp" style="--c:${sk?'#6b7280':SW[g]}">${sk?t(L('Skipped','Omitido')):pr?t(SC.pres[0][g?1:0]):t(GW[g])}${!sk&&pv!=null&&pv!==g?(g>pv?' ↑':' ↓'):''}</span></div>`}).join('')}${C.note?`<div class="srow"><span>${t(L('Note','Nota'))}: ${esc(C.note)}</span></div>`:''}`);
+ bot(L('Does this look right?','¿Está bien así?'));ask({opts:[L('Yes, send it','Sí, enviarlo'),L('Start over','Empezar de nuevo')],cb:i=>i?startChat():submit()})}
+function submit(){C.stage=7;C.sent=true;C.paused=false;const ts=touched();
+ ts.forEach(s=>{if(!ME.hist[s])ME.hist[s]=Array(ME.hist.fat.length).fill(0)});Object.keys(ME.hist).forEach(s=>{const g=gradeC(s);ME.hist[s].push(g??ME.hist[s].at(-1))});
+ ME.lastAt=new Date(TODAY);
+ const hi=ts.filter(s=>gradeC(s)>=3);
+ if(hi.length)bot(LD(()=>[`<b>I’ve let your care team know</b> about your ${lst(hi.map(s=>SN[s])).toLowerCase()}. A nurse will call you today. If things get much worse, or you have a fever of 100.4°F or higher or trouble breathing, call the nurse line at 555-0142 or go to the ER.`,`<b>Le avisé a su equipo</b> sobre ${lst(hi.map(s=>SN[s])).toLowerCase()}. Una enfermera la llamará hoy. Si empeora mucho, o tiene fiebre de 100.4°F o más o le cuesta respirar, llame a la línea de enfermería al 555-0142 o vaya a urgencias.`]),'alert');
+ bot(LD(()=>[`<b>Check-in sent</b><br>Dr. Hart’s team will see it today. Thank you, ${ME.first}.`,`<b>Reporte enviado</b><br>El equipo del Dr. Hart lo verá hoy. Gracias, ${ME.first}.`]),'done');
+ bot(L('Would you like a few tips before you go?','¿Quiere algunos consejos antes de irse?'));ask({opts:[L('Tips for better sleep','Consejos para dormir mejor'),L('Tips for tiredness','Consejos para el cansancio'),L('I’m all set','Estoy bien así')],cb:tips})}
+const TIPS=[[L('A few things that help many people sleep better:','Algunas cosas que ayudan a dormir mejor:'),[L('Go to bed and get up at the same times every day.','Acuéstese y levántese a la misma hora todos los días.'),L('Have 30 minutes without screens before bed.','Pase 30 minutos sin pantallas antes de dormir.'),L('Keep naps short, about 30 minutes, and before mid-afternoon.','Haga siestas cortas, de unos 30 minutos, y antes de media tarde.')]],[L('A few ways to manage tiredness:','Algunas formas de manejar el cansancio:'),[L('Plan important tasks for the time of day you feel best.','Planee las tareas importantes para la hora del día en que se siente mejor.'),L('Short, gentle walks can help, if your care team says they’re okay.','Caminatas cortas y suaves pueden ayudar, si su equipo dice que está bien.'),L('Let friends and family help with shopping or cooking.','Deje que amigos y familiares la ayuden con las compras o la comida.')]]];
+function tips(i){if(i<2){const[h,xs]=TIPS[i];bot(()=>`${t(h)}<ul>${xs.map(x=>`<li>${t(x)}</li>`).join('')}</ul>`)}
+ bot(LD(()=>[`You’re doing a great job, ${ME.first}. Your next check-in is ${fD(ME.sched.next,{weekday:'long',month:'short',day:'numeric'})}. I’m here whenever you need me.`,`Lo está haciendo muy bien, ${ME.first}. Su próximo reporte es el ${fD(ME.sched.next,{weekday:'long',day:'numeric',month:'short'})}. Aquí estoy cuando me necesite.`]));
+ ask({opts:[L('Back to home','Volver al inicio')],cb:()=>{S.ps='home';render()}})}
+function pauseChat(){if(C.sent)return;C.paused=true;C.breaks++;
+ bot(LD(()=>[`No problem. Your answers are saved. Come back whenever you’re ready and we’ll pick up ${C.stage<0?'from the start':'at '+low(STG[C.stage])}. If you can’t finish, I’ll send what you’ve answered on Friday.`,`No hay problema. Sus respuestas están guardadas. Vuelva cuando quiera y seguiremos ${C.stage<0?'desde el principio':'con '+low(STG[C.stage])}. Si no puede terminar, enviaré lo que ya respondió el viernes.`]),'sys');
+ S.ps='home'}
+function resume(){C.paused=false;bot(LD(()=>[`Welcome back, ${ME.first}! Let’s pick up where we left off.`,`¡Bienvenida otra vez, ${ME.first}! Sigamos donde lo dejamos.`]),'sys');if(C.lastQ)C.log.push({...C.lastQ})}
+const answered=()=>C.items.filter(x=>x.v!=null&&x.flag!=='same').length,skipped=()=>C.items.filter(x=>x.v==null).length,carried=()=>C.items.filter(x=>x.flag==='same').length;
+const pct=()=>C.sent?100:Math.max(0,Math.round((C.stage<0?0:C.stage)/STG.length*100));
+const minLeft=()=>Math.max(1,Math.round((STG.length-Math.max(0,C.stage))*.35));
+function addNote(txt,img){const imgs=Array.isArray(img)?img:img?[img]:[];ME.notes.unshift({t:new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate(),new Date().getHours(),new Date().getMinutes()),txt,imgs,fav:false})}
+const readImgs=(files,cb)=>{const fs=[...files].filter(f=>f.type.startsWith('image/')).slice(0,6);if(!fs.length)return;Promise.all(fs.map(f=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>shrink(fr.result,r);fr.readAsDataURL(f)}))).then(cb)};
+function shrink(src,cb){const im=new Image();im.onload=()=>{const k=Math.min(1,1200/Math.max(im.width,im.height));if(k>=1){cb(src);return}const c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.85))};im.onerror=()=>cb(src);im.src=src}
+const thumbs=(arr,act)=>arr.length?`<div class="thumbs">${arr.map((u,i)=>`<span><img src="${u}" alt="">${act?`<button type="button" data-a="${act}" data-i="${i}" aria-label="${t(L('Remove photo','Quitar foto'))}">${ic('x',14,2.6)}</button>`:''}</span>`).join('')}</div>`:'';
+
+/* ---------- screens ---------- */
+const remiAv=(z=44)=>`<span class="rav" style="width:${z}px;height:${z}px" role="img" aria-label="Remi"><svg width="${Math.round(z*.5)}" height="${Math.round(z*.5)}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2v2.6" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="3" r="1.5" fill="#fff"/><rect x="3.5" y="7" width="17" height="12.5" rx="4.2" fill="#fff"/><rect x="7.2" y="11.2" width="9.6" height="4.4" rx="2.2" fill="#2a4fb8"/><circle cx="9.6" cy="13.4" r="1" fill="#8fb3ff"/><circle cx="14.4" cy="13.4" r="1" fill="#8fb3ff"/></svg></span>`;
+const sbar=w=>`<div class="sbar ${w?'w':''}"><span>9:41</span><i></i><span style="display:flex;gap:6px;align-items:center"><svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="26" height="13" viewBox="0 0 26 13" aria-hidden="true"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2" fill="currentColor"/><rect x="24" y="4.5" width="1.5" height="4" rx=".7" fill="currentColor" opacity=".4"/></svg></span></div>`;
+const NAV=[['home','home',L('Home','Inicio')],['notes','note',L('Notes','Notas')],['messages','msg',L('Messages','Mensajes')],['reports','chart',L('Progress','Progreso')],['profile','user',L('Profile','Perfil')]];
+const unread=()=>TH.reduce((a,x)=>a+x.unread,0);
+const pnav=a=>`<nav class="pnav">${NAV.map(([s,n,l])=>`<button data-a="ps" data-v="${s}" ${a===s?'aria-current="page"':''}><span class="ni">${ic(n,22)}${s==='messages'&&unread()?`<i class="nb">${unread()}</i>`:''}</span>${t(l)}</button>`).join('')}</nav>`;
+const STAFF={hart:['Dr. Daniel Hart',L('Oncologist','Oncólogo'),1,'Daniel Hart'],nurse:['Maria Lopez, RN',L('Oncology nurse','Enfermera de oncología'),3,'Maria Lopez']};
+const TH=[{id:'nurse',unread:1,m:[{who:'nurse',t:new Date(2026,10,17,10,12),h:L('Hi Sarah, a reminder for your infusion on Dec 1: please drink plenty of fluids the day before, and bring your list of medicines. Message me here if you have any questions.','Hola Sarah, un recordatorio para su infusión del 1 de diciembre: tome muchos líquidos el día anterior y traiga su lista de medicinas. Escríbame aquí si tiene preguntas.')}]},
+ {id:'hart',unread:0,m:[{who:'me',t:new Date(2026,10,6,18,40),h:'Is it okay to take ibuprofen for my knee pain?'},{who:'hart',t:new Date(2026,10,7,9,5),h:L('Good question. Please don’t take ibuprofen during chemo unless we say so, because it can affect your blood counts. Acetaminophen (Tylenol) is usually fine. Call the nurse line if the pain gets worse.','Buena pregunta. Por favor no tome ibuprofeno durante la quimioterapia a menos que se lo indiquemos, porque puede afectar sus conteos de sangre. El acetaminofén (Tylenol) por lo general está bien. Llame a la línea de enfermería si el dolor empeora.')},{who:'hart',t:new Date(2026,10,13,14,5),h:ME.update.msg}]}];
+const REPLY={hart:L('Thanks for your message, Sarah. I’ve read it and the nurse will follow up with you today. If anything gets worse, call 555-0142.','Gracias por su mensaje, Sarah. Lo leí y la enfermera la contactará hoy. Si algo empeora, llame al 555-0142.'),nurse:L('Thanks, Sarah. I got your message and I’m looking into it. I’ll get back to you before the end of the day.','Gracias, Sarah. Recibí su mensaje y lo estoy revisando. Le respondo antes de que termine el día.')};
+const tFmt=d=>same(d,TODAY)?d.toLocaleTimeString(loc(),{hour:'numeric',minute:'2-digit'}):fD(d);
+function messages(){const th=S.msgT&&TH.find(x=>x.id===S.msgT);
+ const banner=`<div class="urg">${ic('phone',16,2)}<span>${t(L('Messages are answered within 1 business day. For urgent symptoms call 555-0142. In an emergency, call 911.','Los mensajes se responden en 1 día hábil. Para síntomas urgentes llame al 555-0142. En una emergencia, llame al 911.'))}</span></div>`;
+ if(!th){return`${sbar()}<div class="scr"><div class="hero"><div class="ptitle"><h1>${t(L('Messages','Mensajes'))}</h1><button class="hbtn" data-a="mnew" aria-label="${t(L('New message','Mensaje nuevo'))}">${ic('plus',20,2.2)}</button></div><p class="sub">${t(L('Write to your care team. You can add photos.','Escriba a su equipo médico. Puede agregar fotos.'))}</p></div>
+  <div class="sec">${banner}${S.msgNew?`<div class="card" style="margin-top:12px"><b style="font-weight:600">${t(L('Who do you want to message?','¿A quién quiere escribir?'))}</b>${Object.entries(STAFF).map(([k,[n,r,c]])=>`<button class="pick" data-a="mt" data-v="${k}">${av(STAFF[k][3],40,c)}<span><b>${n}</b><small>${t(r)}</small></span>${ic('right',18)}</button>`).join('')}</div>`:''}
+  <div class="card thl">${TH.slice().sort((a,b)=>b.m.at(-1).t-a.m.at(-1).t).map(x=>{const[n,r,c]=STAFF[x.id],lm=x.m.at(-1),tx=(lm.who==='me'?t(L('You: ','Usted: ')):'')+(lm.img&&!lm.h?t(L('Photo','Foto')):t(lm.h)).replace(/<[^>]+>/g,'');return`<button class="th ${x.unread?'un':''}" data-a="mt" data-v="${x.id}">${av(STAFF[x.id][3],46,c)}<span class="b"><span class="r1"><b>${n}</b><small>${tFmt(lm.t)}</small></span><small class="rl">${t(r)}</small><span class="pv">${esc(tx)}</span></span>${x.unread?`<i class="ud" aria-label="${t(L('Unread','No leído'))}"></i>`:''}</button>`}).join('')}</div></div></div>${pnav('messages')}`}
+ const[n,r,c]=STAFF[th.id];let lastD='';
+ const rows=th.m.map(m=>{const d=fD(m.t,{weekday:'short',month:'short',day:'numeric'}),sep=d!==lastD?`<div class="dsep"><span>${same(m.t,TODAY)?t(L('Today','Hoy')):d}</span></div>`:'';lastD=d;const mine=m.who==='me';
+  return`${sep}<div class="mr ${mine?'me':''}">${mine?'':av(STAFF[m.who][3],30,STAFF[m.who][2])}<div class="bub">${(m.imgs||[]).map(u=>`<img src="${u}" alt="${t(L('Photo','Foto'))}">`).join('')}${m.h?`<div>${typeof m.h==='string'?esc(m.h):t(m.h)}</div>`:''}<small class="mt">${m.t.toLocaleTimeString(loc(),{hour:'numeric',minute:'2-digit'})}${mine?' · '+t(m.read?L('Read','Leído'):L('Sent','Enviado')):''}</small></div></div>`}).join('');
+ return`${sbar()}<div class="ctop"><button class="ib" data-a="mt" data-v="" aria-label="${t(L('Back','Atrás'))}">${ic('left',24,2.2)}</button><div class="t">${av(STAFF[th.id][3],38,c)}<div><b>${n}</b><small>${t(r)}</small></div></div><a class="ib" href="tel:5550142" aria-label="${t(L('Call the nurse line','Llamar a la línea de enfermería'))}">${ic('phone',20,2)}</a></div>
+ ${banner.replace('class="urg"','class="urg flat"')}<div class="chat" id="chat" aria-live="polite">${rows}${th.typing?`<div class="mr">${av(STAFF[th.id][3],30,c)}<div class="bub typing"><i></i><i></i><i></i></div></div>`:''}</div>
+ <form class="inbar msgbar" data-f="msg">${thumbs(S.msgImgs||[],'mrm')}<div class="row" style="gap:8px;align-items:flex-end"><label aria-label="${t(L('Add photos','Agregar fotos'))}">${ic('img',22)}<input type="file" accept="image/*" multiple id="mimg" hidden></label><textarea id="mi" data-in="msgDraft" placeholder="${t(LD(()=>[`Message ${n.split(',')[0]}`,`Mensaje para ${n.split(',')[0]}`]))}" aria-label="${t(L('Message','Mensaje'))}">${esc(S.msgDraft||'')}</textarea><button class="send" aria-label="${t(L('Send','Enviar'))}">${ic('send',20)}</button></div></form>`}
+const langSw=(cls='lpill')=>`<button class="${cls}" data-a="lsheet" aria-label="${t(L('Change language','Cambiar idioma'))}">${ic('globe',17,2)}<span>${LG()[1]}</span>${ic('down',15,2.2)}</button>`;
+function langSheet(){const q=(S.langQ||'').toLowerCase(),ls=LANGS.filter(x=>!q||(x[1]+' '+x[2]).toLowerCase().includes(q));return`<div class="scrim" data-a="lsheet"></div><div class="sheet lsh" role="dialog" aria-label="${t(L('Choose a language','Elija un idioma'))}"><div class="shh"><h2>${t(L('Choose a language','Elija un idioma'))}</h2><button class="ib" data-a="lsheet" aria-label="${t(L('Close','Cerrar'))}">${ic('x',20,2.2)}</button></div><p class="small mut" style="margin-top:4px">${t(L('English and Spanish are built in. Other languages are translated automatically. Dr. Hart always gets your answers in English.','El inglés y el español vienen incluidos. Otros idiomas se traducen automáticamente. El Dr. Hart siempre recibe sus respuestas en inglés.'))}</p><div class="sbox" style="margin-top:12px;box-shadow:none"><span class="i">${ic('search',18)}</span><input id="lq" data-in="langQ" value="${esc(S.langQ||'')}" placeholder="${t(L('Search languages','Buscar idiomas'))}" aria-label="${t(L('Search languages','Buscar idiomas'))}"></div><div class="llist">${ls.map(([k,n,e,,r])=>`<button data-a="lang" data-v="${k}" aria-pressed="${S.lang===k}"><span ${r?'dir="rtl"':''}><b>${n}</b><small>${e}${k==='en'||k==='es'?' · '+t(L('built in','incluido')):''}</small></span>${S.lang===k?ic('check',18,2.4):''}</button>`).join('')||`<p class="small mut" style="padding:10px 4px">${t(L('Not in the list? Type it below.','¿No está en la lista? Escríbalo abajo.'))}</p>`}</div><form class="olang" data-f="olang"><input id="ol" placeholder="${t(L('Other language, e.g. Oromo','Otro idioma, p. ej. oromo'))}" aria-label="${t(L('Other language','Otro idioma'))}" value="${esc(q&&!ls.length?S.langQ:'')}"><button class="btn sm">${t(L('Use','Usar'))}</button></form></div>`}
+const back=()=>`<div class="back"><button class="ib" data-a="ps" data-v="home" aria-label="${t(L('Back','Atrás'))}">${ic('left',24,2.2)}</button></div>`;
+function welcome(){return`${sbar(1)}<div class="welcome"><div><div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px">${ic('logo',28,2.2)}Curo</div>${langSw()}</div>
+ <h1>${t(L('Your treatment companion','Su compañero de tratamiento'))}</h1><p>${t(L('Check in with Remi, keep notes for your doctor, and see your treatment plan in one place.','Hable con Remi, guarde notas para su médico y vea su plan de tratamiento en un solo lugar.'))}</p>
+ <div class="wf"><div>${ic('bot',20,2)}${t(L('A 2-minute check-in that skips what doesn’t apply','Un reporte de 2 minutos que omite lo que no aplica'))}</div><div>${ic('pause',20,2)}${t(L('Skip any question, or take a break and finish later','Salte cualquier pregunta, o tome un descanso y termine después'))}</div><div>${ic('globe',20,2)}${t(L('In your language, in plain words','En su idioma, en palabras sencillas'))}</div></div></div>
+ <div><div class="wremi">${remiAv(96)}</div><button class="wbtn" data-a="ps" data-v="home">${t(L('Get started','Comenzar'))}</button><p style="text-align:center;font-size:13px;margin-top:12px;opacity:.85">${t(L('Signed in as','Sesión iniciada como'))} ${ME.name}</p></div></div>`}
+function signin(){return`${sbar()}<div class="signin"><div class="sih"><div class="brand"><span class="lg">${ic('logo',22,2.2)}</span>Curo</div>${langSw('lpill l')}</div><div class="card sic"><h1>${t(L('Welcome back','Bienvenida de nuevo'))}</h1><p class="mut" style="margin-top:4px">${t(L('Sign in to check in with Remi and see your care plan.','Inicie sesión para hablar con Remi y ver su plan de cuidado.'))}</p><form data-f="signin" style="margin-top:18px"><label class="fl">${t(L('Email','Correo electrónico'))}<span class="inp">${ic('mail',18)}<input type="email" value="sarah.johnson@curo.demo" autocomplete="username"></span></label><label class="fl">${t(L('Password','Contraseña'))}<span class="inp">${ic('lock',18)}<input type="password" value="demo-password" autocomplete="current-password"></span></label><button class="btn w" style="margin-top:6px">${t(L('Sign in','Iniciar sesión'))}</button></form><div class="note2">${ic('shield',16,2)}<span>${t(L('Demo with fictional patient data. You’ll be signed in as Sarah Johnson.','Demostración con datos ficticios. Entrará como Sarah Johnson.'))}</span></div></div><p class="small mut" style="text-align:center;margin-top:16px">${t(L('Need help? Call your care team at 555-0142.','¿Necesita ayuda? Llame a su equipo al 555-0142.'))}</p></div>`}
+function taskCard(){const st=!C.started?'new':C.sent?'done':C.paused?'paused':'go';
+ const h={new:[L('Your weekly check-in is ready','Su reporte semanal está listo'),LD(()=>[`About 2 minutes · ${ME.sched.mods.length+5} short questions`,`Unos 2 minutos · ${ME.sched.mods.length+5} preguntas cortas`])],
+  paused:[L('Check-in paused','Reporte en pausa'),LD(()=>[`Step ${Math.max(1,C.stage+1)} of ${STG.length} · about ${minLeft()} min left`,`Paso ${Math.max(1,C.stage+1)} de ${STG.length} · faltan unos ${minLeft()} min`])],
+  go:[L('Check-in in progress','Reporte en curso'),LD(()=>[`Step ${Math.max(1,C.stage+1)} of ${STG.length}`,`Paso ${Math.max(1,C.stage+1)} de ${STG.length}`])],
+  done:[L('Check-in sent','Reporte enviado'),L('Dr. Hart’s team will see it today','El equipo del Dr. Hart lo verá hoy')]}[st];
+ return`<div class="card tcard"><button class="task" data-a="ps" data-v="chat"><div class="rm">${remiAv(88)}</div><div class="tx"><b>${t(h[0])}</b><p>${t(h[1])}</p>${st==='paused'||st==='go'?`<div class="meter"><i style="width:${pct()}%"></i></div>`:''}</div></button><div class="tbody">
+ ${st==='paused'?`<p class="small mut" style="margin-top:12px">${t(L('Your answers so far are saved. If you can’t finish, Remi sends them on Friday.','Sus respuestas están guardadas. Si no puede terminar, Remi las envía el viernes.'))}</p>`:''}
+ ${st==='done'?'':`<button class="btn w" style="margin-top:14px" data-a="ps" data-v="chat">${t(st==='paused'?L('Resume check-in','Continuar reporte'):st==='go'?L('Continue','Continuar'):L('Start check-in','Empezar reporte'))}</button>`}</div></div>`}
+function home(){const u=ME.update;return`${sbar()}<div class="scr"><div class="hero"><div class="hrow">${av(ME.name,52,0)}<div style="flex:1"><b>${t(LD(()=>[`Hello, ${ME.first}`,`Hola, ${ME.first}`]))}</b><span class="s">${fD(TODAY,{weekday:'long',month:'long',day:'numeric'})}</span></div><button class="hbtn" data-a="ps" data-v="notes" aria-label="${t(L('Notifications','Notificaciones'))}">${ic('bell',22)}<span class="dot"></span></button></div>
+ <form class="sbox" data-f="hsearch"><input id="hq" placeholder="${t(L('Search your notes','Buscar en sus notas'))}" aria-label="${t(L('Search','Buscar'))}"><button aria-label="${t(L('Search','Buscar'))}">${ic('search',20)}</button></form></div>
+ <div class="sec"><h2>${t(L('Today','Hoy'))}</h2>${taskCard()}
+ <div class="tiles" style="margin-top:20px">${[['treat','pill',L('Treatment','Tratamiento')],['res','book',L('Resources','Recursos')],['notes','note',L('Notes','Notas')],['reports','rep',L('Progress','Progreso')]].map(([s,n,l])=>`<button class="tile" data-a="ps" data-v="${s}"><span>${ic(n,26)}</span>${t(l)}</button>`).join('')}</div>
+ <h2>${t(L('From your care team','De su equipo médico'))}</h2><div class="card"><div class="upd">${av('Daniel Hart',40,1)}<div style="flex:1"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-weight:600">Dr. Daniel Hart</b><span class="small mut">${fD(u.t)}</span></div><div class="small mut">${t(LD(()=>[`Reviewed your ${fD(ME.lastAt.getTime()>u.t?wkDates().at(-2):ME.lastAt)} check-in`,`Revisó su reporte del ${fD(ME.lastAt.getTime()>u.t?wkDates().at(-2):ME.lastAt)}`]))}</div><div class="bub">${t(u.msg)}</div><div style="margin-top:8px"><span class="chip g">${ic('check',13,2.4)}${t(u.v)}</span></div><button class="btn o sm" style="margin-top:12px" data-a="mreply" data-v="hart">${ic('msg',16,2)}${t(L('Message Dr. Hart','Escribir al Dr. Hart'))}</button></div></div></div>
+ <h2>${t(L('Next visit','Próxima cita'))}</h2><div class="card appt">${av('Daniel Hart',44,1)}<div><b style="font-weight:600">Dr. Daniel Hart</b><div class="small mut">${t(L('Oncologist · 3:00 PM','Oncólogo · 3:00 PM'))}</div></div><div class="dt"><small>${fD(new Date(2026,10,24),{month:'short'})}</small>24</div></div>
+ <h2>${t(L('Your check-in schedule','Su horario de reportes'))}</h2>${schedCard()}</div></div>${pnav('home')}`}
+const schedCard=()=>`<div class="card"><div class="row"><span class="ico">${ic('cal',22)}</span><div style="flex:1"><b style="font-weight:600">${t(ME.sched.freq)}, ${t(ME.sched.day)}</b><div class="small mut">${t(L('Reminder at','Recordatorio a las'))} ${ME.sched.time} · ${C.sent?t(L('next','próximo'))+' '+fD(ME.sched.next,{weekday:'short',month:'short',day:'numeric'}):t(L('next check-in today','próximo reporte hoy'))}</div></div></div>
+ <p class="small" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line2);color:var(--ink2)">${t(LD(()=>[`Set by ${ME.sched.by}. Remi also asks about ${lst(ME.sched.mods.map(k=>SN[k])).toLowerCase()}. Questions are in ${S.lang==='es'?'Spanish':'English'}.`,`Configurado por el ${ME.sched.by}. Remi también pregunta por ${lst(ME.sched.mods.map(k=>SN[k])).toLowerCase()}. Las preguntas son en ${S.lang==='es'?'español':'inglés'}.`]))}</p></div>`;
+function answers(){const p=C.p;if(!p)return'';const H=p.help?HELP[p.help]:p.scale?(HELP[p.s]||null):null;
+ let body;
+ if(p.multi)body=`<div class="qopts">${p.opts.map((o,i)=>`<button class="qopt" data-a="mq" data-i="${i}" aria-pressed="${p.sel.has(i)}"><span class="rd" style="border-radius:6px"></span><span class="lb"><b>${t(o)}</b>${p.hints&&p.hints[i]?`<small>${t(p.hints[i])}</small>`:''}</span></button>`).join('')}</div><div class="qpills" style="margin-top:10px"><button class="qpill go" data-a="mqd" ${p.sel.size?'':'disabled'}>${t(p.sel.size?L('Continue','Continuar'):L('Pick at least one','Elija al menos una'))}</button></div>`;
+ else if(p.scale)body=`<div class="qopts">${p.opts.map((o,i)=>`<button class="qopt" data-a="q" data-i="${i}"><span class="sw" style="background:${SW[i]}"></span><span class="lb"><b>${t(o)}</b>${p.hints[i]?`<small>${t(p.hints[i])}</small>`:''}</span></button>`).join('')}</div>`;
+ else body=`<div class="qpills">${p.opts.map((o,i)=>`<button class="qpill" data-a="q" data-i="${i}">${t(o)}</button>`).join('')}</div>`;
+ const x=[];
+ if(p.scale&&p.same!=null)x.push(`<button class="same" data-a="qsame">${ic('redo',14,2)}${t(L('Same as last week','Igual que la semana pasada'))} · ${t(SC[p.it][0][p.same])}</button>`);
+ if(p.scale||p.multi&&p.opts.length>3)x.push(`<button data-a="qskip">${ic('skip',14,2)}${t(L('Skip','Saltar'))}</button>`);
+ if(p.scale||H)x.push(`<button data-a="qhelp">${ic('info',14,2)}${t(L('What does this mean?','¿Qué significa?'))}</button>`);
+ return`<div class="ans" aria-label="${t(L('Answer choices','Opciones de respuesta'))}">${body}${x.length?`<div class="qx">${x.join('')}</div>`:''}</div>`}
+function chat(){const Lg=C.log;
+ const rows=Lg.map((m,i)=>{const lb=!m.me&&(!Lg[i+1]||Lg[i+1].me);return m.me?`<div class="mr me"><div class="bub">${m.img?`<img src="${m.img}" alt="${t(L('Photo you shared','Foto que compartió'))}">`:Array.isArray(m.h)?m.h.map(t).join(', '):typeof m.h==='string'?esc(m.h):t(m.h)}</div></div>`:`<div class="mr rb"><div class="bub ${m.cls||''}">${t(m.h)}</div></div>`}).join('');
+ const sub=C.sent?L('Sent to your care team','Enviado a su equipo'):L('Weekly check-in · 2 min','Reporte semanal · 2 min');
+ return`${sbar()}<div class="ctop"><button class="ib" data-a="ps" data-v="home" aria-label="${t(L('Back','Atrás'))}">${ic('left',24,2.2)}</button><div class="t">${remiAv(44)}<div><b>Remi</b><small>${t(sub)}</small></div></div>
+ <div style="position:relative"><button class="ib" data-a="cmenu" aria-label="${t(L('More options','Más opciones'))}" aria-expanded="${!!S.cmenu}">${ic('dots',20,2.6)}</button>${S.cmenu?`<div class="menu cm"><button data-a="lsheet">${ic('globe',17,2)}<span>${t(L('Language','Idioma'))}</span><small>${LG()[1]}</small></button><button data-a="big">${ic('tsize',17,2)}<span>${t(L('Larger text','Letra más grande'))}</span><small>${S.big?t(L('On','Sí')):t(L('Off','No'))}</small></button><button data-a="speak">${ic('spk',17,2)}<span>${t(L('Read aloud','Leer en voz alta'))}</span></button></div>`:''}</div>${C.sent?'':`<button class="ib" data-a="pausec" aria-label="${t(L('Take a break','Tomar un descanso'))}" title="${t(L('Take a break','Tomar un descanso'))}">${ic('pause',20,2.2)}</button>`}</div>
+ <div class="prog"><div class="segs">${STG.map((_,k)=>`<i class="${C.sent||k<C.stage?'d':k===C.stage?'c':''}"></i>`).join('')}</div><div class="l"><span>${C.sent?t(L('Sent to your care team','Enviado a su equipo')):C.stage<0?t(L('Ready when you are','Cuando esté lista')):t(LD(()=>[`Step <b>${C.stage+1}</b> of ${STG.length} · ${t(STG[C.stage])}`,`Paso <b>${C.stage+1}</b> de ${STG.length} · ${t(STG[C.stage])}`]))}</span><span>${C.sent||C.stage<0?'':t(LD(()=>[`About ${minLeft()} min left`,`Faltan unos ${minLeft()} min`]))}</span></div></div>
+ ${builtIn()?'':`<div class="trn">${ic('globe',14,2)}<span>${pending()?t(L('Translating…','Traduciendo…')):t(L('Translated automatically. Dr. Hart gets your answers in English.','Traducido automáticamente.'))}</span></div>`}<div class="chat" id="chat" aria-live="polite">${rows}</div>${answers()}
+ <form class="inbar" data-f="chatin"><label aria-label="${t(L('Attach a photo','Adjuntar una foto'))}">${ic('img',22)}<input type="file" accept="image/*" id="cimg" hidden></label><textarea id="ci" placeholder="${t(C.p?.text?L('Type a note for Dr. Hart…','Escriba una nota para el Dr. Hart…'):L('Message (saved as a note)','Mensaje (se guarda como nota)'))}" aria-label="${t(L('Message','Mensaje'))}"></textarea><button class="send" aria-label="${t(L('Send','Enviar'))}">${ic('send',20)}</button></form>`}
+function notes(){const ws=new Date(TODAY);ws.setDate(TODAY.getDate()-((TODAY.getDay()+6)%7));const days=Array.from({length:7},(_,i)=>new Date(ws.getTime()+i*DAY));
+ const ns=ME.notes.filter(n=>S.noteMode==='day'?same(n.t,S.noteDay):true).filter(n=>!S.fav||n.fav).filter(n=>!S.noteQ||n.txt.toLowerCase().includes(S.noteQ.toLowerCase()));
+ const dl=S.lang==='es'?'LMMJVSD':'MTWTFSS';
+ return`${sbar()}<div class="scr"><div class="hero" style="padding-bottom:16px"><div class="ptitle"><h1>${t(L('Notes','Notas'))}</h1><div class="seg"><button data-a="nm" data-v="day" aria-pressed="${S.noteMode==='day'}">${t(L('Day','Día'))}</button><button data-a="nm" data-v="week" aria-pressed="${S.noteMode==='week'}">${t(L('All','Todas'))}</button></div></div>
+ <div class="week">${days.map(d=>`<button data-a="nd" data-v="${d.getTime()}" aria-pressed="${S.noteMode==='day'&&same(d,S.noteDay)}">${dl[(d.getDay()+6)%7]}<b>${d.getDate()}</b>${ME.notes.some(n=>same(n.t,d))?'<i></i>':'<i style="opacity:0"></i>'}</button>`).join('')}</div></div>
+ <div class="srch"><div class="sbox"><input id="nq" data-in="noteQ" value="${esc(S.noteQ)}" placeholder="${t(L('Search notes','Buscar notas'))}" aria-label="${t(L('Search notes','Buscar notas'))}"><span class="i">${ic('search',20)}</span></div><button class="fbtn" data-a="fav" aria-pressed="${S.fav}" aria-label="${t(L('Favorites only','Solo favoritas'))}">${ic('heart',22)}</button></div>
+ <div class="sec"><h2>${S.noteMode==='day'?fLong(S.noteDay):t(L('Recent','Recientes'))}<small>${t(L('Shared with your care team','Compartidas con su equipo'))}</small></h2>${ns.length?ns.map(n=>{const k=ME.notes.indexOf(n);return`<div class="card note"><div class="dt"><span class="chip n">${ic('cal',13,2)}${fLong(n.t)}</span>${n.fav?`<span class="chip r">${t(L('Favorite','Favorita'))}</span>`:''}</div><button class="kb" data-a="nmenu" data-i="${k}" aria-label="${t(L('Note options','Opciones de la nota'))}">${ic('dots',20,3)}</button>${S.menu===k?`<div class="menu"><button data-a="nfav" data-i="${k}">${t(n.fav?L('Remove from favorites','Quitar de favoritas'):L('Add to favorites','Agregar a favoritas'))}</button><button data-a="ndel" data-i="${k}">${t(L('Delete note','Borrar nota'))}</button></div>`:''}${(n.imgs||[]).length?`<div class="nimgs n${Math.min(3,n.imgs.length)}">${n.imgs.map(u=>`<img src="${u}" alt="${t(L('Photo in note','Foto en la nota'))}">`).join('')}</div>`:''}<p>${esc(n.txt)}</p></div>`}).join(''):`<div class="empty">${t(S.noteMode==='day'?L('No notes on this day. Tap + to add one.','No hay notas este día. Toque + para agregar una.'):L('No notes match.','Ninguna nota coincide.'))}</div>`}</div></div>
+ <button class="fab" data-a="compose" aria-label="${t(L('Add note','Agregar nota'))}">${ic('plus',26,2.2)}</button>${pnav('notes')}
+ ${S.composer?`<div class="scrim" data-a="compx"></div><form class="sheet" data-f="note"><h2 style="font-size:20px">${t(L('New note','Nota nueva'))}</h2><p class="small mut" style="margin-top:4px">${t(L('Notes are shared with your care team.','Las notas se comparten con su equipo médico.'))}</p><textarea id="nt" data-in="noteDraft" placeholder="${t(L('How are you feeling right now?','¿Cómo se siente ahora?'))}" aria-label="${t(L('Note','Nota'))}">${esc(S.noteDraft||'')}</textarea>${thumbs(S.noteImgs||[],'nrm')}<label class="addph">${ic('img',18,2)}${t(L('Add photos','Agregar fotos'))}<input type="file" accept="image/*" multiple id="nimg" hidden></label><div class="rw"><button type="button" class="btn o" data-a="compx">${t(L('Cancel','Cancelar'))}</button><button class="btn">${t(L('Save note','Guardar nota'))}</button></div></form>`:''}`}
+const MEDS={active:[['Docetaxel (Taxotere)',L('IV infusion, 75 mg/m²','Infusión IV, 75 mg/m²'),L('Once every 3 weeks','Una vez cada 3 semanas'),L('Your main chemotherapy. You get fluids and anti-nausea medicine before each infusion.','Su quimioterapia principal. Recibe líquidos y medicina contra las náuseas antes de cada infusión.'),VIAL,1],['Dexamethasone',L('Tablet, 8 mg','Tableta, 8 mg'),L('Twice a day for 3 days around each infusion','Dos veces al día por 3 días alrededor de cada infusión'),L('Helps prevent swelling and allergic reactions to Docetaxel.','Ayuda a prevenir hinchazón y reacciones alérgicas al Docetaxel.'),TAB],['Pantoprazole',L('Capsule, 40 mg','Cápsula, 40 mg'),L('Once a day','Una vez al día'),L('Protects your stomach from irritation caused by other medicines.','Protege el estómago de la irritación que causan otras medicinas.'),CAP],['Ondansetron',L('Tablet, 8 mg','Tableta, 8 mg'),L('As needed, up to 3 times a day','Según la necesite, hasta 3 veces al día'),L('Prevents and treats nausea. Take it at the first sign of feeling sick.','Previene y trata las náuseas. Tómela en cuanto empiece a sentirse mal.'),TAB]],
+ inactive:[['Doxorubicin',L('IV infusion, 60 mg/m²','Infusión IV, 60 mg/m²'),L('Finished Aug 2026','Terminado en ago. 2026'),L('Four cycles given before Docetaxel, with cyclophosphamide.','Cuatro ciclos antes del Docetaxel, junto con ciclofosfamida.'),VIAL],['Cyclophosphamide',L('IV infusion, 600 mg/m²','Infusión IV, 600 mg/m²'),L('Finished Aug 2026','Terminado en ago. 2026'),L('Given with doxorubicin in the first part of treatment.','Se dio con doxorrubicina en la primera parte del tratamiento.'),VIAL]]};
+function treat(){const m=MEDS[S.treat].filter(x=>!S.medQ||x[0].toLowerCase().includes(S.medQ.toLowerCase()));
+ return`${sbar()}<div class="scr"><div class="hero"><div class="ptitle"><h1>${t(L('Treatment','Tratamiento'))}</h1><button class="hbtn" data-a="ps" data-v="home" aria-label="${t(L('Close','Cerrar'))}">${ic('x',20,2.2)}</button></div><p class="sub">${t(L('Your current and past medicines, in plain words.','Sus medicinas actuales y anteriores, en palabras sencillas.'))}</p><div class="seg" style="margin-top:14px"><button data-a="tt" data-v="active" aria-pressed="${S.treat==='active'}">${t(L('Current','Actuales'))}</button><button data-a="tt" data-v="inactive" aria-pressed="${S.treat==='inactive'}">${t(L('Past','Anteriores'))}</button></div></div>
+ <div class="srch"><div class="sbox"><input id="mq" data-in="medQ" value="${esc(S.medQ)}" placeholder="${t(L('Search medicines','Buscar medicinas'))}" aria-label="${t(L('Search medicines','Buscar medicinas'))}"><span class="i">${ic('search',20)}</span></div></div>
+ <div class="sec">${m.map(x=>`<div class="card med ${x[5]?'pri':''}"><div class="im">${x[4]}</div><div>${x[5]?`<span class="chip" style="margin-bottom:6px">${t(L('Main treatment','Tratamiento principal'))}</span>`:''}<b>${x[0]}</b><small>${t(x[1])}</small><small>${t(x[2])}</small><p>${t(x[3])}</p></div></div>`).join('')||`<div class="empty">${t(L('No medicines match.','Ninguna medicina coincide.'))}</div>`}
+ <h2>${t(L('Care team','Equipo médico'))}</h2><div class="card"><div class="kv"><span>${t(L('Oncologist','Oncólogo'))}</span><span>Dr. Daniel Hart</span></div><div class="kv"><span>${t(L('Treatment cycle','Ciclo de tratamiento'))}</span><span>${ME.cycle} ${t(L('of 6','de 6'))}</span></div><div class="kv"><span>${t(L('Next infusion','Próxima infusión'))}</span><span>${fD(new Date(2026,11,1),{weekday:'short',month:'short',day:'numeric'})}</span></div><div class="kv"><span>${t(L('Nurse line','Línea de enfermería'))}</span><span>555-0142</span></div></div></div></div>${pnav('')}`}
+const RES=[[L('Managing tiredness','Cómo manejar el cansancio'),L('Plan your day around your energy. Short, gentle activity and short rests usually help more than long naps. Tell your care team if tiredness stops you doing daily tasks.','Planee su día según su energía. Actividad suave y descansos cortos suelen ayudar más que siestas largas. Avise a su equipo si el cansancio no la deja hacer sus tareas.')],[L('Nausea and eating','Náuseas y comida'),L('Eat small meals often and try bland, cool foods. Take your anti-nausea medicine as prescribed, before nausea gets bad.','Coma porciones pequeñas seguido y pruebe comidas suaves y frescas. Tome su medicina contra las náuseas como se la recetaron, antes de que empeoren.')],[L('Tingling hands and feet','Hormigueo en manos y pies'),L('Docetaxel can cause numbness or tingling. Tell your care team early, since your doctor may change the dose. Take care with hot water and sharp objects.','El Docetaxel puede causar adormecimiento u hormigueo. Avise pronto a su equipo, porque su médico puede cambiar la dosis. Tenga cuidado con el agua caliente y los objetos filosos.')],[L('When to call right away','Cuándo llamar de inmediato'),L('Call 555-0142 or go to the ER for a fever of 100.4°F or higher, trouble breathing, chest pain, or diarrhea that won’t stop.','Llame al 555-0142 o vaya a urgencias si tiene fiebre de 100.4°F o más, le cuesta respirar, dolor de pecho o diarrea que no para.')]];
+const res=()=>`${sbar()}<div class="scr"><div class="hero"><div class="ptitle"><h1>${t(L('Resources','Recursos'))}</h1><button class="hbtn" data-a="ps" data-v="home" aria-label="${t(L('Close','Cerrar'))}">${ic('x',20,2.2)}</button></div><p class="sub">${t(L('Simple guides for common side effects.','Guías sencillas para efectos secundarios comunes.'))}</p></div><div class="sec">${RES.map((r,i)=>`<div class="card acc"><button data-a="ro" data-i="${i}" aria-expanded="${S.resOpen===i}">${t(r[0])}${ic(S.resOpen===i?'up2':'down',20)}</button>${S.resOpen===i?`<p>${t(r[1])}</p>`:''}</div>`).join('')}<p class="foot">${t(L('General guidance for this prototype, not medical advice. Always follow your care team’s instructions.','Orientación general para este prototipo, no es consejo médico. Siga siempre las indicaciones de su equipo.'))}</p></div></div>${pnav('')}`;
+I.up2='M6 15l6-6 6 6';
+function symSay(k){const s=ME.hist[k],n=s.length,g=s.at(-1),pv=s.at(-2),mx=Math.max(...s),st=(()=>{let c=0;for(let i=n-1;i>=0&&s[i]>=2;i--)c++;return c})(),d0=wkDates()[s.indexOf(mx)];
+ if(g>pv)return[L('A bit worse this week','Un poco peor esta semana'),L('Your care team can see this. Tell them how it’s affecting you.','Su equipo puede ver esto. Cuénteles cómo le está afectando.'),'up','a'];
+ if(g<pv||g<mx&&mx>=2)return[L('Getting better','Mejorando'),LD(()=>[`Better than it was around ${fD(d0)}.`,`Mejor que alrededor del ${fD(d0)}.`]),'down2','g'];
+ if(st>=3)return[LD(()=>[`Moderate or higher for ${st} weeks`,`Moderado o más por ${st} semanas`]),L('Dr. Hart is keeping an eye on this. Check Resources for tips that may help.','El Dr. Hart está pendiente de esto. Vea Recursos para consejos que pueden ayudar.'),'flat','a'];
+ return[L('Steady','Estable'),L('About the same as recent weeks.','Más o menos igual que las últimas semanas.'),'flat','n']}
+function reports(){const ds=wkDates(),ks=Object.keys(ME.hist).sort((a,b)=>ME.hist[b].at(-1)-ME.hist[a].at(-1));const n=ds.length;
+ return`${sbar()}<div class="scr"><div class="hero"><div class="ptitle"><h1>${t(L('My progress','Mi progreso'))}</h1></div><p class="sub">${t(LD(()=>[`How you’ve felt over the last ${n} check-ins. Dr. Hart sees the same information.`,`Cómo se ha sentido en sus últimos ${n} reportes. El Dr. Hart ve la misma información.`]))}</p>
+ <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><span class="chip n">${ic('check',13,2.4)}${t(LD(()=>[`${n} of ${n} check-ins done`,`${n} de ${n} reportes hechos`]))}</span><span class="chip n">${ic('cal',13,2)}${t(L('Last','Último'))}: ${fD(ME.lastAt)}</span></div></div>
+ <div class="sec"><div class="legend">${[1,2,3].map(g=>`<span><i style="background:${GBG[g]};border:1px solid ${SW[g]}"></i>${g} ${t(GW[g])}</span>`).join('')}</div>
+ ${ks.map(k=>{const[h,p,icn,c]=symSay(k);return`<div class="card sym" style="margin-top:12px"><div class="top"><b>${t(SN[k])}</b><span class="chip ${c}">${ic(icn,13,2.2)}${t(h)}</span></div><div class="dots">${ME.hist[k].slice(-6).map(g=>`<span style="background:${GBG[g]};color:${GINK[g]}" title="${t(GW[g])}">${g||'–'}</span>`).join('')}</div><div class="dlab">${ds.slice(-6).map(d=>`<span>${fD(d)}</span>`).join('')}</div><p>${t(p)}</p></div>`}).join('')}
+ <h2>${t(L('Past check-ins','Reportes anteriores'))}</h2>${ds.map((d,i)=>i).reverse().map(i=>`<div class="card acc"><button data-a="rep" data-i="${i}" aria-expanded="${S.repOpen===i}"><span>${fLong(ds[i])}</span>${ic(S.repOpen===i?'up2':'down',20)}</button>${S.repOpen===i?`<div style="margin-top:10px">${ks.map(k=>`<div class="kv"><span>${t(SN[k])}</span><span class="gp" style="--c:${SW[ME.hist[k][i]]}">${t(GW[ME.hist[k][i]])}</span></div>`).join('')}</div>`:''}</div>`).join('')}</div></div>${pnav('reports')}`}
+const profile=()=>`${sbar()}<div class="scr"><div class="hero"><div class="hrow">${av(ME.name,64,0)}<div><b>${ME.name}</b><span class="s">${t(L('Stage II breast cancer · Docetaxel','Cáncer de mama etapa II · Docetaxel'))}</span></div></div></div>
+ <div class="sec"><h2>${t(L('Settings','Ajustes'))}</h2><div class="card"><div class="set"><div><b>${t(L('Language','Idioma'))}</b><small>${t(L('Remi and the app','Remi y la aplicación'))}</small></div>${langSw('lpill l')}</div>
+ <div class="set"><div><b>${t(L('Larger text','Letra más grande'))}</b><small>${t(L('Easier to read in chat','Más fácil de leer en el chat'))}</small></div><button class="tg" role="switch" aria-checked="${S.big}" data-a="big" aria-label="${t(L('Larger text','Letra más grande'))}"></button></div>
+ <div class="set"><div><b>${t(L('Read questions aloud','Leer las preguntas en voz alta'))}</b><small>${t(L('Remi speaks each question','Remi dice cada pregunta'))}</small></div><button class="tg" role="switch" aria-checked="${S.speak}" data-a="autospk" aria-label="${t(L('Read questions aloud','Leer las preguntas en voz alta'))}"></button></div></div>
+ <h2>${t(L('Check-ins','Reportes'))}</h2>${schedCard()}
+ <h2>${t(L('My details','Mis datos'))}</h2><div class="card"><div class="kv"><span>${t(L('Date of birth','Fecha de nacimiento'))}</span><span>${ME.dob}</span></div><div class="kv"><span>${t(L('Oncologist','Oncólogo'))}</span><span>Dr. Daniel Hart</span></div><div class="kv"><span>${t(L('Nurse line','Línea de enfermería'))}</span><span>555-0142</span></div></div><button class="btn o w signout" style="margin-top:20px" data-a="signout">${ic('out',18,2)}${t(L('Sign out','Cerrar sesión'))}</button></div></div>${pnav('profile')}`;
+function outPanel(){const ts=touched(),st=!C.started?L('Not started','Sin empezar'):C.sent?L('Sent','Enviado'):C.paused?L('Paused','En pausa'):L('In progress','En curso');
+ return`<div><span class="ochip"><i></i>Live as Sarah answers</span><h1 style="margin-top:12px">Remi check-in, low burden by design</h1><p class="lead" style="margin-top:8px">Remi asks only about symptoms Sarah has, reported last week, or Dr. Hart added. She can skip, reuse last week’s answer, pause and come back, and switch to Spanish. Every answer still maps to a PRO-CTCAE item.</p></div>
+ <div class="pan"><div class="ochips"><span class="chip n">Status: ${st.en}</span><span class="chip n">Language: ${S.lang==='es'?'Spanish':'English'}</span>${C.breaks?`<span class="chip a">Paused ${C.breaks}×</span>`:''}${S.big?'<span class="chip n">Larger text on</span>':''}</div>
+ <div class="stats"><div><b>${answered()}</b><small>answered</small></div><div><b>${carried()}</b><small>same as last week</small></div><div><b>${skipped()}</b><small>skipped</small></div><div><b>${FULL}</b><small>items in the full form</small></div></div></div>
+ <div class="pan"><h3>What Dr. Hart receives</h3><small>PRO-CTCAE items and scores, in English, whatever language Sarah answers in</small>${C.items.length?`<table><thead><tr><th>Symptom</th><th>Item</th><th>Response</th><th class="n">Score</th></tr></thead><tbody>${C.items.map(a=>`<tr><td>${SN[a.s].en}</td><td>${AT[a.it]}</td><td>${a.v==null?'<span class="mut">Skipped</span>':SC[a.it][0][a.v].en+(a.flag==='same'?' <span class="chip g" style="padding:1px 7px;font-size:11px">same as last week</span>':'')}</td><td class="n">${a.v??'–'}</td></tr>`).join('')}</tbody></table>`:`<p class="mut" style="margin-top:14px">Answers appear here as Sarah replies to Remi. Open the check-in from the home screen.</p>`}
+ ${ts.length?`<div style="margin-top:14px">${ts.map(s=>{const g=gradeC(s);return`<div class="kv"><span>${SN[s].en}</span><span>${g==null?'Not graded (skipped)':`Grade ${g} · ${GW[g].en}`}</span></div>`}).join('')}</div>`:''}
+ ${C.sent?`<p style="margin-top:14px;color:var(--green);font-weight:600">Sent. It appears in the clinician portal as a new check-in.</p>`:C.paused?`<p style="margin-top:14px;color:var(--amber);font-weight:600">Paused. If Sarah doesn’t finish, the portal shows this as an incomplete check-in.</p>`:''}</div>
+ <p class="foot" style="margin:0">Prototype with fictional data. Grades use a simplified mapping (highest item score, capped at 3), not the validated PRO-CTCAE composite algorithm. Spanish wording here is our own; a real app should use NCI’s official Spanish PRO-CTCAE items. Plain-language hints are optional help, shown under the standard answer choices.</p>`}
+function view(){const scr={messages,welcome,signin,home,chat,notes,treat,res,reports,profile}[S.ps]();return`<div class="wrap"><div class="stage"><div class="phone ${S.big?'big':''}" lang="${LG()[3].split('-')[0]}" dir="${LG()[4]?'rtl':'ltr'}">${scr}${S.lsheet?langSheet():''}${pending()&&S.ps!=='chat'?`<div class="trpill">${ic('globe',14,2)}${t(L('Translating…','Traduciendo…'))}</div>`:''}<span class="hind"></span></div></div></div>`}
+
+/* ---------- render & events ---------- */
+const app=$('app');
+function toast(x){const el=$('toast');el.textContent=x;el.hidden=false;clearTimeout(toast.k);toast.k=setTimeout(()=>el.hidden=true,2200)}
+function say(){try{const m=[...C.log].reverse().find(x=>!x.me);const u=new SpeechSynthesisUtterance(t(m.h).replace(/<[^>]+>/g,' '));u.lang=LG()[3];speechSynthesis.cancel();speechSynthesis.speak(u);return true}catch(_){return false}}
+let lastLen=0;
+function render(){const ch0=$('chat'),grew=C.log.length!==lastLen;lastLen=C.log.length;const keep=ch0?ch0.scrollTop:0;
+ app.innerHTML=view();document.documentElement.lang=S.lang;
+ const ch=$('chat');if(ch)ch.scrollTop=grew?ch.scrollHeight:keep;
+ if(grew&&S.speak&&S.ps==='chat')say();
+ if(S.focus){const e=$(S.focus);if(e){e.focus();const l=e.value.length;try{e.setSelectionRange(l,l)}catch(_){}}S.focus=null}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');
+ if(!b){if(S.menu!==null||S.cmenu){S.menu=null;S.cmenu=false;render()}return}
+ const a=b.dataset.a,v=b.dataset.v,i=+b.dataset.i;if(a!=='nmenu')S.menu=null;if(!['cmenu','big','speak'].includes(a))S.cmenu=false;
+ switch(a){
+ case'ps':S.ps=v;if(v==='messages'&&b.closest('.pnav'))S.msgT=null;if(v==='chat'){if(!C.started||C.sent&&!C.p)startChat();else if(C.paused)resume()}break;
+ case'q':{const p=C.p;me(p.opts[i]);C.p=null;p.cb(i);break}
+ case'qsame':{const p=C.p;me(LD(()=>[`Same as last week (${SC[p.it][0][p.same].en})`,`Igual que la semana pasada (${SC[p.it][0][p.same].es})`]));C.p=null;p.cb(p.same,'same');break}
+ case'qskip':{const p=C.p;me(L('Skip this one','Saltar esta'));C.p=null;if(p.multi){bot(L('No problem, we’ll skip that.','No hay problema, lo saltamos.'));p.cb(null)}else p.cb(null,'skip');break}
+ case'qhelp':{const p=C.p,k=p.help||(p.scale?(p.it==='int'||p.it==='freq'?null:p.s):null);const parts=[];if(p.scale&&HELP[p.s])parts.push(HELP[p.s]);if(p.help&&!p.scale)parts.push(HELP[p.help]);if(p.scale&&(p.it==='int'||p.it==='freq'))parts.push(HELP[p.it]);
+  me(L('What does this mean?','¿Qué significa?'));bot(()=>parts.map(t).join(' ')+(p.scale?' '+t(L('The words under each answer can help you choose. There are no wrong answers.','Las palabras debajo de cada respuesta pueden ayudarle a elegir. No hay respuestas incorrectas.')):''),'help');break}
+ case'mq':{const p=C.p;if(i===p.excl)p.sel=new Set([i]);else{p.sel.delete(p.excl);p.sel.has(i)?p.sel.delete(i):p.sel.add(i)}break}
+ case'mqd':{const p=C.p;if(!p.sel.size)return;const sel=[...p.sel].sort((x,y)=>x-y);me(sel.map(j=>p.opts[j]));C.p=null;p.cb(sel);break}
+ case'pausec':pauseChat();toast(t(L('Saved. Resume any time from Home.','Guardado. Continúe cuando quiera desde Inicio.')));break;
+ case'lang':S.lang=v;S.lsheet=false;S.langQ='';break;
+ case'lsheet':S.lsheet=!S.lsheet;S.cmenu=false;S.langQ='';break;
+ case'signout':S.ps='welcome';S.lsheet=false;toast(t(L('You’re signed out','Cerró sesión')));break;
+ case'big':S.big=!S.big;S.cmenu=false;break;
+ case'cmenu':S.cmenu=!S.cmenu;break;
+ case'autospk':S.speak=!S.speak;break;
+ case'speak':if(!say())toast(t(L('Read-aloud isn’t available in this browser','La lectura en voz alta no está disponible en este navegador')));return;
+ case'nm':S.noteMode=v;break;case'nd':S.noteDay=new Date(+v);S.noteMode='day';break;case'fav':S.fav=!S.fav;break;
+ case'nmenu':S.menu=S.menu===i?null:i;break;case'nfav':ME.notes[i].fav=!ME.notes[i].fav;break;case'ndel':ME.notes.splice(i,1);toast(t(L('Note deleted','Nota borrada')));break;
+ case'compose':S.composer=true;S.noteDraft='';S.noteImgs=[];render();$('nt')?.focus();return;case'compx':S.composer=false;break;
+ case'nrm':S.noteImgs.splice(i,1);break;case'mrm':S.msgImgs.splice(i,1);break;
+ case'mt':S.msgT=v||null;S.msgNew=false;if(v){const th=TH.find(x=>x.id===v);th.unread=0}break;
+ case'mnew':S.msgNew=!S.msgNew;break;
+ case'mreply':S.ps='messages';S.msgT=v;TH.find(x=>x.id===v).unread=0;break;
+ case'tt':S.treat=v;break;case'ro':S.resOpen=S.resOpen===i?-1:i;break;case'rep':S.repOpen=S.repOpen===i?-1:i;break;
+ default:return}
+ render()});
+document.addEventListener('change',e=>{const x=e.target;
+ if(x.id==='nimg'){S.noteDraft=$('nt')?.value||S.noteDraft;readImgs(x.files,a=>{S.noteImgs=[...(S.noteImgs||[]),...a].slice(0,6);render()});return}
+ if(x.id==='mimg'){S.msgDraft=$('mi')?.value||S.msgDraft;readImgs(x.files,a=>{S.msgImgs=[...(S.msgImgs||[]),...a].slice(0,4);render()});return}
+ if(x.id==='cimg'&&x.files[0]){const f=x.files[0];if(!f.type.startsWith('image/'))return;const fr=new FileReader();fr.onload=()=>{me('',fr.result);addNote(t(L('Photo shared during check-in.','Foto compartida durante el reporte.')),fr.result);bot(L('Thanks! I’ve saved the photo to your notes for Dr. Hart.','¡Gracias! Guardé la foto en sus notas para el Dr. Hart.'));render()};fr.readAsDataURL(f)}});
+document.addEventListener('input',e=>{const x=e.target,k=x.dataset.in;if(!k)return;S[k]=x.value;S.focus=x.id;render()});
+document.addEventListener('submit',e=>{e.preventDefault();const f=e.target,k=f.dataset.f;
+ if(k==='chatin'){const x=$('ci').value.trim();if(!x)return;if(!C.started){startChat()}me(x);
+  if(C.p?.text){C.note=x;addNote(x);C.p=null;bot(L('Got it. I’ve added your note for Dr. Hart.','Entendido. Agregué su nota para el Dr. Hart.'));summary()}
+  else{addNote(x);bot(L('Got it. I’ve saved that as a note for Dr. Hart.','Entendido. Lo guardé como nota para el Dr. Hart.'));if(C.p&&C.lastQ)C.log.push({...C.lastQ})}render();$('ci')?.focus()}
+ else if(k==='note'){const x=$('nt').value.trim(),im=S.noteImgs||[];if(!x&&!im.length)return;addNote(x||t(L('Photo note','Nota con foto')),im);S.noteImgs=[];S.noteDraft='';S.composer=false;S.noteMode='week';toast(t(L('Note saved','Nota guardada')));render()}
+ else if(k==='olang'){const v=$('ol').value.trim();if(!v)return;const hit=LANGS.find(x=>[x[1],x[2]].some(n=>n.toLowerCase()===v.toLowerCase()));S.lang=hit?hit[0]:'x:'+v.replace(/[^\p{L}\p{M} ()'-]/gu,'').slice(0,40);S.lsheet=false;S.langQ='';render()}
+ else if(k==='signin'){S.ps='home';render()}
+ else if(k==='msg'){const x=($('mi')?.value||'').trim(),im=S.msgImgs||[];if(!x&&!im.length)return;const th=TH.find(z=>z.id===S.msgT);th.m.forEach(m=>{if(m.who==='me')m.read=true});th.m.push({who:'me',t:new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate(),new Date().getHours(),new Date().getMinutes()),h:x,imgs:im});S.msgDraft='';S.msgImgs=[];render();$('mi')?.focus();
+  const id=th.id;if(th.pending)return;th.pending=1;setTimeout(()=>{th.typing=1;th.m.at(-1).read=true;render()},1400);setTimeout(()=>{th.typing=0;th.pending=0;th.m.push({who:id,t:new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate(),new Date().getHours(),new Date().getMinutes()),h:REPLY[id]});if(!(S.ps==='messages'&&S.msgT===id))th.unread++;render()},4200)}
+ else if(k==='hsearch'){S.noteQ=$('hq').value.trim();S.noteMode='week';S.ps='notes';render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&(e.target.id==='ci'||e.target.id==='mi')){e.preventDefault();e.target.form.requestSubmit()}});
+function fit(){const k=Math.min(1,(innerHeight-40)/876,(innerWidth-32)/417);document.documentElement.style.setProperty('--k',k.toFixed(4))}addEventListener('resize',fit);fit();
+C=fresh();render();
+window.__curo={get S(){return S},get C(){return C},render,ME};
+
+}
+</script>
+</body>
+</html>

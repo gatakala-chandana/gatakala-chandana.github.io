@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qnet · Respond to Issue</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Source+Sans+3:ital,wght@0,300..800;1,300..800&display=swap"><script>window.__resources={"https://unpkg.com/react@18.3.1/umd/react.production.min.js":"assets/react.js","https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js":"assets/react-dom.js"};</script><link rel="stylesheet" href="assets/qnet-glue.css"><script src="assets/dc-runtime.js"></script>
+</head>
+<body>
+
+<x-dc>
+<helmet>
+<script>(function(){if(window.top===window&&!document.getElementById("vt-opt")){var s=document.createElement("style");s.id="vt-opt";s.textContent="@view-transition{navigation:auto}";document.head.appendChild(s)}function q(v){if(!v)return;["ready","finished","updateCallbackDone"].forEach(function(k){v[k]&&v[k].catch(function(){})})}addEventListener("pagereveal",function(e){q(e.viewTransition)});addEventListener("pageswap",function(e){q(e.viewTransition)});addEventListener("unhandledrejection",function(e){if(e.reason&&/Transition was aborted|ViewTransition/i.test(String(e.reason&&e.reason.message||e.reason)))e.preventDefault()})})();</script>
+<style>/* Team Quality Services — design system entry point.
+   Consumers link this one file. Source of truth: TQS-AI-Team/tqs-brand-guide
+   (tokens/tokens.json → tokens/tqs-tokens.css). Import lines only. */
+/* Two webfonts, split by output medium — brand/05-typography.md.
+   Open Sans   → web and software UI (screen).
+   Source Sans 3 → print, Word documents, decks, posters, ad creative.
+   Both are SIL OFL 1.1, so both may be self-hosted and embedded with no
+   licensing gate. No binaries were supplied in tqs-brand-guide/assets/fonts
+   (README only), so both load from the Google CDN; the brand guide prefers
+   self-hosting — drop .woff2 files into assets/fonts/ and swap to @font-face.
+
+   Source Sans 3 replaced Myriad Pro on 2026-08-18 (decision D21). Myriad Pro
+   is retired: never specify it. "Source Sans Pro" stays in the print stack
+   because some machines carry that earlier release name instead.
+   Do not ship final ad creative rendered in a fallback face — stop and flag. */
+/* Color — brand/04-color.md. Canonical unless marked [PROPOSED]. */
+:root {
+  /* Primary brand */
+  --tqs-yellow: #fedd00;   /* Pantone Yellow C — surface/accent, never a text color */
+  --tqs-ink: #212322;      /* Pantone 419 C — replaces black, everywhere */
+  --tqs-gray: #aaaaaa;     /* Pantone Cool Gray 6 C — NOT a text color on light */
+  --tqs-white: #ffffff;    /* Pantone 000C White */
+
+  /* Secondary — accent only, never dominant */
+  --tqs-mist: #c4c6c8;     /* Pantone 421 C */
+
+  /* Artwork value, not a palette color: the horizontal lockup wordmark fill. */
+  --tqs-logo-wordmark-ink: #5b6670;
+
+  /* Neutral ramp ([PROPOSED]: 50, 200, 600) */
+  --tqs-neutral-50: #f4f4f4;
+  --tqs-neutral-100: #e2e2e2;
+  --tqs-neutral-200: #d2d2d2;
+  --tqs-neutral-300: #c4c6c8; /* = mist */
+  --tqs-neutral-400: #aaaaaa; /* = gray */
+  --tqs-neutral-500: #8d8d8d; /* lightest neutral usable as a perceivable border (3.32:1) */
+  --tqs-neutral-600: #6b6b6b; /* lowest step passing AA on white (5.33:1) */
+  --tqs-neutral-700: #555555;
+  --tqs-neutral-800: #383838;
+  --tqs-neutral-900: #212322; /* = ink */
+
+  /* Semantic text */
+  --tqs-text-primary: var(--tqs-ink);              /* 15.81:1 on white — AAA */
+  --tqs-text-secondary: var(--tqs-neutral-600);    /*  5.33:1 on white — AA  */
+  --tqs-text-disabled: var(--tqs-neutral-400);     /*  2.32:1 — disabled only */
+  --tqs-text-on-dark: var(--tqs-white);            /* 15.81:1 on ink — AAA */
+  --tqs-text-on-dark-secondary: var(--tqs-mist);   /*  9.23:1 on ink — AAA */
+  --tqs-text-on-yellow: var(--tqs-ink);            /* 11.71:1 — the ONLY approved text color on yellow */
+  --tqs-text-yellow-on-light: #867400;             /*  4.65:1 — last resort; prefer the accent bar */
+
+  /* Surfaces */
+  --tqs-surface: var(--tqs-white);
+  --tqs-surface-subtle: var(--tqs-neutral-50);
+  --tqs-surface-inverse: var(--tqs-ink);
+  --tqs-surface-accent: var(--tqs-yellow);
+
+  /* Borders */
+  --tqs-border-subtle: var(--tqs-neutral-200);
+  --tqs-border: var(--tqs-gray);                /* 2.32:1 — decorative dividers only */
+  --tqs-border-strong: var(--tqs-neutral-500);  /* 3.32:1 — meets the 3:1 non-text minimum */
+
+  /* Interaction (hover/active fills, [PROPOSED] — derived by darkening ~8% / ~14%) */
+  --tqs-yellow-hover: #e8ca00;
+  --tqs-yellow-active: #d4b800;
+  --tqs-ink-hover: #383838;
+  --tqs-ink-active: #4a4a4a;
+
+  /* Status — indicator = fills/chart marks/icons on dark; -text = text on light;
+     -surface = the tint behind that text (pairs at exactly 4.5:1). */
+  --tqs-info: #0a84ff;
+  --tqs-info-text: #086dd3;
+  --tqs-info-surface: #e6f3ff;
+  --tqs-info-surface-dark: #1d344a;
+
+  --tqs-success: #30d158;
+  --tqs-success-text: #1e8237;
+  --tqs-success-surface: #eafaee;
+  --tqs-success-surface-dark: #24422c;
+
+  /* Warning is TQS brand yellow. Status-yellow ALWAYS carries a warning icon
+     and a text label, or it is not a valid warning state. */
+  --tqs-warning: var(--tqs-yellow);
+  --tqs-warning-text: #867400;
+  --tqs-warning-surface: #fffce6;
+  --tqs-warning-surface-dark: #49441c;
+
+  --tqs-danger: #ff453a;
+  --tqs-danger-text: #ca372e;
+  --tqs-danger-surface: #ffeceb;
+  --tqs-danger-surface-dark: #492926;
+
+  /* Chart series — quality trend data. Yellow marks the SERIES OF INTEREST only;
+     the rest of a chart is the neutral ramp. Never yellow for every series. */
+  --tqs-chart-focus: var(--tqs-yellow);
+  --tqs-chart-1: var(--tqs-ink);
+  --tqs-chart-2: var(--tqs-neutral-500);
+  --tqs-chart-3: var(--tqs-mist);
+  --tqs-chart-4: var(--tqs-neutral-700);
+  --tqs-chart-grid: var(--tqs-neutral-200);
+  --tqs-chart-axis: var(--tqs-neutral-600);
+  --tqs-chart-pass: var(--tqs-success);
+  --tqs-chart-fail: var(--tqs-danger);
+}
+
+/* Typography — brand/05-typography.md. Two families split by output MEDIUM,
+   not by heading vs body: Open Sans if it renders in a browser as software,
+   Source Sans 3 if it renders on a page or in generated creative. Within each
+   medium there is one family — hierarchy comes from weight and size, never
+   from mixing families. Type scale is [PROPOSED]. */
+:root {
+  --tqs-font-web: "Open Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tqs-font-heading: var(--tqs-font-web);
+  --tqs-font-body: var(--tqs-font-web);
+  /* Print / Word / decks / posters / social & ad creative. Replaced Myriad Pro
+     2026-08-18 (D21); Myriad Pro is retired — never specify it. */
+  --tqs-font-print: "Source Sans 3", "Source Sans Pro", Arial, sans-serif;
+  --tqs-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --tqs-weight-light: 300;      /* large body, long-form web text */
+  --tqs-weight-regular: 400;    /* default body, UI text */
+  --tqs-weight-semibold: 600;   /* subheads, buttons, table headers, emphasis */
+  --tqs-weight-bold: 700;       /* display and ad headlines */
+
+  /* 1.25 modular scale, 16px base [PROPOSED] */
+  --tqs-text-xs: 0.75rem;    /* 12 — labels, legal, table meta */
+  --tqs-text-sm: 0.875rem;   /* 14 — secondary text, captions */
+  --tqs-text-base: 1rem;     /* 16 — body default; never ship body below this */
+  --tqs-text-lg: 1.125rem;   /* 18 */
+  --tqs-text-xl: 1.375rem;   /* 22 — H4, lead paragraph */
+  --tqs-text-2xl: 1.75rem;   /* 28 — H3 */
+  --tqs-text-3xl: 2.25rem;   /* 36 — section H2 */
+  --tqs-text-4xl: 3rem;      /* 48 — page H1 */
+  --tqs-text-5xl: 3.75rem;   /* 60 — hero display */
+
+  --tqs-leading-tight: 1.15;   /* 3xl and up */
+  --tqs-leading-snug: 1.3;     /* xl, 2xl */
+  --tqs-leading-normal: 1.55;  /* body */
+  --tqs-leading-relaxed: 1.7;
+
+  --tqs-tracking-tight: -0.02em; /* display sizes */
+  --tqs-tracking-normal: 0em;
+  --tqs-tracking-wide: 0.04em;   /* xs labels */
+  --tqs-tracking-caps: 0.08em;   /* all-caps labels and badges */
+
+  /* PRINT SCALE. Source Sans 3 sets a 9.2% smaller x-height than Open Sans
+     (0.486 vs 0.535 em) — at 16px it has the apparent size of Open Sans at
+     14.5px. Do NOT reuse the web scale verbatim on a print artboard: these
+     are the web steps sized up ~10% and optically checked. Body is 17.5px. */
+  --tqs-print-xs: 0.8125rem;  /* 13 — legal, table meta */
+  --tqs-print-sm: 0.9375rem;  /* 15 — captions, secondary */
+  --tqs-print-base: 1.09375rem; /* 17.5 — body default on a page */
+  --tqs-print-lg: 1.25rem;    /* 20 — large body */
+  --tqs-print-xl: 1.5rem;     /* 24 — lead paragraph, deck body minimum */
+  --tqs-print-2xl: 1.9375rem; /* 31 */
+  --tqs-print-3xl: 2.5rem;    /* 40 */
+  --tqs-print-4xl: 3.3125rem; /* 53 */
+  --tqs-print-5xl: 4.125rem;  /* 66 — poster / cover display */
+}
+
+/* Spacing, radius, layout — brand/07-ui-design-system.md.
+   4px base. The whole scale is [PROPOSED] scaffolding: no TQS precedent existed. */
+:root {
+  --tqs-space-1: 0.25rem;  /*  4 */
+  --tqs-space-2: 0.5rem;   /*  8 */
+  --tqs-space-3: 0.75rem;  /* 12 */
+  --tqs-space-4: 1rem;     /* 16 */
+  --tqs-space-5: 1.5rem;   /* 24 */
+  --tqs-space-6: 2rem;     /* 32 */
+  --tqs-space-7: 3rem;     /* 48 */
+  --tqs-space-8: 4rem;     /* 64 */
+  --tqs-space-9: 6rem;     /* 96 */
+  --tqs-space-10: 8rem;    /* 128 */
+
+  --tqs-radius-none: 0;
+  --tqs-radius-sm: 0.125rem;  /* 2 */
+  --tqs-radius-md: 0.25rem;   /* 4 — the default for buttons, inputs, cards */
+  --tqs-radius-lg: 0.5rem;    /* 8 — dialogs, drawers */
+  --tqs-radius-pill: 9999px;  /* chips, tags, status badges only */
+
+  --tqs-border-hairline: 1px;
+  --tqs-border-thick: 2px;
+  --tqs-accent-bar: 4px;      /* the yellow rule motif */
+
+  /* Controls */
+  --tqs-control-h-sm: 32px;
+  --tqs-control-h-md: 40px;   /* default button and input height */
+  --tqs-control-h-lg: 48px;
+  --tqs-touch-min: 44px;      /* minimum touch target */
+  --tqs-row-h: 44px;          /* table row, default */
+  --tqs-row-h-compact: 36px;
+
+  /* Layout — content max and breakpoints are canonical */
+  --tqs-content-max: 1140px;
+  --tqs-prose-max: 68ch;
+  --tqs-gutter: 24px;
+  --tqs-gutter-mobile: 16px;
+  --tqs-bp-md: 767px;
+  --tqs-bp-lg: 1024px;
+
+  /* Icons — Lucide, 24px grid, 1.5px stroke */
+  --tqs-icon-size: 24px;
+  --tqs-icon-stroke: 1.5px;
+
+  /* Motif opacities — brand/06-imagery-motifs.md */
+  /* yellow 8x6 dot grid, right-anchored */
+  --tqs-dot-grid-opacity: 0.4; /* @kind other */
+  /* dotted-Q watermark, in Mist */
+  --tqs-watermark-opacity: 0.24; /* @kind other */
+  --tqs-map-watermark-opacity: 0.6; /* @kind other */
+}
+
+/* Elevation — [PROPOSED]. Ink-tinted, never black. Prefer borders for static
+   grouping; reserve shadow for things that genuinely float. */
+:root {
+  --tqs-shadow-sm: 0 1px 2px rgba(33, 35, 34, 0.08);   /* card at rest */
+  --tqs-shadow-md: 0 2px 8px rgba(33, 35, 34, 0.1);    /* interactive card hover */
+  --tqs-shadow-lg: 0 8px 24px rgba(33, 35, 34, 0.14);  /* menus, dialogs, popovers */
+  --tqs-scrim: rgba(33, 35, 34, 0.6);                  /* text over photography, modal backdrop */
+}
+
+/* Motion — [PROPOSED]. Precise and mechanical. No bounce, no overshoot, no spin. */
+:root {
+  --tqs-duration-micro: 140ms; /* @kind other */
+  --tqs-duration-base: 220ms; /* @kind other */
+  --tqs-ease-enter: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --tqs-ease-exit: cubic-bezier(0.4, 0, 1, 1); /* @kind other */
+  --tqs-translate: 8px;         /* 4–12px is the whole range */
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tqs-duration-micro: 0ms; /* @kind other */
+    --tqs-duration-base: 0ms; /* @kind other */
+    --tqs-translate: 0px;
+  }
+}
+
+/* Dark surface context — brand/07-ui-design-system.md#dark-mode.
+   The dark surface is the SIGNATURE TQS look, not an accommodation: white/mist
+   type on ink with yellow accents. Reach for it before a light layout.
+   Apply .tqs-inverse to any section that should render dark. Yellow never remaps. */
+.tqs-inverse {
+  --tqs-surface: var(--tqs-ink);
+  --tqs-surface-subtle: var(--tqs-neutral-800);
+  --tqs-text-primary: var(--tqs-white);
+  --tqs-text-secondary: var(--tqs-mist);
+  --tqs-text-disabled: var(--tqs-neutral-600);
+  --tqs-border-subtle: var(--tqs-neutral-800);
+  --tqs-border: var(--tqs-neutral-700);
+  --tqs-border-strong: var(--tqs-gray);
+
+  /* On dark, the raw indicator colors ARE legible — use them directly. */
+  --tqs-info-text: var(--tqs-info);
+  --tqs-success-text: var(--tqs-success);
+  --tqs-warning-text: var(--tqs-warning);
+  --tqs-danger-text: var(--tqs-danger);
+  --tqs-info-surface: var(--tqs-info-surface-dark);
+  --tqs-success-surface: var(--tqs-success-surface-dark);
+  --tqs-warning-surface: var(--tqs-warning-surface-dark);
+  --tqs-danger-surface: var(--tqs-danger-surface-dark);
+
+  /* Chart series invert to light-on-dark; focus stays yellow. */
+  --tqs-chart-1: var(--tqs-white);
+  --tqs-chart-2: var(--tqs-gray);
+  --tqs-chart-3: var(--tqs-neutral-600);
+  --tqs-chart-4: var(--tqs-mist);
+  --tqs-chart-grid: var(--tqs-neutral-800);
+  --tqs-chart-axis: var(--tqs-mist);
+
+  background-color: var(--tqs-surface);
+  color: var(--tqs-text-primary);
+}
+
+/* Explicit theme toggle: light on :root, dark by preference unless forced light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+}
+
+/* Base utilities that carry accessibility rules the tokens alone can't. */
+
+/* Focus visibility. Yellow alone is 1.35:1 on white — a yellow-only ring is
+   invisible on light surfaces. Pair it with an ink ring. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--tqs-border-thick) solid var(--tqs-ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--tqs-yellow);
+}
+.tqs-inverse :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--tqs-border-thick) solid var(--tqs-yellow);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* Links: underlined, ink on light, white on dark. Never yellow on white. */
+a { color: var(--tqs-text-primary); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--tqs-neutral-700); }
+.tqs-inverse a { color: var(--tqs-white); }
+.tqs-inverse a:hover { color: var(--tqs-mist); }
+
+/* The accent bar — the correct way to get yellow emphasis into a light layout. */
+.tqs-accent-bar { border-left: var(--tqs-accent-bar) solid var(--tqs-yellow); padding-left: var(--tqs-space-4); }
+.tqs-accent-rule { border-bottom: var(--tqs-accent-bar) solid var(--tqs-yellow); padding-bottom: var(--tqs-space-2); display: inline-block; }
+
+/* Dot grid motif: yellow, 40%, 8x6, right-anchored. Decorative — aria-hidden it. */
+.tqs-dot-grid {
+  background-image: radial-gradient(var(--tqs-yellow) 1.5px, transparent 1.6px);
+  background-size: 14px 14px;
+  opacity: var(--tqs-dot-grid-opacity);
+  width: 112px; height: 84px;
+}
+
+/* Tabular figures for data displays. */
+.tqs-tnum { font-variant-numeric: tabular-nums; }
+
+/* Light island inside a dark section. The ink surface is a context, so a white
+   card placed inside .tqs-inverse would otherwise inherit white text. Put
+   .tqs-light on that card to restore the light token values. */
+.tqs-light {
+  --tqs-surface: var(--tqs-white);
+  --tqs-surface-subtle: var(--tqs-neutral-50);
+  --tqs-text-primary: var(--tqs-ink);
+  --tqs-text-secondary: var(--tqs-neutral-600);
+  --tqs-text-disabled: var(--tqs-neutral-400);
+  --tqs-border-subtle: var(--tqs-neutral-200);
+  --tqs-border: var(--tqs-gray);
+  --tqs-border-strong: var(--tqs-neutral-500);
+  --tqs-info-text: #086dd3;
+  --tqs-success-text: #1e8237;
+  --tqs-warning-text: #867400;
+  --tqs-danger-text: #ca372e;
+  --tqs-info-surface: #e6f3ff;
+  --tqs-success-surface: #eafaee;
+  --tqs-warning-surface: #fffce6;
+  --tqs-danger-surface: #ffeceb;
+  background-color: var(--tqs-surface);
+  color: var(--tqs-text-primary);
+}
+
+</style>
+<style></style>
+<script src="assets/lucide.js"></script>
+<script src="assets/tqs-ds.js"></script>
+<style>::view-transition-old(root),::view-transition-new(root){animation-duration:160ms;animation-timing-function:cubic-bezier(0.2,0,0,1)}::view-transition-group(sidebar),::view-transition-group(topbar){animation-duration:0s}body{margin:0;font-family:"Geist","Open Sans",system-ui,sans-serif;background:#f7f7f8;color:#212322;-webkit-font-smoothing:antialiased}a{color:#4f46e5}a:hover{color:#4338ca}input::placeholder{color:#8d8d8d}</style>
+<script src="assets/qnet-nav.js"></script>
+</helmet>
+<div data-screen-label="Respond to Issue" style="display:flex;min-height:100vh;min-width:1280px;background:#f7f7f8">
+<aside aria-label="Primary" style="position:sticky;top:0;align-self:flex-start;width:240px;height:100vh;flex-shrink:0;background:#161616;border-right:1px solid #161616;display:flex;flex-direction:column;padding:16px 12px;box-sizing:border-box;overflow-y:auto">
+<div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 4px 0 8px;margin-bottom:20px">
+<a href="dashboard.html" aria-label="Qnet home" style="display:flex;align-items:center;text-decoration:none;color:#ffffff;font-size:22px;font-weight:800;letter-spacing:-0.01em;line-height:1">QNET</a>
+<button type="button" aria-label="Collapse sidebar" style="margin-left:auto;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:#aaaaaa;cursor:pointer" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="panel-left" size="18" hint-size="18px,18px"></x-import></button>
+</div>
+<div style="padding:0 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">Overview</div>
+<nav aria-label="Overview" style="display:flex;flex-direction:column;gap:2px">
+<a href="dashboard.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="layout-grid" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Dashboard</span></a>
+<a href="metrics.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="trending-up" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Metrics</span></a>
+</nav>
+<div style="padding:24px 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">Operations</div>
+<nav aria-label="Operations" style="display:flex;flex-direction:column;gap:2px">
+<a href="quality-issues.html" aria-current="page" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c7d2fe;background:rgba(99,102,241,0.22);text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#a5b4fc"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="bell" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Quality Issues</span></a>
+<a href="locations.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="map-pin" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Locations</span></a>
+<a href="agreements.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="file-text" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Agreements</span></a>
+<a href="part-management.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="package" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Part Management</span></a>
+<a href="action-center.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="clipboard-check" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Action Center</span></a>
+</nav>
+<div style="padding:24px 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">System</div>
+<nav aria-label="System" style="display:flex;flex-direction:column;gap:2px">
+<a href="account.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="user" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Account</span></a>
+<a href="settings.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="settings" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Settings</span></a>
+<a href="index.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="log-out" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Log Out</span></a>
+</nav>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:16px;border-top:1px solid #2a2a2a">
+<button type="button" role="switch" aria-checked="false" style="display:flex;align-items:center;gap:10px;height:44px;padding:0 12px;border-radius:8px;border:none;background:transparent;font:inherit;font-size:16px;font-weight:600;color:#c4c6c8;cursor:pointer;text-align:left" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="moon" size="18" hint-size="18px,18px"></x-import></span><span style="flex:1">Dark mode</span><span aria-hidden="true" style="position:relative;width:32px;height:18px;border-radius:999px;background:#3a3a3a;flex-shrink:0"><span style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:999px;background:#ffffff"></span></span></button>
+</div>
+</aside>
+
+<div style="flex:1;min-width:0;display:flex;flex-direction:column">
+<header style="view-transition-name:topbar;position:sticky;top:0;z-index:5;display:flex;align-items:center;height:60px;padding:0 32px;background:#ffffff;border-bottom:1px solid #e2e2e2;box-sizing:border-box">
+<nav aria-label="Breadcrumb" style="display:flex;align-items:center;gap:8px;font-size:13px;min-width:0">
+<sc-for list="{{ nav.crumbs }}" as="c" hint-placeholder-count="2"><sc-if value="{{ c.sep }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="display:flex;color:#8d8d8d"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-right" size="14" hint-size="14px,14px"></x-import></span></sc-if><sc-if value="{{ c.link }}" hint-placeholder-val="{{ true }}"><a href="{{ c.href }}" style="color:#6b6b6b;text-decoration:none;white-space:nowrap" style-hover="color:#212322;text-decoration:underline">{{ c.label }}</a></sc-if><sc-if value="{{ c.cur }}" hint-placeholder-val="{{ false }}"><span aria-current="page" style="color:#212322;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.label }}</span></sc-if></sc-for>
+</nav>
+<div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+<span style="font-size:14px;font-weight:500;color:#212322">Daniel Brown</span>
+<span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:999px;background:#eef2ff;color:#212322;font-size:12px;font-weight:600">DB</span>
+</div>
+</header>
+
+<main style="flex:1;padding:32px clamp(32px,4vw,64px) 0;box-sizing:border-box">
+<div style="max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:24px">
+<sc-if value="{{ nav.hasBack }}" hint-placeholder-val="{{ false }}"><a href="{{ nav.backHref }}" style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin:0 0 12px -2px;padding:2px;border-radius:6px;font-size:14px;font-weight:600;color:#555555;text-decoration:none" style-hover="color:#212322;text-decoration:underline" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-left" size="16" hint-size="16px,16px"></x-import>Back to {{ nav.backLabel }}</a></sc-if>
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+<a href="quality-issues.html" aria-label="Back to Quality Issues" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#383838" style-hover="background:#f4f4f4;color:#212322" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-left" size="17" hint-size="17px,17px"></x-import></a>
+<h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.02em;color:#212322;font-variant-numeric:tabular-nums">{{ issue.id }}</h1>
+<span style="{{ typeStyle }}">{{ issue.type }}</span>
+<span style="font-size:13px;color:#6b6b6b">Reported by {{ issue.reporter }} · {{ issue.date }}</span>
+<label style="margin-left:auto;position:relative;display:flex;align-items:center"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Status at your location</span><span aria-hidden="true" style="{{ statusDot }}"></span><sc-raw-select value="{{ status }}" sc-camel-on-change="{{ onStatus }}" style="{{ statusStyle }}" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><option value="New">New</option><option value="Checking">Checking</option><option value="Issue Found">Issue Found</option><option value="No Issue">No Issue</option><option value="Closed">Closed</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:12px;display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="16" hint-size="16px,16px"></x-import></span></label>
+</div>
+
+<sc-if value="{{ notNoIssue }}" hint-placeholder-val="{{ true }}">
+<section aria-labelledby="h-iss" style="background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #f4f4f4"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid #e2e2e2;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="map-pin" size="15" hint-size="15px,15px"></x-import></span><h2 id="h-iss" style="margin:0;font-size:15px;font-weight:600;color:#212322">Issuing Location</h2><button type="button" sc-camel-on-click="{{ toggleMore }}" aria-expanded="{{ moreOpen }}" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#f4f4f4" style-focus="outline:2px solid #4f46e5;outline-offset:2px">{{ moreLabel }}<span style="{{ moreChev }}"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="15" hint-size="15px,15px"></x-import></span></button></div>
+<div style="padding:18px 20px;display:flex;flex-direction:column;gap:18px">
+<dl style="margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 24px">
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Location</dt><dd style="margin:4px 0 0;font-size:14px;font-weight:500;color:#212322">{{ issue.location }}</dd></div>
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Supplier</dt><dd style="margin:4px 0 0;font-size:14px;font-weight:500;color:#212322">{{ issue.supplier }}</dd></div>
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Supplier Contact</dt><dd style="margin:4px 0 0;font-size:14px;font-weight:500;color:#212322">{{ issue.contact }}</dd></div>
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Issue Category</dt><dd style="margin:4px 0 0;font-size:14px;font-weight:500;color:#212322">{{ issue.category }}</dd></div>
+</dl>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;font-weight:500;color:#6b6b6b">Affected Parts ({{ partCount }})</span>
+<sc-for list="{{ issue.parts }}" as="p" hint-placeholder-count="1"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px solid #f0f0f2;border-radius:8px;background:#fafafa"><span style="font-size:14px;font-weight:600;color:#212322">{{ p.name }}</span><span style="font-size:13px;color:#6b6b6b;font-variant-numeric:tabular-nums">{{ p.num }}</span><span style="margin-left:auto;font-size:13px;font-weight:600;color:#383838;font-variant-numeric:tabular-nums">{{ p.qtyLabel }}</span></div></sc-for></div>
+<sc-if value="{{ moreOpen }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;padding-top:16px;border-top:1px solid #f4f4f4">
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Issue summary</dt><p style="margin:6px 0 0;font-size:14px;line-height:1.6;color:#212322;max-width:80ch">{{ issue.summary }}</p></div>
+<dl style="margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 24px">
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Detected</dt><dd style="margin:4px 0 0;font-size:14px;color:#212322">{{ issue.detected }}</dd></div>
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Platform</dt><dd style="margin:4px 0 0;font-size:14px;color:#212322">{{ issue.platform }}</dd></div>
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">OEM complaint</dt><dd style="margin:4px 0 0;font-size:14px;color:#212322">{{ issue.oem }}</dd></div>
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Customer QC#</dt><dd style="margin:4px 0 0;font-size:14px;color:#212322">{{ issue.qc }}</dd></div>
+</dl>
+<div><dt style="font-size:12px;font-weight:500;color:#6b6b6b">Supplier action required</dt><p style="margin:6px 0 0;font-size:14px;line-height:1.6;color:#212322">{{ issue.supplierAction }}</p></div>
+</div>
+</sc-if>
+</div>
+</section>
+</sc-if>
+
+<div style="display:flex;align-items:baseline;gap:10px;margin-top:8px"><h2 style="margin:0;font-size:18px;font-weight:600;color:#212322">Your Location</h2><span style="font-size:13px;color:#6b6b6b">Log what you checked and what you found.</span></div>
+
+<section aria-labelledby="h-basic" style="background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #f4f4f4"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid #e2e2e2;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="info" size="15" hint-size="15px,15px"></x-import></span><h2 id="h-basic" style="margin:0;font-size:15px;font-weight:600;color:#212322">Basic Information</h2></div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;padding:20px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:500;color:#383838">Location</span><span style="position:relative;display:block"><sc-raw-select value="{{ myLoc }}" sc-camel-on-change="{{ onLoc }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 40px 0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;appearance:none;outline:none;cursor:pointer" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option>Plant 2 — Lansing, MI</option><option>GM — Flint, MI</option><option>Ford Truck — Louisville, KY</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:500;color:#383838">Assignee</span><span style="position:relative;display:block"><sc-raw-select value="{{ assignee }}" sc-camel-on-change="{{ onAssignee }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 40px 0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;appearance:none;outline:none;cursor:pointer" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option>Daniel Brown · Resident Liaison</option><option>Marcus Johnson · Site QA Lead</option><option>Sarah Kim · Quality Rep</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+</div>
+</section>
+
+<section aria-labelledby="h-act" style="background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #f4f4f4"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid #e2e2e2;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="clipboard-list" size="15" hint-size="15px,15px"></x-import></span><h2 id="h-act" style="margin:0;font-size:15px;font-weight:600;color:#212322">Internal Actions Taken<span aria-label="required" style="color:#be123c;margin-left:4px">*</span></h2></div>
+<div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+<div style="position:relative">
+<textarea rows="4" sc-camel-max-length="250" value="{{ draft }}" sc-camel-on-input="{{ onDraft }}" aria-label="New internal action" placeholder="Describe the action taken — what was done, by whom, when, and the outcome." style="width:100%;box-sizing:border-box;min-height:120px;padding:12px 56px 32px 14px;border:1px solid #d2d2d2;border-radius:10px;background:#ffffff;color:#212322;font:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></textarea>
+<span style="position:absolute;left:14px;bottom:12px;font-size:12px;color:#6b6b6b;font-variant-numeric:tabular-nums;pointer-events:none">{{ draftCount }}/250 characters</span>
+<button type="button" aria-label="Add action" title="Add action" sc-camel-on-click="{{ addAction }}" aria-disabled="{{ cantAdd }}" style="{{ sendStyle }}" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="send" size="16" hint-size="16px,16px"></x-import></button>
+</div>
+<sc-for list="{{ actions }}" as="a" hint-placeholder-count="1">
+<div style="padding:12px 14px;border:1px solid #f0f0f2;border-radius:10px;background:#fafafa">
+<div style="display:flex;align-items:center;gap:8px;font-size:13px"><span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:999px;background:#ffffff;border:1px solid #e2e2e2;color:#383838;font-size:10px;font-weight:700">{{ a.initials }}</span><span style="font-weight:600;color:#212322">{{ a.by }}</span><span style="color:#6b6b6b">· {{ a.when }}</span></div>
+<p style="margin:8px 0 0;font-size:14px;line-height:1.55;color:#212322">{{ a.text }}</p>
+</div>
+</sc-for>
+</div>
+</section>
+
+<sc-if value="{{ isNoIssue }}" hint-placeholder-val="{{ false }}">
+<section aria-labelledby="h-inv" style="background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<div style="padding:16px 20px;border-bottom:1px solid #f4f4f4"><div style="display:flex;align-items:center;gap:10px"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid #e2e2e2;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="search-check" size="15" hint-size="15px,15px"></x-import></span><h2 id="h-inv" style="margin:0;font-size:15px;font-weight:600;color:#212322">Investigation Details</h2></div><p style="margin:8px 0 0;font-size:13px;line-height:1.5;color:#6b6b6b">Provide supporting documentation of your investigation. This will appear in customer reporting and portals.</p></div>
+<div style="padding:20px;display:flex;flex-direction:column;gap:18px">
+<label style="display:flex;flex-direction:column;gap:8px;max-width:520px"><span style="display:flex;gap:4px;font-size:13px;font-weight:500;color:#383838">Reason for No Issue<span aria-label="required" style="color:#be123c">*</span></span><span style="position:relative;display:block"><sc-raw-select value="{{ inv.reason }}" sc-camel-on-change="{{ inv.onReason }}" style="{{ inv.reasonStyle }}" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option value="">Select a reason…</option><option>Lot not received at this location</option><option>Lot already consumed or shipped</option><option>Parts inspected — conforming</option><option>Part not used at this location</option><option>Other</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+<div style="display:flex;flex-direction:column;gap:14px;padding:16px;border:1px solid {{ inv.groupBorder }};border-radius:10px;background:#fafafa">
+<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:{{ inv.groupColor }}"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="info" size="14" hint-size="14px,14px"></x-import>At least one of the following options is required.</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:13px;font-weight:500;color:#383838">Lot Date</span><input type="date" value="{{ inv.lot }}" sc-camel-on-change="{{ inv.onLot }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:13px;font-weight:500;color:#383838">Serial Number</span><input type="text" value="{{ inv.serial }}" sc-camel-on-input="{{ inv.onSerial }}" placeholder="Enter Serial Number" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:13px;font-weight:500;color:#383838">Cavity/Mold Number</span><input type="text" value="{{ inv.cavity }}" sc-camel-on-input="{{ inv.onCavity }}" placeholder="Enter Cavity/Mold Number" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:13px;font-weight:500;color:#383838">Upload Attachment</span>
+<sc-if value="{{ inv.noFile }}" hint-placeholder-val="{{ true }}"><button type="button" sc-camel-on-click="{{ inv.attach }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:96px;border:1px dashed #aaaaaa;border-radius:10px;background:#ffffff;color:#383838;font:inherit;cursor:pointer" style-hover="border-color:#4f46e5" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="cloud-upload" size="20" hint-size="20px,20px"></x-import><span style="font-size:14px"><span style="color:#4f46e5;font-weight:600">Click to upload</span> or drag &amp; drop</span><span style="font-size:12px;color:#6b6b6b">PNG, JPG, PPT, PDF up to 20MB</span></button></sc-if>
+<sc-if value="{{ inv.hasFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 8px 0 14px;border:1px solid #e2e2e2;border-radius:8px;background:#ffffff"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="image" size="16" hint-size="16px,16px"></x-import></span><span style="flex:1;font-size:14px;color:#212322">{{ inv.file }}</span><button type="button" aria-label="Remove file" sc-camel-on-click="{{ inv.removeFile }}" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:none;border-radius:6px;background:transparent;color:#6b6b6b;cursor:pointer" style-hover="background:#f4f4f4" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="x" size="15" hint-size="15px,15px"></x-import></button></div></sc-if>
+</div>
+</div>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:13px;font-weight:500;color:#383838">Investigation Notes</span><textarea rows="4" value="{{ inv.notes }}" sc-camel-on-input="{{ inv.onNotes }}" placeholder="Enter any additional details related to your investigation…" style="width:100%;box-sizing:border-box;min-height:104px;padding:12px 14px;border:1px solid #d2d2d2;border-radius:10px;background:#ffffff;color:#212322;font:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></textarea></label>
+</div>
+</section>
+</sc-if>
+
+
+<sc-if value="{{ notNoIssue }}" hint-placeholder-val="{{ true }}">
+<section aria-labelledby="h-att" style="background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #f4f4f4"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid #e2e2e2;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="paperclip" size="15" hint-size="15px,15px"></x-import></span><h2 id="h-att" style="margin:0;font-size:15px;font-weight:600;color:#212322">Attachments</h2></div>
+<div style="padding:20px;display:flex;flex-wrap:wrap;gap:10px">
+<sc-for list="{{ files }}" as="f" hint-placeholder-count="0"><span style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 8px 0 12px;border:1px solid #e2e2e2;border-radius:8px;font-size:13px;color:#212322"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="image" size="15" hint-size="15px,15px"></x-import></span>{{ f.name }}<button type="button" aria-label="Remove {{ f.name }}" sc-camel-on-click="{{ f.remove }}" style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border:none;border-radius:6px;background:transparent;color:#6b6b6b;cursor:pointer" style-hover="background:#f4f4f4;color:#212322" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="x" size="14" hint-size="14px,14px"></x-import></button></span></sc-for>
+<button type="button" sc-camel-on-click="{{ addFile }}" style="flex:1 1 100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:104px;border:1px dashed #aaaaaa;border-radius:10px;background:#fafafa;color:#383838;font:inherit;cursor:pointer" style-hover="background:#f4f4f4;border-color:#4f46e5" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="cloud-upload" size="22" hint-size="22px,22px"></x-import><span style="font-size:14px"><span style="color:#4f46e5;font-weight:600">Click to upload</span> or drag &amp; drop</span><span style="font-size:12px;color:#6b6b6b">PNG, JPG, PPT, PDF up to 20MB</span></button>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ notNoIssue }}" hint-placeholder-val="{{ true }}">
+<section aria-labelledby="h-other" style="background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid #f4f4f4"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid #e2e2e2;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="building-2" size="15" hint-size="15px,15px"></x-import></span><h2 id="h-other" style="margin:0;font-size:15px;font-weight:600;color:#212322">Status at Other Locations</h2><span style="font-size:12px;color:#6b6b6b;font-variant-numeric:tabular-nums">{{ otherCount }}</span></div>
+<div style="display:flex;flex-direction:column">
+<sc-for list="{{ others }}" as="o" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) 120px 170px;gap:16px;align-items:center;padding:14px 20px;border-top:{{ o.border }}">
+<div style="min-width:0"><div style="font-size:14px;font-weight:600;color:#212322">{{ o.loc }}</div><div style="margin-top:3px;font-size:13px;line-height:1.45;color:#6b6b6b">{{ o.note }}</div></div>
+<div style="display:flex;align-items:center;gap:10px;min-width:0"><span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;flex-shrink:0;border-radius:999px;background:#f4f4f4;color:#383838;font-size:11px;font-weight:700">{{ o.initials }}</span><div style="min-width:0"><div style="font-size:14px;font-weight:500;color:#212322">{{ o.by }}</div><div style="font-size:12px;color:#6b6b6b">{{ o.role }}</div></div></div>
+<span style="{{ o.tag }}">{{ o.status }}</span>
+<span style="font-size:13px;color:#6b6b6b;font-variant-numeric:tabular-nums">{{ o.when }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-if>
+
+
+
+</div>
+
+<div style="position:sticky;bottom:0;z-index:6;margin:32px calc(-1 * clamp(32px,4vw,64px)) 0;padding:14px clamp(32px,4vw,64px);background:rgba(255,255,255,0.96);border-top:1px solid #e2e2e2;box-shadow:0 -4px 16px rgba(33,35,34,0.05)">
+<div style="max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:8px">
+<a href="quality-issues.html" style="display:inline-flex;align-items:center;height:42px;padding:0 18px;border-radius:8px;color:#383838;font-size:14px;font-weight:600;text-decoration:none" style-hover="background:#f4f4f4;color:#212322" style-focus="outline:2px solid #4f46e5;outline-offset:2px">Cancel</a>
+<sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}"><span role="status" style="display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:13px;color:#166534"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="circle-check" size="15" hint-size="15px,15px"></x-import>Response saved</span></sc-if>
+<button type="button" sc-camel-on-click="{{ save }}" aria-disabled="{{ cantSave }}" style="{{ saveStyle }}" style-focus="outline:2px solid #4f46e5;outline-offset:2px">{{ saveLabel }}</button>
+</div>
+</div>
+</main>
+
+<sc-if value="{{ cl.open }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;z-index:130;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(33,35,34,0.6)">
+<div role="dialog" aria-modal="true" aria-labelledby="cl-title" style="width:560px;max-width:100%;max-height:calc(100vh - 48px);overflow-y:auto;box-sizing:border-box;padding:28px;background:#ffffff;border-radius:14px;box-shadow:0 16px 40px rgba(33,35,34,0.24)">
+<h2 id="cl-title" style="margin:0;font-size:20px;font-weight:600;color:#212322">Close this issue</h2>
+<p style="margin:8px 0 0;font-size:14px;line-height:1.55;color:#383838">Select a reason for closing. The issue will move to the Closed state and remain in the audit log.</p>
+<div role="radiogroup" aria-labelledby="cl-title" style="display:flex;flex-direction:column;gap:8px;margin-top:18px">
+<sc-for list="{{ cl.opts }}" as="o" hint-placeholder-count="6"><button type="button" role="radio" aria-checked="{{ o.on }}" sc-camel-on-click="{{ o.pick }}" style="{{ o.style }}" style-hover="border-color:#aaaaaa" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><span style="{{ o.box }}"></span>{{ o.label }}</button></sc-for>
+</div>
+<sc-if value="{{ cl.isOther }}" hint-placeholder-val="{{ false }}"><label style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><span style="display:flex;gap:4px;font-size:13px;font-weight:500;color:#383838">Closure note<span aria-label="required" style="color:#be123c">*</span></span><textarea rows="3" value="{{ cl.note }}" sc-camel-on-input="{{ cl.onNote }}" placeholder="Explain why this issue is being closed." style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d2d2d2;border-radius:8px;font:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></textarea></label></sc-if>
+<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+<button type="button" sc-camel-on-click="{{ cl.cancel }}" style="height:44px;padding:0 22px;border-radius:8px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#f4f4f4" style-focus="outline:2px solid #4f46e5;outline-offset:2px">Cancel</button>
+<button type="button" sc-camel-on-click="{{ cl.go }}" aria-disabled="{{ cl.cant }}" style="{{ cl.btn }}" style-focus="outline:2px solid #4f46e5;outline-offset:2px">Close</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+class Component extends DCLogic {
+  state = { status: "Checking", myLoc: "Ford Truck — Louisville, KY", assignee: "Marcus Johnson · Site QA Lead", draft: "", more: false, saved: false,
+    actions: [{ by: "System", initials: "S", when: "Apr 26, 2026, 9:42 AM", text: "Held all suspect parts in QC quarantine zone B-7. Notified line lead and supervisor, paused dock-to-stock release on lot K2UC-0418." }],
+    files: [], inv: { reason: "", lot: "", serial: "", cavity: "", file: "", notes: "" } };
+  static ISSUE = { id: "QA 26-0418", type: "Near Miss", reporter: "Daniel Brown", date: "Apr 26, 2026", location: "Ford Truck — Louisville, KY", supplier: "ABC Technologies", contact: "Pat Smith", category: "Welding Damage",
+    parts: [{ name: "Front Lower Control Arm", num: "51350-TLA-A81", qty: 24 }],
+    summary: "Weld porosity found on front lower control arms from lot K2UC-0418 during line-side inspection; 24 units held pending supplier containment.",
+    detected: "Apr 25, 2026 · 8:45 PM", platform: "F-150", oem: "Yes — OEM-77105", qc: "QC-55120", supplierAction: "100% sort of lot K2UC-0418 at supplier by May 6; submit 8D within 10 business days." };
+  static OTHERS = [
+    ["Ford Truck — Louisville, KY", "Originating site — 24 units held on lot K2UC-0418.", "Daniel Brown", "Resident Liaison", "Issue Found", "Apr 26, 2026, 9:50 AM"],
+    ["Ford — Dearborn Truck", "Awaiting initial review.", "Rannesha Robinson", "Quality Engineer", "New", "—"],
+    ["Lincoln — Wixom, MI", "Lot K2UC-0418 not present at this site; no overlap with current build.", "Priya Patel", "Supplier Quality", "No Issue", "Apr 25, 2026, 5:05 PM"],
+    ["Ford Stamping — Dearborn, MI", "Closed — certified material received.", "Jamal Carter", "Stamping QA", "Closed", "Apr 26, 2026, 4:10 PM"],
+    ["Ford — Kansas City Assembly", "Reviewing receiving logs for any lot K2UC-0418 inbound this week.", "Elena Vasquez", "Resident Liaison", "Checking", "Apr 26, 2026, 1:18 PM"],
+  ];
+  static DOT = { New: "#3b82f6", Checking: "#f59e0b", "Issue Found": "#f43f5e", "No Issue": "#22c55e", Closed: "#8d8d8d" };
+  renderVals() {
+    const N = window.QnetNav;
+    const v = this.__rv();
+    const label = (Component.ISSUE && Component.ISSUE.id) || "Respond";
+    const parents = [{ label: "Quality Issues", href: "quality-issues.html" }];
+    const nav = N ? N.vals(parents, label) : { crumbs: [...parents.map((p, i) => ({ ...p, link: true, cur: false, sep: i > 0 })), { label, href: "#", link: false, cur: true, sep: parents.length > 0 }], hasBack: false };
+    return { ...v, nav };
+  }
+  __rv() {
+    const s = this.state, C = Component, X = C.ISSUE;
+    const V = s.inv, noIssue = s.status === "No Issue";
+    const setV = (k) => (e) => { const v = e.target.value; this.setState((st) => ({ saved: false, inv: { ...st.inv, [k]: v } })); };
+    const evidence = !!(V.lot || V.serial.trim() || V.cavity.trim() || V.file);
+    const ok = s.actions.length > 0 && (!noIssue || (V.reason && evidence));
+    const canAdd = !!s.draft.trim();
+    const dot = (c) => ({ width: 8, height: 8, borderRadius: 999, background: c, flexShrink: 0 });
+    const ini = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+    const isQa = X.type === "Quality Alert";
+    return {
+      issue: { ...X, parts: X.parts.map((p) => ({ ...p, qtyLabel: "Qty " + p.qty })) }, partCount: X.parts.length,
+      typeStyle: { display: "inline-flex", alignItems: "center", height: 26, padding: "0 12px", borderRadius: 999, fontSize: 13, fontWeight: 600, background: isQa ? "#ffe4e6" : "#ffedd5", color: isQa ? "#9f1239" : "#9a3412" },
+      status: s.status, onStatus: (e) => { const v = e.target.value; if (v === "Closed") { this.setState({ closing: { reason: "", note: "" } }); return; } this.setState({ status: v, saved: false }); },
+      cl: (() => { const K = s.closing; if (!K) return { open: false, opts: [] };
+        const R = ["Corrective Action (8D/5-phase) Accepted", "Certified Material Received", "Dead Issue", "SPPS/NC/QR Rescinded", "Plant process / Closed as an error concern (erc)", "Other Closure Reason (requires note)"];
+        const isOther = K.reason === R[5]; const ok = !!K.reason && (!isOther || !!K.note.trim());
+        return { open: true, isOther, note: K.note, cant: !ok,
+          onNote: (e) => { const v = e.target.value; this.setState((st) => ({ closing: { ...st.closing, note: v } })); },
+          opts: R.map((label) => { const on = K.reason === label; return { label, on, pick: () => this.setState((st) => ({ closing: { ...st.closing, reason: label } })),
+            style: { display: "flex", alignItems: "center", gap: 12, width: "100%", minHeight: 48, padding: "10px 16px", boxSizing: "border-box", border: "1px solid " + (on ? "#4f46e5" : "#e2e2e2"), borderRadius: 10, background: on ? "#eef2ff" : "#fafafa", fontFamily: "inherit", fontSize: 15, fontWeight: 600, color: "#212322", textAlign: "left", cursor: "pointer" },
+            box: { width: 20, height: 20, flexShrink: 0, boxSizing: "border-box", borderRadius: 999, border: on ? "6px solid #4f46e5" : "1px solid #c4c6c8", background: "#ffffff" } }; }),
+          cancel: () => this.setState({ closing: null }),
+          btn: { minWidth: 110, height: 44, padding: "0 22px", borderRadius: 8, border: "none", fontFamily: "inherit", fontSize: 14, fontWeight: 600, background: ok ? "#4f46e5" : "#f4f4f4", color: ok ? "#ffffff" : "#8d8d8d", cursor: ok ? "pointer" : "not-allowed" },
+          go: () => { if (!ok) return; this.setState((st) => ({ status: "Closed", closing: null, saved: false, actions: [{ by: "Daniel Brown", initials: "DB", when: "Just now", text: "Closed — " + (isOther ? K.note.trim() : K.reason) + "." }, ...st.actions] })); } }; })(),
+      statusDot: { ...dot(C.DOT[s.status]), position: "absolute", left: 14, pointerEvents: "none" },
+      statusStyle: { height: 40, minWidth: 190, padding: "0 36px 0 32px", border: "1px solid #d2d2d2", borderRadius: 10, background: "#ffffff", color: "#212322", fontFamily: "inherit", fontSize: 14, fontWeight: 600, appearance: "none", cursor: "pointer" },
+      moreOpen: s.more, moreLabel: s.more ? "Hide details" : "View more info", toggleMore: () => this.setState({ more: !s.more }),
+      moreChev: { display: "flex", transition: "transform 160ms", transform: s.more ? "rotate(180deg)" : "none" },
+      myLoc: s.myLoc, onLoc: (e) => this.setState({ myLoc: e.target.value }), assignee: s.assignee, onAssignee: (e) => this.setState({ assignee: e.target.value }),
+      draft: s.draft, onDraft: (e) => this.setState({ draft: e.target.value }), draftCount: s.draft.length, cantAdd: !canAdd,
+      sendStyle: { position: "absolute", right: 10, bottom: 12, display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, border: "none", borderRadius: 8, background: canAdd ? "#4f46e5" : "#f4f4f4", color: canAdd ? "#ffffff" : "#8d8d8d", cursor: canAdd ? "pointer" : "not-allowed" },
+      addAction: () => { if (!canAdd) return; this.setState((st) => ({ draft: "", saved: false, actions: [{ by: "Daniel Brown", initials: "DB", when: "Just now", text: st.draft.trim() }, ...st.actions] })); },
+      actions: s.actions,
+      files: s.files.map((f) => ({ ...f, remove: () => this.setState((st) => ({ files: st.files.filter((x) => x.id !== f.id) })) })),
+      addFile: () => this.setState((st) => ({ files: [...st.files, { id: Date.now(), name: "photo-" + (st.files.length + 1) + ".jpg" }] })),
+      otherCount: C.OTHERS.length + " locations",
+      others: C.OTHERS.map(([loc, note, by, role, status, when], i) => { const t = { New: ["#dbeafe", "#1e40af"], Checking: ["#fef3c7", "#92400e"], "Issue Found": ["#ffe4e6", "#9f1239"], "No Issue": ["#dcfce7", "#166534"], Closed: ["#f4f4f4", "#383838"] }[status]; return { loc, note, by, role, status, when, initials: ini(by), border: i === 0 ? "none" : "1px solid #f4f4f4",
+        tag: { display: "inline-flex", alignItems: "center", justifySelf: "start", height: 24, padding: "0 10px", borderRadius: 999, background: t[0], color: t[1], fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" } }; }),
+      isNoIssue: noIssue, notNoIssue: !noIssue, saveLabel: noIssue ? "Save changes" : "Save response",
+      inv: { ...V, onReason: setV("reason"), onLot: setV("lot"), onSerial: setV("serial"), onCavity: setV("cavity"), onNotes: setV("notes"),
+        reasonStyle: { height: 44, width: "100%", boxSizing: "border-box", padding: "0 40px 0 14px", border: "1px solid #d2d2d2", borderRadius: 8, background: "#ffffff", color: V.reason ? "#212322" : "#8d8d8d", fontFamily: "inherit", fontSize: 14, appearance: "none", outline: "none", cursor: "pointer" },
+        groupBorder: evidence ? "#e2e2e2" : "#fde68a", groupColor: evidence ? "#166534" : "#92400e",
+        noFile: !V.file, hasFile: !!V.file, attach: () => this.setState((st) => ({ inv: { ...st.inv, file: "investigation-photo.jpg" } })), removeFile: () => this.setState((st) => ({ inv: { ...st.inv, file: "" } })) },
+      saved: s.saved, cantSave: !ok,
+      saveStyle: { marginLeft: s.saved ? 12 : "auto", height: 42, padding: "0 22px", borderRadius: 8, border: "none", fontFamily: "inherit", fontSize: 14, fontWeight: 600, background: ok ? "#4f46e5" : "#f4f4f4", color: ok ? "#ffffff" : "#8d8d8d", cursor: ok ? "pointer" : "not-allowed", whiteSpace: "nowrap" },
+      save: () => ok && this.setState({ saved: true }),
+    };
+  }
+}
+</script>
+
+
+<script src="assets/qnet-glue.js"></script><link rel="stylesheet" href="assets/qnet-mobile.css"><script src="assets/qnet-mobile.js"></script>
+</body></html>

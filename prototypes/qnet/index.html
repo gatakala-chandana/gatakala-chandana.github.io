@@ -1,0 +1,462 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qnet · Sign In</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Source+Sans+3:ital,wght@0,300..800;1,300..800&display=swap"><script>window.__resources={"https://unpkg.com/react@18.3.1/umd/react.production.min.js":"assets/react.js","https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js":"assets/react-dom.js"};</script><link rel="stylesheet" href="assets/qnet-glue.css"><script src="assets/dc-runtime.js"></script>
+</head>
+<body>
+
+<x-dc>
+<helmet>
+<script>(function(){if(window.top===window&&!document.getElementById("vt-opt")){var s=document.createElement("style");s.id="vt-opt";s.textContent="@view-transition{navigation:auto}";document.head.appendChild(s)}function q(v){if(!v)return;["ready","finished","updateCallbackDone"].forEach(function(k){v[k]&&v[k].catch(function(){})})}addEventListener("pagereveal",function(e){q(e.viewTransition)});addEventListener("pageswap",function(e){q(e.viewTransition)});addEventListener("unhandledrejection",function(e){if(e.reason&&/Transition was aborted|ViewTransition/i.test(String(e.reason&&e.reason.message||e.reason)))e.preventDefault()})})();</script>
+<style>/* Team Quality Services — design system entry point.
+   Consumers link this one file. Source of truth: TQS-AI-Team/tqs-brand-guide
+   (tokens/tokens.json → tokens/tqs-tokens.css). Import lines only. */
+/* Two webfonts, split by output medium — brand/05-typography.md.
+   Open Sans   → web and software UI (screen).
+   Source Sans 3 → print, Word documents, decks, posters, ad creative.
+   Both are SIL OFL 1.1, so both may be self-hosted and embedded with no
+   licensing gate. No binaries were supplied in tqs-brand-guide/assets/fonts
+   (README only), so both load from the Google CDN; the brand guide prefers
+   self-hosting — drop .woff2 files into assets/fonts/ and swap to @font-face.
+
+   Source Sans 3 replaced Myriad Pro on 2026-08-18 (decision D21). Myriad Pro
+   is retired: never specify it. "Source Sans Pro" stays in the print stack
+   because some machines carry that earlier release name instead.
+   Do not ship final ad creative rendered in a fallback face — stop and flag. */
+/* Color — brand/04-color.md. Canonical unless marked [PROPOSED]. */
+:root {
+  /* Primary brand */
+  --tqs-yellow: #fedd00;   /* Pantone Yellow C — surface/accent, never a text color */
+  --tqs-ink: #212322;      /* Pantone 419 C — replaces black, everywhere */
+  --tqs-gray: #aaaaaa;     /* Pantone Cool Gray 6 C — NOT a text color on light */
+  --tqs-white: #ffffff;    /* Pantone 000C White */
+
+  /* Secondary — accent only, never dominant */
+  --tqs-mist: #c4c6c8;     /* Pantone 421 C */
+
+  /* Artwork value, not a palette color: the horizontal lockup wordmark fill. */
+  --tqs-logo-wordmark-ink: #5b6670;
+
+  /* Neutral ramp ([PROPOSED]: 50, 200, 600) */
+  --tqs-neutral-50: #f4f4f4;
+  --tqs-neutral-100: #e2e2e2;
+  --tqs-neutral-200: #d2d2d2;
+  --tqs-neutral-300: #c4c6c8; /* = mist */
+  --tqs-neutral-400: #aaaaaa; /* = gray */
+  --tqs-neutral-500: #8d8d8d; /* lightest neutral usable as a perceivable border (3.32:1) */
+  --tqs-neutral-600: #6b6b6b; /* lowest step passing AA on white (5.33:1) */
+  --tqs-neutral-700: #555555;
+  --tqs-neutral-800: #383838;
+  --tqs-neutral-900: #212322; /* = ink */
+
+  /* Semantic text */
+  --tqs-text-primary: var(--tqs-ink);              /* 15.81:1 on white — AAA */
+  --tqs-text-secondary: var(--tqs-neutral-600);    /*  5.33:1 on white — AA  */
+  --tqs-text-disabled: var(--tqs-neutral-400);     /*  2.32:1 — disabled only */
+  --tqs-text-on-dark: var(--tqs-white);            /* 15.81:1 on ink — AAA */
+  --tqs-text-on-dark-secondary: var(--tqs-mist);   /*  9.23:1 on ink — AAA */
+  --tqs-text-on-yellow: var(--tqs-ink);            /* 11.71:1 — the ONLY approved text color on yellow */
+  --tqs-text-yellow-on-light: #867400;             /*  4.65:1 — last resort; prefer the accent bar */
+
+  /* Surfaces */
+  --tqs-surface: var(--tqs-white);
+  --tqs-surface-subtle: var(--tqs-neutral-50);
+  --tqs-surface-inverse: var(--tqs-ink);
+  --tqs-surface-accent: var(--tqs-yellow);
+
+  /* Borders */
+  --tqs-border-subtle: var(--tqs-neutral-200);
+  --tqs-border: var(--tqs-gray);                /* 2.32:1 — decorative dividers only */
+  --tqs-border-strong: var(--tqs-neutral-500);  /* 3.32:1 — meets the 3:1 non-text minimum */
+
+  /* Interaction (hover/active fills, [PROPOSED] — derived by darkening ~8% / ~14%) */
+  --tqs-yellow-hover: #e8ca00;
+  --tqs-yellow-active: #d4b800;
+  --tqs-ink-hover: #383838;
+  --tqs-ink-active: #4a4a4a;
+
+  /* Status — indicator = fills/chart marks/icons on dark; -text = text on light;
+     -surface = the tint behind that text (pairs at exactly 4.5:1). */
+  --tqs-info: #0a84ff;
+  --tqs-info-text: #086dd3;
+  --tqs-info-surface: #e6f3ff;
+  --tqs-info-surface-dark: #1d344a;
+
+  --tqs-success: #30d158;
+  --tqs-success-text: #1e8237;
+  --tqs-success-surface: #eafaee;
+  --tqs-success-surface-dark: #24422c;
+
+  /* Warning is TQS brand yellow. Status-yellow ALWAYS carries a warning icon
+     and a text label, or it is not a valid warning state. */
+  --tqs-warning: var(--tqs-yellow);
+  --tqs-warning-text: #867400;
+  --tqs-warning-surface: #fffce6;
+  --tqs-warning-surface-dark: #49441c;
+
+  --tqs-danger: #ff453a;
+  --tqs-danger-text: #ca372e;
+  --tqs-danger-surface: #ffeceb;
+  --tqs-danger-surface-dark: #492926;
+
+  /* Chart series — quality trend data. Yellow marks the SERIES OF INTEREST only;
+     the rest of a chart is the neutral ramp. Never yellow for every series. */
+  --tqs-chart-focus: var(--tqs-yellow);
+  --tqs-chart-1: var(--tqs-ink);
+  --tqs-chart-2: var(--tqs-neutral-500);
+  --tqs-chart-3: var(--tqs-mist);
+  --tqs-chart-4: var(--tqs-neutral-700);
+  --tqs-chart-grid: var(--tqs-neutral-200);
+  --tqs-chart-axis: var(--tqs-neutral-600);
+  --tqs-chart-pass: var(--tqs-success);
+  --tqs-chart-fail: var(--tqs-danger);
+}
+
+/* Typography — brand/05-typography.md. Two families split by output MEDIUM,
+   not by heading vs body: Open Sans if it renders in a browser as software,
+   Source Sans 3 if it renders on a page or in generated creative. Within each
+   medium there is one family — hierarchy comes from weight and size, never
+   from mixing families. Type scale is [PROPOSED]. */
+:root {
+  --tqs-font-web: "Open Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tqs-font-heading: var(--tqs-font-web);
+  --tqs-font-body: var(--tqs-font-web);
+  /* Print / Word / decks / posters / social & ad creative. Replaced Myriad Pro
+     2026-08-18 (D21); Myriad Pro is retired — never specify it. */
+  --tqs-font-print: "Source Sans 3", "Source Sans Pro", Arial, sans-serif;
+  --tqs-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --tqs-weight-light: 300;      /* large body, long-form web text */
+  --tqs-weight-regular: 400;    /* default body, UI text */
+  --tqs-weight-semibold: 600;   /* subheads, buttons, table headers, emphasis */
+  --tqs-weight-bold: 700;       /* display and ad headlines */
+
+  /* 1.25 modular scale, 16px base [PROPOSED] */
+  --tqs-text-xs: 0.75rem;    /* 12 — labels, legal, table meta */
+  --tqs-text-sm: 0.875rem;   /* 14 — secondary text, captions */
+  --tqs-text-base: 1rem;     /* 16 — body default; never ship body below this */
+  --tqs-text-lg: 1.125rem;   /* 18 */
+  --tqs-text-xl: 1.375rem;   /* 22 — H4, lead paragraph */
+  --tqs-text-2xl: 1.75rem;   /* 28 — H3 */
+  --tqs-text-3xl: 2.25rem;   /* 36 — section H2 */
+  --tqs-text-4xl: 3rem;      /* 48 — page H1 */
+  --tqs-text-5xl: 3.75rem;   /* 60 — hero display */
+
+  --tqs-leading-tight: 1.15;   /* 3xl and up */
+  --tqs-leading-snug: 1.3;     /* xl, 2xl */
+  --tqs-leading-normal: 1.55;  /* body */
+  --tqs-leading-relaxed: 1.7;
+
+  --tqs-tracking-tight: -0.02em; /* display sizes */
+  --tqs-tracking-normal: 0em;
+  --tqs-tracking-wide: 0.04em;   /* xs labels */
+  --tqs-tracking-caps: 0.08em;   /* all-caps labels and badges */
+
+  /* PRINT SCALE. Source Sans 3 sets a 9.2% smaller x-height than Open Sans
+     (0.486 vs 0.535 em) — at 16px it has the apparent size of Open Sans at
+     14.5px. Do NOT reuse the web scale verbatim on a print artboard: these
+     are the web steps sized up ~10% and optically checked. Body is 17.5px. */
+  --tqs-print-xs: 0.8125rem;  /* 13 — legal, table meta */
+  --tqs-print-sm: 0.9375rem;  /* 15 — captions, secondary */
+  --tqs-print-base: 1.09375rem; /* 17.5 — body default on a page */
+  --tqs-print-lg: 1.25rem;    /* 20 — large body */
+  --tqs-print-xl: 1.5rem;     /* 24 — lead paragraph, deck body minimum */
+  --tqs-print-2xl: 1.9375rem; /* 31 */
+  --tqs-print-3xl: 2.5rem;    /* 40 */
+  --tqs-print-4xl: 3.3125rem; /* 53 */
+  --tqs-print-5xl: 4.125rem;  /* 66 — poster / cover display */
+}
+
+/* Spacing, radius, layout — brand/07-ui-design-system.md.
+   4px base. The whole scale is [PROPOSED] scaffolding: no TQS precedent existed. */
+:root {
+  --tqs-space-1: 0.25rem;  /*  4 */
+  --tqs-space-2: 0.5rem;   /*  8 */
+  --tqs-space-3: 0.75rem;  /* 12 */
+  --tqs-space-4: 1rem;     /* 16 */
+  --tqs-space-5: 1.5rem;   /* 24 */
+  --tqs-space-6: 2rem;     /* 32 */
+  --tqs-space-7: 3rem;     /* 48 */
+  --tqs-space-8: 4rem;     /* 64 */
+  --tqs-space-9: 6rem;     /* 96 */
+  --tqs-space-10: 8rem;    /* 128 */
+
+  --tqs-radius-none: 0;
+  --tqs-radius-sm: 0.125rem;  /* 2 */
+  --tqs-radius-md: 0.25rem;   /* 4 — the default for buttons, inputs, cards */
+  --tqs-radius-lg: 0.5rem;    /* 8 — dialogs, drawers */
+  --tqs-radius-pill: 9999px;  /* chips, tags, status badges only */
+
+  --tqs-border-hairline: 1px;
+  --tqs-border-thick: 2px;
+  --tqs-accent-bar: 4px;      /* the yellow rule motif */
+
+  /* Controls */
+  --tqs-control-h-sm: 32px;
+  --tqs-control-h-md: 40px;   /* default button and input height */
+  --tqs-control-h-lg: 48px;
+  --tqs-touch-min: 44px;      /* minimum touch target */
+  --tqs-row-h: 44px;          /* table row, default */
+  --tqs-row-h-compact: 36px;
+
+  /* Layout — content max and breakpoints are canonical */
+  --tqs-content-max: 1140px;
+  --tqs-prose-max: 68ch;
+  --tqs-gutter: 24px;
+  --tqs-gutter-mobile: 16px;
+  --tqs-bp-md: 767px;
+  --tqs-bp-lg: 1024px;
+
+  /* Icons — Lucide, 24px grid, 1.5px stroke */
+  --tqs-icon-size: 24px;
+  --tqs-icon-stroke: 1.5px;
+
+  /* Motif opacities — brand/06-imagery-motifs.md */
+  /* yellow 8x6 dot grid, right-anchored */
+  --tqs-dot-grid-opacity: 0.4; /* @kind other */
+  /* dotted-Q watermark, in Mist */
+  --tqs-watermark-opacity: 0.24; /* @kind other */
+  --tqs-map-watermark-opacity: 0.6; /* @kind other */
+}
+
+/* Elevation — [PROPOSED]. Ink-tinted, never black. Prefer borders for static
+   grouping; reserve shadow for things that genuinely float. */
+:root {
+  --tqs-shadow-sm: 0 1px 2px rgba(33, 35, 34, 0.08);   /* card at rest */
+  --tqs-shadow-md: 0 2px 8px rgba(33, 35, 34, 0.1);    /* interactive card hover */
+  --tqs-shadow-lg: 0 8px 24px rgba(33, 35, 34, 0.14);  /* menus, dialogs, popovers */
+  --tqs-scrim: rgba(33, 35, 34, 0.6);                  /* text over photography, modal backdrop */
+}
+
+/* Motion — [PROPOSED]. Precise and mechanical. No bounce, no overshoot, no spin. */
+:root {
+  --tqs-duration-micro: 140ms; /* @kind other */
+  --tqs-duration-base: 220ms; /* @kind other */
+  --tqs-ease-enter: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --tqs-ease-exit: cubic-bezier(0.4, 0, 1, 1); /* @kind other */
+  --tqs-translate: 8px;         /* 4–12px is the whole range */
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tqs-duration-micro: 0ms; /* @kind other */
+    --tqs-duration-base: 0ms; /* @kind other */
+    --tqs-translate: 0px;
+  }
+}
+
+/* Dark surface context — brand/07-ui-design-system.md#dark-mode.
+   The dark surface is the SIGNATURE TQS look, not an accommodation: white/mist
+   type on ink with yellow accents. Reach for it before a light layout.
+   Apply .tqs-inverse to any section that should render dark. Yellow never remaps. */
+.tqs-inverse {
+  --tqs-surface: var(--tqs-ink);
+  --tqs-surface-subtle: var(--tqs-neutral-800);
+  --tqs-text-primary: var(--tqs-white);
+  --tqs-text-secondary: var(--tqs-mist);
+  --tqs-text-disabled: var(--tqs-neutral-600);
+  --tqs-border-subtle: var(--tqs-neutral-800);
+  --tqs-border: var(--tqs-neutral-700);
+  --tqs-border-strong: var(--tqs-gray);
+
+  /* On dark, the raw indicator colors ARE legible — use them directly. */
+  --tqs-info-text: var(--tqs-info);
+  --tqs-success-text: var(--tqs-success);
+  --tqs-warning-text: var(--tqs-warning);
+  --tqs-danger-text: var(--tqs-danger);
+  --tqs-info-surface: var(--tqs-info-surface-dark);
+  --tqs-success-surface: var(--tqs-success-surface-dark);
+  --tqs-warning-surface: var(--tqs-warning-surface-dark);
+  --tqs-danger-surface: var(--tqs-danger-surface-dark);
+
+  /* Chart series invert to light-on-dark; focus stays yellow. */
+  --tqs-chart-1: var(--tqs-white);
+  --tqs-chart-2: var(--tqs-gray);
+  --tqs-chart-3: var(--tqs-neutral-600);
+  --tqs-chart-4: var(--tqs-mist);
+  --tqs-chart-grid: var(--tqs-neutral-800);
+  --tqs-chart-axis: var(--tqs-mist);
+
+  background-color: var(--tqs-surface);
+  color: var(--tqs-text-primary);
+}
+
+/* Explicit theme toggle: light on :root, dark by preference unless forced light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+}
+
+/* Base utilities that carry accessibility rules the tokens alone can't. */
+
+/* Focus visibility. Yellow alone is 1.35:1 on white — a yellow-only ring is
+   invisible on light surfaces. Pair it with an ink ring. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--tqs-border-thick) solid var(--tqs-ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--tqs-yellow);
+}
+.tqs-inverse :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--tqs-border-thick) solid var(--tqs-yellow);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* Links: underlined, ink on light, white on dark. Never yellow on white. */
+a { color: var(--tqs-text-primary); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--tqs-neutral-700); }
+.tqs-inverse a { color: var(--tqs-white); }
+.tqs-inverse a:hover { color: var(--tqs-mist); }
+
+/* The accent bar — the correct way to get yellow emphasis into a light layout. */
+.tqs-accent-bar { border-left: var(--tqs-accent-bar) solid var(--tqs-yellow); padding-left: var(--tqs-space-4); }
+.tqs-accent-rule { border-bottom: var(--tqs-accent-bar) solid var(--tqs-yellow); padding-bottom: var(--tqs-space-2); display: inline-block; }
+
+/* Dot grid motif: yellow, 40%, 8x6, right-anchored. Decorative — aria-hidden it. */
+.tqs-dot-grid {
+  background-image: radial-gradient(var(--tqs-yellow) 1.5px, transparent 1.6px);
+  background-size: 14px 14px;
+  opacity: var(--tqs-dot-grid-opacity);
+  width: 112px; height: 84px;
+}
+
+/* Tabular figures for data displays. */
+.tqs-tnum { font-variant-numeric: tabular-nums; }
+
+/* Light island inside a dark section. The ink surface is a context, so a white
+   card placed inside .tqs-inverse would otherwise inherit white text. Put
+   .tqs-light on that card to restore the light token values. */
+.tqs-light {
+  --tqs-surface: var(--tqs-white);
+  --tqs-surface-subtle: var(--tqs-neutral-50);
+  --tqs-text-primary: var(--tqs-ink);
+  --tqs-text-secondary: var(--tqs-neutral-600);
+  --tqs-text-disabled: var(--tqs-neutral-400);
+  --tqs-border-subtle: var(--tqs-neutral-200);
+  --tqs-border: var(--tqs-gray);
+  --tqs-border-strong: var(--tqs-neutral-500);
+  --tqs-info-text: #086dd3;
+  --tqs-success-text: #1e8237;
+  --tqs-warning-text: #867400;
+  --tqs-danger-text: #ca372e;
+  --tqs-info-surface: #e6f3ff;
+  --tqs-success-surface: #eafaee;
+  --tqs-warning-surface: #fffce6;
+  --tqs-danger-surface: #ffeceb;
+  background-color: var(--tqs-surface);
+  color: var(--tqs-text-primary);
+}
+
+</style>
+<style></style>
+<script src="assets/lucide.js"></script>
+<script src="assets/tqs-ds.js"></script>
+<style>::view-transition-old(root),::view-transition-new(root){animation-duration:200ms;animation-timing-function:cubic-bezier(0.2,0,0,1)}body{margin:0;font-family:"Geist","Open Sans",system-ui,sans-serif;background:#ffffff;color:#212322;-webkit-font-smoothing:antialiased}a{color:#4f46e5}a:hover{color:#4338ca}input::placeholder{color:#8d8d8d}</style>
+</helmet>
+<div data-screen-label="Sign in" style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);min-height:100vh;min-width:1100px;background:#ffffff">
+<section aria-label="Qnet" style="position:relative;overflow:hidden;display:flex;flex-direction:column;padding:56px 72px;background:linear-gradient(160deg,#4f46e5 0%,#3730a3 48%,#1e1b8a 100%);color:#ffffff">
+<div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(120% 80% at 15% 0%,rgba(129,140,248,0.45) 0%,rgba(129,140,248,0) 60%),radial-gradient(90% 70% at 100% 100%,rgba(30,27,75,0.55) 0%,rgba(30,27,75,0) 70%);pointer-events:none"></div>
+<div aria-hidden="true" style="position:absolute;inset:0;opacity:0.11;mix-blend-mode:overlay;pointer-events:none;background-image:url(&quot;assets/0ad7bdc54e.png&quot;);background-size:256px 256px"></div>
+<div aria-hidden="true" style="position:absolute;inset:0;opacity:0.03;pointer-events:none;background-image:url(&quot;assets/0ad7bdc54e.png&quot;);background-size:180px 180px"></div>
+<div aria-hidden="true" style="position:absolute;right:-220px;top:-180px;width:720px;height:720px;border-radius:999px;border:1px solid rgba(255,255,255,0.08)"></div>
+<div aria-hidden="true" style="position:absolute;right:-140px;top:-100px;width:560px;height:560px;border-radius:999px;border:1px solid rgba(255,255,255,0.08)"></div>
+<div aria-hidden="true" style="position:absolute;right:-60px;top:-20px;width:400px;height:400px;border-radius:999px;border:1px solid rgba(255,255,255,0.1)"></div>
+<div aria-hidden="true" style="position:absolute;left:-200px;bottom:-260px;width:620px;height:620px;border-radius:999px;background:radial-gradient(closest-side,rgba(129,140,248,0.35),rgba(129,140,248,0))"></div>
+<div style="position:relative;display:flex;align-items:center;gap:12px">
+<img src="assets/ba125167bf.svg" alt="" width="36" height="36" style="display:block">
+<span style="font-size:18px;font-weight:600;letter-spacing:-0.01em">Qnet</span>
+</div>
+<div style="position:relative;margin-top:auto;margin-bottom:auto;max-width:520px">
+<span style="display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);font-size:12px;font-weight:600;color:#eef2ff"><span aria-hidden="true" style="width:6px;height:6px;border-radius:999px;background:#22c55e"></span>Team Quality Services</span>
+<h1 style="margin:24px 0 0;font-size:52px;line-height:1.05;letter-spacing:-0.03em;font-weight:600;color:#ffffff;text-wrap:balance">Quality, logged where the work happens.</h1>
+<p style="margin:20px 0 0;max-width:44ch;font-size:17px;line-height:1.6;color:#eef2ff;text-wrap:pretty">Report quality issues, run proactive audits and close out daily checklists for every location you cover.</p>
+<div style="display:flex;flex-direction:column;gap:14px;margin-top:40px">
+<sc-for list="{{ points }}" as="p" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:12px"><span style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.12);color:#ffffff;flex-shrink:0"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="{{ p.icon }}" size="16" hint-size="16px,16px"></x-import></span><span style="font-size:15px;color:#ffffff">{{ p.label }}</span></div>
+</sc-for>
+</div>
+</div>
+<p style="position:relative;margin:0;font-size:13px;color:#d2d2d2">© 2026 Team Quality Services. All rights reserved.</p>
+</section>
+
+<section aria-labelledby="h-signin" style="display:flex;flex-direction:column;padding:56px 72px">
+<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:13px;color:#6b6b6b">Need help? <a href="mailto:support@teamqualityservices.com" style="font-weight:600">Contact support</a></div>
+<form sc-camel-on-submit="{{ submit }}" novalidate="" style="width:100%;max-width:400px;margin:auto;display:flex;flex-direction:column">
+<h2 id="h-signin" style="margin:0;font-size:30px;line-height:1.15;letter-spacing:-0.02em;font-weight:600;color:#212322">Welcome back</h2>
+<p style="margin:8px 0 0;font-size:15px;line-height:1.55;color:#6b6b6b">Sign in with your TQS account to continue.</p>
+
+<sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="display:flex;align-items:flex-start;gap:10px;margin-top:24px;padding:12px 14px;border-radius:10px;background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;font-size:13px;line-height:1.5"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="circle-alert" size="16" hint-size="16px,16px"></x-import><span>{{ error }}</span></div>
+</sc-if>
+
+<label style="display:flex;flex-direction:column;gap:8px;margin-top:28px">
+<span style="font-size:13px;font-weight:600;color:#212322">Work email</span>
+<span style="position:relative;display:block"><span aria-hidden="true" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;color:#8d8d8d;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="mail" size="16" hint-size="16px,16px"></x-import></span><input type="email" autocomplete="username" placeholder="name@teamqualityservices.com" value="{{ email }}" sc-camel-on-input="{{ onEmail }}" style="{{ emailStyle }}" style-focus="border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></span>
+<sc-if value="{{ emailErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#be123c">Enter a valid email address.</span></sc-if>
+</label>
+
+<label style="display:flex;flex-direction:column;gap:8px;margin-top:18px">
+<span style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;font-weight:600;color:#212322">Password</span><a href="#" sc-camel-on-click="{{ forgot }}" style="font-size:13px;font-weight:500">Forgot password?</a></span>
+<span style="position:relative;display:block"><span aria-hidden="true" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;color:#8d8d8d;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="lock" size="16" hint-size="16px,16px"></x-import></span><input type="{{ pwType }}" autocomplete="current-password" placeholder="Enter your password" value="{{ pw }}" sc-camel-on-input="{{ onPw }}" style="{{ pwStyle }}" style-focus="border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><button type="button" aria-label="{{ eyeLabel }}" aria-pressed="{{ showPw }}" sc-camel-on-click="{{ togglePw }}" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:none;border-radius:8px;background:transparent;color:#6b6b6b;cursor:pointer" style-hover="background:#f4f4f4;color:#212322" style-focus="outline:2px solid #212322;outline-offset:0"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="{{ eyeIcon }}" size="16" hint-size="16px,16px"></x-import></button></span>
+<sc-if value="{{ pwErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#be123c">Enter your password.</span></sc-if>
+</label>
+
+<label style="display:flex;align-items:center;gap:10px;margin-top:18px;font-size:14px;color:#383838;cursor:pointer;width:max-content"><input type="checkbox" checked="{{ remember }}" sc-camel-on-change="{{ toggleRemember }}" style="width:16px;height:16px;margin:0;accent-color:#212322;cursor:pointer"><span>Keep me signed in on this device</span></label>
+
+<button type="submit" disabled="{{ loading }}" style="{{ submitStyle }}" style-hover="background:#4338ca" style-focus="outline:2px solid #4f46e5;outline-offset:2px">
+<sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}"><span style="display:flex;animation:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="loader-circle" size="16" hint-size="16px,16px"></x-import></span></sc-if>
+<span>{{ submitLabel }}</span>
+</button>
+
+<div style="display:flex;align-items:center;gap:12px;margin:22px 0;font-size:12px;color:#8d8d8d"><span style="flex:1;height:1px;background:#e2e2e2"></span><span>or</span><span style="flex:1;height:1px;background:#e2e2e2"></span></div>
+
+<button type="button" sc-camel-on-click="{{ sso }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:46px;border-radius:10px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#f7f7f8;border-color:#aaaaaa" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><span style="display:flex;color:#555555"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="key-round" size="17" hint-size="17px,17px"></x-import></span><span>Sign in with company SSO</span></button>
+
+<p style="margin:28px 0 0;font-size:13px;line-height:1.55;color:#6b6b6b">Don't have access yet? <a href="#" style="font-weight:600">Ask your regional manager</a> to add you.</p>
+</form>
+<div style="display:flex;align-items:center;gap:16px;font-size:12px;color:#6b6b6b"><a href="#" style="color:#6b6b6b" style-hover="color:#212322">Privacy</a><a href="#" style="color:#6b6b6b" style-hover="color:#212322">Terms</a><span style="margin-left:auto">v4.2</span></div>
+</section>
+</div>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+<div role="status" style="position:fixed;left:50%;bottom:32px;transform:translateX(-50%);z-index:120;display:flex;align-items:center;gap:10px;padding:10px 14px;background:#212322;color:#ffffff;border-radius:10px;box-shadow:0 8px 24px rgba(33,35,34,0.24);font-size:13px;font-weight:500"><span style="display:flex;color:#22c55e"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="mail-check" size="16" hint-size="16px,16px"></x-import></span><span>{{ toast }}</span></div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+class Component extends DCLogic {
+  state = { email: "", pw: "", showPw: false, remember: true, touched: false, loading: false, error: null, toast: null };
+  componentWillUnmount() { clearTimeout(this.tt); clearTimeout(this.lt); }
+  renderVals() {
+    const s = this.state;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email.trim());
+    const emailErr = s.touched && !emailOk, pwErr = s.touched && !s.pw;
+    const inp = (err, padR) => ({ height: 46, width: "100%", boxSizing: "border-box", padding: `0 ${padR}px 0 42px`, border: `1px solid ${err ? "#fda4af" : "#d2d2d2"}`, borderRadius: 10, background: "#ffffff", color: "#212322", fontFamily: "inherit", fontSize: 15, outline: "none" });
+    return {
+      points: [{ icon: "bell", label: "Quality alerts and near misses in one feed" }, { icon: "clipboard-check", label: "Daily checklists and proactive audits" }, { icon: "trending-up", label: "Location performance at a glance" }],
+      email: s.email, pw: s.pw, showPw: s.showPw, remember: s.remember,
+      onEmail: (e) => this.setState({ email: e.target.value, error: null }), onPw: (e) => this.setState({ pw: e.target.value, error: null }),
+      emailErr, pwErr, emailStyle: inp(emailErr, 14), pwStyle: inp(pwErr, 46),
+      pwType: s.showPw ? "text" : "password", eyeIcon: s.showPw ? "eye-off" : "eye", eyeLabel: s.showPw ? "Hide password" : "Show password",
+      togglePw: () => this.setState((st) => ({ showPw: !st.showPw })), toggleRemember: () => this.setState((st) => ({ remember: !st.remember })),
+      hasError: !!s.error, error: s.error,
+      loading: s.loading, submitLabel: s.loading ? "Signing in…" : "Sign in",
+      submitStyle: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, height: 46, marginTop: 24, borderRadius: 10, border: "1px solid transparent", background: "#212322", color: "#ffffff", fontFamily: "inherit", fontSize: 15, fontWeight: 600, cursor: s.loading ? "progress" : "pointer", opacity: s.loading ? 0.85 : 1, boxShadow: "0 1px 2px rgba(33,35,34,0.25)" },
+      submit: (e) => {
+        e.preventDefault();
+        const go = () => { this.setState({ loading: true }); this.lt = setTimeout(() => { window.location.href = "dashboard.html"; }, 700); };
+        if (emailOk && s.pw) { go(); return; }
+        this.setState({ email: emailOk ? s.email : "daniel.brown@teamqualityservices.com", pw: s.pw || "Qnet2026!secure", touched: false, error: null });
+        this.lt = setTimeout(go, 450);
+      },
+      sso: () => { this.setState({ loading: true }); this.lt = setTimeout(() => { window.location.href = "dashboard.html"; }, 700); },
+      forgot: (e) => { e.preventDefault(); clearTimeout(this.tt); this.setState({ toast: emailOk ? `Reset link sent to ${s.email.trim()}` : "Enter your work email first, then tap Forgot password" }); this.tt = setTimeout(() => this.setState({ toast: null }), 3500); },
+      hasToast: !!s.toast, toast: s.toast,
+    };
+  }
+}
+</script>
+
+
+<script src="assets/qnet-glue.js"></script><link rel="stylesheet" href="assets/qnet-mobile.css"><script src="assets/qnet-mobile.js"></script>
+</body></html>
+</body></html>

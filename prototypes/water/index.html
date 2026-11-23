@@ -1,0 +1,953 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Arizona Water Chatbot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap">
+<style>
+  /* Layout: one-screen app — left rail (brand, new chat, history) + chat column with a pinned composer */
+  :root{
+    --maroon:#8C1D40; --maroon-hover:#731633; --on-maroon:#fff;
+    --gold:#FFC627; --sun:#F7A928;
+    --water:#1E88C7; --water-deep:#0E5E92; --aqua:#3CC3D8; --mist:#E6F5FB;
+    --leaf:#3FA66B; --clay:#D9653B;
+    --ink:#1d2430; --muted:#5d6878; --faint:#8b96a5;
+    --line:#e2e8ef; --bg:#f5f9fc; --rail:#ffffff; --card:#ffffff; --hover:#eef6fb;
+    --bubble-user:#8C1D40; --on-user:#fff;
+    --link:#1a6fb0; --scrim:rgba(20,40,60,.4); --tour:rgba(15,30,45,.62);
+    --shadow:0 1px 2px rgba(20,50,80,.06),0 4px 14px rgba(20,50,80,.08);
+    --shadow-lift:0 6px 22px rgba(20,70,110,.16);
+    --display:"Fredoka","Nunito Sans",system-ui,sans-serif;
+    --body:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --ink:#e9eef4; --muted:#a6b1bf; --faint:#7c8796;
+    --line:#2b3644; --bg:#121a24; --rail:#17212d; --card:#1c2836; --hover:#223244;
+    --mist:#16324a; --water:#4aa8e0; --water-deep:#7cc4ee; --link:#8cc8f5;
+    --scrim:rgba(0,0,0,.55); --tour:rgba(0,0,0,.68);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3); --shadow-lift:0 6px 22px rgba(0,0,0,.45);
+    color-scheme:dark }}
+  :root[data-theme="dark"]{
+    --ink:#e9eef4; --muted:#a6b1bf; --faint:#7c8796;
+    --line:#2b3644; --bg:#121a24; --rail:#17212d; --card:#1c2836; --hover:#223244;
+    --mist:#16324a; --water:#4aa8e0; --water-deep:#7cc4ee; --link:#8cc8f5;
+    --scrim:rgba(0,0,0,.55); --tour:rgba(0,0,0,.68);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.3); --shadow-lift:0 6px 22px rgba(0,0,0,.45);
+    color-scheme:dark }
+
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{height:100%}
+  body{font-family:var(--body);color:var(--ink);background:var(--bg);font-size:15px;overflow:hidden}
+  button{font:inherit;color:inherit;cursor:pointer}
+  button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+  svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  /* spacing scale: every gap and padding below comes from these */
+  :root{ --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --rail-w:272px; --rail-x:16px; --item-h:44px }
+
+  .app{height:100%;display:grid;grid-template-columns:var(--rail-w) minmax(0,1fr);transition:grid-template-columns .22s ease}
+  .app.collapsed{--rail-w:76px}
+  @media (min-width:1181px){ .app{grid-template-columns:var(--rail-w) minmax(0,1fr) var(--info-w,320px)} }
+
+  /* ---------- info panel (right) ---------- */
+  .info{background:var(--rail);border-left:1px solid var(--line);overflow-y:auto;min-height:0;min-width:0;padding-block:var(--s6) calc(var(--s6) + env(safe-area-inset-bottom,0px));padding-left:var(--s5);padding-right:max(var(--s5),env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:var(--s5)}
+  .info-head{display:flex;align-items:center;gap:var(--s3)}
+  .info-head svg{flex:none;filter:drop-shadow(0 4px 8px rgba(30,136,199,.28))}
+  .info-head h2{font-family:var(--display);font-weight:600;font-size:22px;line-height:1.15;margin:0;text-wrap:balance}
+  .info-close{display:none;margin-left:auto;align-self:flex-start;width:34px;height:34px;border:0;border-radius:10px;background:none;color:var(--muted);place-items:center;flex:none}
+  .info-close:hover{background:var(--hover);color:var(--ink)}
+  .info-close svg.i{width:18px;height:18px}
+  .info-intro{margin:0;font-size:14.5px;line-height:1.6;color:var(--muted)}
+  .info-sec{display:flex;flex-direction:column;gap:var(--s2)}
+  .info-sec h3{display:flex;align-items:center;gap:var(--s2);margin:0 0 var(--s1);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .info-sec h3 svg.i{width:15px;height:15px}
+  .faq{border-bottom:1px solid var(--line)}
+  .info-sec .faq+.faq{margin-top:calc(-1 * var(--s2))}
+  .faq summary{list-style:none;cursor:pointer;display:flex;align-items:flex-start;gap:var(--s3);padding:var(--s3);font-weight:700;font-size:14px;line-height:1.35;padding-inline:0}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary:hover .q{color:var(--water-deep)}
+  .faq summary:focus-visible{outline:2px solid var(--water);outline-offset:-2px}
+  .faq summary .q{flex:1;min-width:0}
+  .faq summary svg.i{width:16px;height:16px;margin-top:2px;color:var(--faint);transition:transform .2s}
+  .faq[open] summary svg.i{transform:rotate(180deg);color:var(--water)}
+  .faq .a{padding:0 0 var(--s3);font-size:13.5px;line-height:1.55;color:var(--muted)}
+  .faq .a p{margin:0}
+  .links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+  .links a{display:flex;align-items:center;gap:var(--s3);padding:var(--s2);border-radius:10px;color:var(--link);text-decoration:none;font-size:14px;font-weight:600;line-height:1.3}
+  .links a:hover{background:var(--hover)}
+  .links a:hover .lt{text-decoration:underline}
+  .links .li{width:30px;height:30px;border-radius:9px;background:var(--mist);color:var(--water-deep);display:grid;place-items:center;flex:none}
+  .links .li svg.i{width:16px;height:16px}
+  .links .lt{flex:1;min-width:0}
+  .links .ext{width:14px;height:14px;color:var(--faint);flex:none}
+  .infobtn{position:absolute;top:var(--s3);right:max(var(--s3),env(safe-area-inset-right,0px));z-index:6;display:none;align-items:center;gap:var(--s2);height:38px;padding:0 var(--s3);border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted);font-weight:700;font-size:13.5px;box-shadow:var(--shadow)}
+  .infobtn:hover{color:var(--ink)}
+  .infobtn svg.i{width:17px;height:17px}
+  .info-scrim{display:none}
+  @media (max-width:1180px){
+    .info{position:fixed;z-index:41;top:0;bottom:0;right:0;width:min(340px,90vw);transform:translateX(102%);transition:transform .25s;box-shadow:var(--shadow-lift);padding-top:calc(var(--s5) + env(safe-area-inset-top,0px))}
+    .info.open{transform:none}
+    .info-close{display:grid}
+    .info-scrim{display:block;position:fixed;inset:0;z-index:40;background:var(--scrim)}
+    .infobtn{display:flex}
+  }
+
+  /* ---------- rail ---------- */
+  aside{background:var(--rail);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;padding-left:env(safe-area-inset-left,0px)}
+  .rail-top{display:flex;flex-direction:column;gap:var(--s3);padding:var(--s4) var(--rail-x) var(--s3)}
+  .brand{display:flex;align-items:center;gap:var(--s3);min-height:44px}
+  .brand .logo{flex:none;width:34px;height:42px;filter:drop-shadow(0 2px 4px rgba(30,136,199,.3))}
+  .brand .words{flex:1;min-width:0;white-space:nowrap}
+  .brand .name{font-family:var(--display);font-weight:600;font-size:20px;line-height:1.1}
+  .brand .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .collapse{flex:none;width:34px;height:34px;border:0;border-radius:10px;background:none;color:var(--faint);display:grid;place-items:center}
+  .collapse:hover{background:var(--hover);color:var(--ink)}
+  .collapse svg.i{width:18px;height:18px;transition:transform .22s}
+  .newchat{display:flex;align-items:center;gap:var(--s3);height:var(--item-h);background:var(--maroon);color:var(--on-maroon);border:0;border-radius:12px;padding:0 var(--s3);font-weight:700;font-size:15px;box-shadow:0 3px 10px rgba(140,29,64,.25);transition:background .15s,box-shadow .15s;white-space:nowrap}
+  .newchat:hover{background:var(--maroon-hover);box-shadow:0 5px 14px rgba(140,29,64,.32)}
+  .newchat .tile{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
+  .newchat .tile svg.i{width:17px;height:17px}
+  .newchat kbd{margin-left:auto;font:inherit;font-size:11.5px;font-weight:600;opacity:.75;background:rgba(255,255,255,.14);border-radius:6px;padding:2px 6px}
+
+  .navitem,.hist .item{width:100%;display:flex;align-items:center;gap:var(--s3);min-height:var(--item-h);padding:var(--s1) var(--s2);border:0;border-radius:12px;background:none;text-align:left;font-size:14.5px;line-height:1.25;color:var(--ink);white-space:nowrap}
+  .navitem:hover,.hist .item:hover{background:var(--hover)}
+  .navitem .ic{background:var(--mist);color:var(--water-deep)}
+  .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;color:#fff}
+  .ic svg.i{width:17px;height:17px}
+  .navitem .t{font-weight:600}
+
+  .railscroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;margin-top:var(--s7);padding:var(--s4) var(--rail-x) var(--s4);display:flex;flex-direction:column;gap:var(--s4)}
+  .group{display:flex;flex-direction:column;gap:2px}
+  .grouphead{display:flex;align-items:center;justify-content:space-between;padding:var(--s2) var(--s2) var(--s1);font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);white-space:nowrap}
+  .grouphead .count{font-weight:700;letter-spacing:0;background:var(--hover);color:var(--muted);border-radius:999px;padding:1px 7px;font-size:11px}
+  .hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+  .hist li{position:relative}
+  .hist .item.on{background:var(--mist)}
+  .hist .ic{background:var(--hover);color:var(--muted);transition:background .15s,color .15s}
+  .hist .item:hover .ic{color:var(--ink)}
+  .hist .item.on .ic{background:var(--water);color:#fff}
+  .hist .item.on .t{font-weight:700}
+  .hist .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .hist .t{overflow:hidden;text-overflow:ellipsis}
+  .hist .m{font-size:12px;color:var(--faint);overflow:hidden;text-overflow:ellipsis}
+  .hist .del{position:absolute;right:var(--s1);top:50%;margin-top:-15px;width:30px;height:30px;border:0;border-radius:8px;background:var(--rail);color:var(--faint);display:grid;place-items:center;opacity:0;transition:opacity .15s}
+  .hist li:hover .del,.hist .del:focus-visible{opacity:1}
+  .hist .del:hover{color:var(--maroon);background:var(--hover)}
+  .hist .del svg.i{width:15px;height:15px}
+  .empty{font-size:13px;color:var(--faint);padding:var(--s1) var(--s2) var(--s2);line-height:1.4;white-space:normal}
+
+  .railfoot{display:flex;gap:var(--s2);align-items:center;padding:var(--s3) var(--rail-x) calc(var(--s3) + env(safe-area-inset-bottom,0px));margin:0;font-size:12px;color:var(--faint);border-top:1px solid var(--line);white-space:nowrap;overflow:hidden}
+  .uchip{width:32px;height:32px;border-radius:50%;background:var(--maroon);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+  .uname{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .uname b{font-size:14px;color:var(--ink);overflow:hidden;text-overflow:ellipsis}
+  .uname small{font-size:11.5px;color:var(--faint)}
+  .signout{flex:none;width:32px;height:32px;border:0;border-radius:9px;background:none;color:var(--faint);display:grid;place-items:center}
+  .signout:hover{background:var(--hover);color:var(--maroon)}
+  .signout svg.i{width:17px;height:17px}
+
+  /* ---------- login screen ---------- */
+  .login{position:fixed;inset:0;z-index:80;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);background:var(--bg);animation:fadein .3s ease-out both}
+  .login.leaving{animation:fadeout .3s ease-in both}
+  @keyframes fadein{from{opacity:0}} @keyframes fadeout{to{opacity:0;transform:scale(1.01)}}
+  .lg-art{position:relative;overflow:hidden;background:linear-gradient(160deg,#3CC3D8 0%,#1E88C7 55%,#0E5E92 100%);color:#fff;display:flex;flex-direction:column;justify-content:center;gap:var(--s6);padding-block:var(--s7);padding-left:max(var(--s7),env(safe-area-inset-left,0px));padding-right:var(--s7)}
+  .lg-art .sunburst{position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(255,198,39,.95) 0 34%,rgba(255,198,39,.22) 35% 54%,transparent 55%);animation:pulse 6s ease-in-out infinite}
+  .lg-art .waves{position:absolute;left:0;right:0;bottom:-2px;height:110px}
+  .lg-art .waves svg{position:absolute;bottom:0;width:200%;height:100%;left:0}
+  .lg-art .w1{animation:drift 16s linear infinite;opacity:.25}.lg-art .w2{animation:drift 11s linear infinite reverse;opacity:.4}
+  .lg-art h1{position:relative;font-family:var(--display);font-weight:600;font-size:clamp(30px,3.6vw,44px);line-height:1.1;margin:0;max-width:16ch;text-wrap:balance}
+  .lg-art .lede{position:relative;font-size:17px;line-height:1.55;margin:var(--s3) 0 0;max-width:42ch;opacity:.95}
+  .feats{position:relative;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--s4);max-width:420px}
+  .feats li{display:flex;gap:var(--s3);align-items:flex-start;font-size:15px;line-height:1.45}
+  .feats .fi{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
+  .feats b{display:block;font-size:15.5px}
+  .feats span{opacity:.88}
+  .lg-panel{display:flex;align-items:center;justify-content:center;padding-block:var(--s7);padding-left:var(--s6);padding-right:max(var(--s6),env(safe-area-inset-right,0px));overflow-y:auto}
+  .lg-card{width:min(400px,100%);display:flex;flex-direction:column;gap:var(--s5)}
+  .lg-brand{display:flex;align-items:center;gap:var(--s3)}
+  .lg-brand .name{font-family:var(--display);font-weight:600;font-size:22px}
+  .lg-brand .sub{font-size:13px;color:var(--muted)}
+  .lg-card h2{font-family:var(--display);font-weight:600;font-size:28px;margin:0 0 var(--s2)}
+  .lg-card .intro{margin:0;color:var(--muted);font-size:15.5px;line-height:1.5}
+  .lg-form{display:flex;flex-direction:column;gap:var(--s4)}
+  .field{display:flex;flex-direction:column;gap:var(--s2)}
+  .field label{font-weight:700;font-size:14px}
+  .field label small{font-weight:400;color:var(--faint);margin-left:4px}
+  .inwrap{position:relative;display:flex;align-items:center}
+  .inwrap svg.i{position:absolute;left:14px;width:18px;height:18px;color:var(--faint);pointer-events:none}
+  .field input{width:100%;height:48px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);padding:0 14px 0 42px;font:inherit;font-size:16px;transition:border-color .15s,box-shadow .15s}
+  .field input:focus{outline:none;border-color:var(--water);box-shadow:0 0 0 4px color-mix(in srgb,var(--water) 18%,transparent)}
+  .lg-go{height:50px;border:0;border-radius:12px;background:var(--maroon);color:#fff;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:var(--s2);box-shadow:0 4px 12px rgba(140,29,64,.28);transition:background .15s,transform .15s}
+  .lg-go:hover{background:var(--maroon-hover);transform:translateY(-1px)}
+  .lg-go svg.i{width:18px;height:18px}
+  .lg-note{display:flex;gap:var(--s2);align-items:flex-start;font-size:13px;color:var(--muted);line-height:1.45;background:var(--mist);border-radius:12px;padding:var(--s3)}
+  .lg-note svg.i{width:16px;height:16px;margin-top:1px;color:var(--water-deep)}
+  .lg-fine{font-size:12px;color:var(--faint);line-height:1.45;margin:0}
+  @media (max-width:860px){
+    .login{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr;overflow-y:auto}
+    .lg-art{padding-block:var(--s6) 88px;padding-left:max(var(--s5),env(safe-area-inset-left,0px));padding-right:max(var(--s5),env(safe-area-inset-right,0px));gap:var(--s4)}
+    .lg-art .waves{height:70px}
+    .lg-art .sunburst{width:140px;height:140px;right:-56px;top:-56px}
+    .feats{display:none}
+    .lg-art .lede{font-size:15.5px}
+    .lg-panel{align-items:flex-start;padding-block:var(--s5) var(--s6);padding-left:max(var(--s5),env(safe-area-inset-left,0px));padding-right:max(var(--s5),env(safe-area-inset-right,0px));overflow:visible}
+  }
+
+  /* collapsed rail: icons only */
+  .app.collapsed .brand .words,.app.collapsed .newchat .lbl,.app.collapsed .newchat kbd,.app.collapsed .navitem .t,
+  .app.collapsed .grouphead,.app.collapsed .hist .txt,.app.collapsed .hist .del,.app.collapsed .empty,.app.collapsed .railfoot .uname,.app.collapsed .railfoot .signout{display:none}
+  .app.collapsed .brand{flex-direction:column;gap:var(--s2)}
+  .app.collapsed .collapse svg.i{transform:rotate(180deg)}
+  .app.collapsed .newchat,.app.collapsed .navitem,.app.collapsed .hist .item{justify-content:center;padding:var(--s1)}
+  .app.collapsed .group+.group{border-top:1px solid var(--line);padding-top:var(--s3)}
+  .app.collapsed .railfoot{justify-content:center}
+
+  /* ---------- chat column ---------- */
+  .chat{display:flex;flex-direction:column;min-height:0;min-width:0;position:relative}
+  .topbar{display:none}
+  .scroll{flex:1;overflow-y:auto;min-height:0}
+  .thread{max-width:860px;margin:0 auto;padding-block:var(--s6) var(--s7);padding-left:max(var(--s5),env(safe-area-inset-left,0px));padding-right:max(var(--s5),env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:var(--s6)}
+  .turn{display:flex;flex-direction:column;gap:var(--s4)}
+  .starter{display:flex;flex-direction:column;gap:var(--s3)}
+
+  .hero{position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(160deg,#3CC3D8 0%,#1E88C7 55%,#0E5E92 100%);color:#fff;padding:var(--s6) var(--s6) 72px;display:flex;gap:var(--s5);align-items:center;box-shadow:var(--shadow-lift)}
+  .hero h2{font-family:var(--display);font-weight:600;font-size:clamp(24px,3.2vw,32px);margin:0 0 var(--s2);text-wrap:balance}
+  .hero p{margin:0;font-size:16px;line-height:1.55;max-width:56ch;opacity:.95}
+  .hero .sunburst{position:absolute;right:-30px;top:-40px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(255,198,39,.95) 0 34%,rgba(255,198,39,.25) 35% 52%,transparent 53%);animation:pulse 6s ease-in-out infinite}
+  .hero .waves{position:absolute;left:0;right:0;bottom:-2px;height:58px}
+  .hero .waves svg{position:absolute;bottom:0;width:200%;height:100%;left:0}
+  .hero .w1{animation:drift 14s linear infinite;opacity:.35}
+  .hero .w2{animation:drift 9s linear infinite reverse;opacity:.6}
+  @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes pulse{50%{transform:scale(1.07)}}
+  .hero .blue{flex:none;animation:bob 3.2s ease-in-out infinite;filter:drop-shadow(0 8px 14px rgba(0,40,80,.28)) drop-shadow(0 0 14px rgba(180,243,255,.55))}
+  .hero .spark{position:absolute;width:12px;height:12px;background:#fff;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:twinkle 2.6s ease-in-out infinite;z-index:1;pointer-events:none}
+  .hero .s1{left:28px;top:26px}.hero .s2{left:122px;top:40px;width:9px;height:9px;animation-delay:.9s}.hero .s3{left:38px;top:112px;width:8px;height:8px;animation-delay:1.6s}
+  @keyframes twinkle{0%,100%{opacity:.25;transform:scale(.6) rotate(0)}50%{opacity:1;transform:scale(1) rotate(45deg)}}
+  .mascot{overflow:visible;display:block}
+  .mascot .glow{fill:var(--aqua);opacity:.28}
+  .mascot .tipdrop{transform-box:fill-box;transform-origin:center;animation:float 2.6s ease-in-out infinite}
+  @keyframes float{50%{transform:translateY(-3px)}}
+  .mascot .bodyg{transform-box:view-box;transform-origin:40px 92px}
+  .m-wave .bodyg{animation:wiggle 1.6s ease-in-out infinite}
+  @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+  @keyframes wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-38deg)}50%{transform:rotate(-12deg)}75%{transform:rotate(-38deg)}}
+  .m-think .bodyg{transform-box:view-box;transform-origin:40px 92px;animation:sway 1.3s ease-in-out infinite}
+  .m-think .tipdrop{animation-duration:.9s}
+  @keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  .m-sad .bodyg{transform:scaleY(.96)}
+  .m-love .bodyg{transform-box:view-box;transform-origin:40px 92px;animation:hop .7s ease-in-out 2}
+  @keyframes hop{50%{transform:translateY(-6px) scale(1.03)}}
+  .mascot.pop{animation:popin .35s cubic-bezier(.3,1.6,.6,1) both}
+  @keyframes popin{from{transform:scale(.6);opacity:.3}}
+  @keyframes bob{50%{transform:translateY(-6px) rotate(-3deg)}}
+  .hero-text{position:relative;z-index:1;min-width:0}
+
+  .prompts-label{font-family:var(--display);font-weight:500;font-size:16px;margin:0 var(--s1);color:var(--muted)}
+  .prompts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s3)}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:var(--s4);text-align:left;display:flex;flex-direction:column;gap:var(--s3);box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s,border-color .18s;min-height:150px}
+  .pcard:hover,.pcard:focus-visible{transform:translateY(-3px);box-shadow:var(--shadow-lift);border-color:transparent}
+  .pcard .tile{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:#fff;transition:transform .25s}
+  .pcard:hover .tile{transform:rotate(-8deg) scale(1.08)}
+  .pcard .tile svg.i{width:24px;height:24px}
+  .pcard .lbl{font-weight:700;font-size:15px;line-height:1.3}
+  .pcard .hint{font-size:13px;color:var(--muted);margin-top:auto;display:flex;align-items:center;gap:4px}
+
+  .row{display:flex;gap:var(--s3);align-items:flex-start;animation:rise .35s ease-out both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}}
+  .row.user{justify-content:flex-end;align-items:flex-end}
+  .ububble{background:var(--bubble-user);color:var(--on-user);border-radius:20px 20px 6px 20px;padding:var(--s3) var(--s4);font-size:15.5px;line-height:1.45;max-width:min(560px,85%);overflow-wrap:anywhere;box-shadow:0 3px 10px rgba(140,29,64,.22)}
+  .uav{width:36px;height:36px;border-radius:50%;background:var(--bubble-user);color:var(--on-user);display:grid;place-items:center;flex:none}
+  .bav{flex:none;margin-top:-6px;width:38px}
+  .bot{background:var(--card);border:1px solid var(--line);border-radius:6px 20px 20px 20px;padding:var(--s4) var(--s5) var(--s2);font-size:15.5px;line-height:1.6;box-shadow:var(--shadow);min-width:0;flex:1;max-width:720px;overflow-wrap:anywhere}
+  .bot .who{font-family:var(--display);font-weight:600;font-size:14px;color:var(--water-deep);margin-bottom:var(--s2);display:flex;align-items:center;gap:var(--s2)}
+  .bot .mode-chip{font-family:var(--body);font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--water);background:var(--mist);border-radius:999px;padding:2px 8px}
+  .bot .body p{margin:0 0 var(--s3);max-width:72ch}
+  .bot .body ul{margin:0 0 var(--s3);padding:0;list-style:none;max-width:72ch}
+  .bot .body li{position:relative;padding-left:24px;margin-bottom:8px}
+  .bot .body li::before{content:"";position:absolute;left:4px;top:.5em;width:9px;height:12px;background:var(--water);border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;transform:rotate(180deg)}
+  .bot .note{font-size:13px;color:var(--muted);background:var(--mist);border-radius:8px;padding:6px 10px;margin:0 0 10px;display:flex;gap:6px;align-items:center}
+  .bot .note svg.i{width:15px;height:15px}
+  .meta{display:flex;align-items:center;gap:var(--s1);flex-wrap:wrap;margin-top:var(--s2);padding-top:var(--s2);border-top:1px dashed var(--line);font-size:13.5px}
+  .act{display:inline-flex;align-items:center;gap:6px;background:none;border:0;border-radius:999px;padding:6px 10px;color:var(--muted);font-weight:600}
+  .act:hover{background:var(--hover);color:var(--ink)}
+  .act svg.i{width:17px;height:17px}
+  .act.liked{color:var(--maroon)}
+  .act.liked svg.i{fill:currentColor}
+  .act.on{background:var(--mist);color:var(--water-deep)}
+  .rtype{position:relative}
+  .menu{position:absolute;left:0;bottom:38px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px;min-width:200px;box-shadow:var(--shadow-lift);z-index:5}
+  .menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:9px;padding:9px 12px;color:var(--muted);font-size:14.5px;font-weight:600}
+  .menu button:hover{background:var(--hover);color:var(--ink)}
+  .menu button.cur{color:var(--water-deep);background:var(--mist)}
+
+  .sources{margin:0 0 0 50px;min-width:0;animation:rise .3s ease-out both}
+  .sources .hd{display:flex;align-items:center;gap:var(--s2);padding:0 var(--s1) var(--s2);font-weight:700;font-size:14px;color:var(--muted)}
+  .sources .close{margin-left:auto;background:none;border:0;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:4px;border-radius:999px;padding:4px 8px}
+  .sources .close:hover{background:var(--hover)}
+  .srow{position:relative}
+  .strack{display:flex;gap:12px;overflow-x:auto;scroll-behavior:smooth;padding:2px 44px 8px 2px;scrollbar-width:none}
+  .strack::-webkit-scrollbar{display:none}
+  .scard{flex:0 0 220px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:13.5px;display:flex;gap:10px;align-items:flex-start;box-shadow:var(--shadow)}
+  .scard .ini{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-weight:700;color:#fff;flex:none}
+  .scard .t{font-weight:700;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .scard .s{color:var(--muted);font-size:12.5px;margin-top:3px}
+  .snext{position:absolute;right:4px;top:50%;margin-top:-20px;width:34px;height:34px;border-radius:50%;border:0;background:var(--water);color:#fff;display:grid;place-items:center;box-shadow:var(--shadow)}
+
+  .typing{display:inline-flex;gap:5px;align-items:flex-end;color:var(--muted);font-size:14px;height:22px}
+  .typing i{width:8px;height:10px;background:var(--water);border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;transform:rotate(180deg);animation:drip 1s infinite ease-in-out}
+  .typing i:nth-child(2){animation-delay:.15s;background:var(--aqua)}.typing i:nth-child(3){animation-delay:.3s}
+  .typing span{margin-left:8px}
+  @keyframes drip{0%,80%,100%{transform:rotate(180deg) translateY(0)}40%{transform:rotate(180deg) translateY(6px)}}
+
+  /* ---------- composer ---------- */
+  .composer{border-top:1px solid var(--line);background:var(--rail);padding-block:var(--s4) calc(var(--s3) + env(safe-area-inset-bottom,0px));padding-left:max(var(--s5),env(safe-area-inset-left,0px));padding-right:max(var(--s5),env(safe-area-inset-right,0px))}
+  .cinner{max-width:860px;margin:0 auto;position:relative}
+  .tip{position:absolute;left:4px;top:-50px;background:var(--ink);color:var(--bg);border-radius:8px;padding:8px 12px;font-size:13px;white-space:nowrap;animation:rise .3s ease-out both}
+  .tip::after{content:"";position:absolute;left:40px;bottom:-6px;border:6px solid transparent;border-bottom:0;border-top-color:var(--ink)}
+  .bar{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);padding:var(--s1) var(--s1) var(--s1) 6px;transition:border-color .15s,box-shadow .15s}
+  .bar:focus-within{border-color:var(--water);box-shadow:0 0 0 4px color-mix(in srgb,var(--water) 18%,transparent)}
+  .selwrap{position:relative;display:flex;align-items:center;background:var(--mist);border-radius:999px;color:var(--water-deep)}
+  .modebtn{display:flex;align-items:center;gap:var(--s2);border:0;background:transparent;border-radius:999px;padding:10px 12px;font-weight:700;font-size:14px;color:inherit;white-space:nowrap}
+  .modebtn:hover{background:color-mix(in srgb,var(--water) 12%,transparent)}
+  .modebtn svg.i{width:16px;height:16px}
+  .modebtn .chev{width:14px;height:14px;transition:transform .2s}
+  .modebtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .modemenu{bottom:calc(100% + 10px);left:0;min-width:250px;animation:rise .18s ease-out both}
+  .modemenu .opt{flex-wrap:wrap}
+  .modemenu .d{flex-basis:100%;padding-left:30px;font-size:12.5px;font-weight:400;color:var(--faint);margin-top:-2px}
+  .modemenu .opt:focus-visible{outline:2px solid var(--water);outline-offset:-2px}
+  .bar input{flex:1;border:0;background:transparent;color:var(--ink);padding:0 8px;font:inherit;font-size:16px;outline:none;min-width:0}
+  .bar input::placeholder{color:var(--faint)}
+  .send{width:44px;height:44px;border-radius:50%;border:0;background:var(--maroon);color:#fff;display:grid;place-items:center;flex:none;transition:transform .15s,opacity .15s,background .15s}
+  .send:not(:disabled):hover{transform:scale(1.06);background:var(--maroon-hover)}
+  .send:disabled{opacity:.35;cursor:default}
+  .send svg.i{width:20px;height:20px}
+  .send .stop{display:none}
+  .bar.busy .send .plane{display:none}
+  .bar.busy .send .stop{display:block}
+  .foot{display:flex;justify-content:space-between;gap:var(--s3);flex-wrap:wrap;margin:var(--s2) var(--s4) 0;font-size:12px;color:var(--faint);line-height:1.35}
+  .status{color:var(--water-deep);font-weight:600}
+
+  /* ---------- overlays ---------- */
+  .scrim{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .modal{background:var(--card);border-radius:22px;box-shadow:0 12px 40px rgba(0,0,0,.3);padding:28px;width:min(460px,100%);animation:rise .25s ease-out both;text-align:center}
+  .modal .burst{display:flex;justify-content:center;margin:-4px 0 var(--s2)}
+  .modal h2{font-family:var(--display);font-weight:600;margin:0 0 16px;font-size:22px}
+  .modal textarea{width:100%;height:110px;border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:15px;resize:vertical;background:var(--bg);color:var(--ink);text-align:left}
+  .modal .acts{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:16px}
+  .modal .cancel{background:none;border:0;color:var(--muted);font-weight:600;padding:10px 14px;border-radius:999px}
+  .modal .cancel:hover{background:var(--hover)}
+  .modal .submit{background:var(--maroon);color:#fff;border:0;border-radius:999px;padding:11px 28px;font-weight:700}
+  .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;transition:opacity .2s;z-index:60;pointer-events:none;display:flex;gap:8px;align-items:center}
+  .toast.show{opacity:1}
+  .toast svg.i{width:16px;height:16px}
+
+  .tour{position:fixed;inset:0;z-index:70;cursor:pointer}
+  .tour .hole{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px var(--tour);transition:all .3s;pointer-events:none}
+  .tour .callout{position:fixed;background:var(--card);border-radius:14px;padding:12px 14px;font-size:15px;font-weight:600;max-width:min(420px,calc(100vw - 32px));transition:all .3s;box-shadow:var(--shadow-lift);display:flex;gap:10px;align-items:center}
+  .tour .cont{position:fixed;color:#fff;font-weight:700;text-align:center;font-size:14px;line-height:1.6;transition:all .3s}
+  .tour .dots{display:flex;gap:6px;justify-content:center;margin-top:4px}
+  .tour .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4)}
+  .tour .dots i.on{background:var(--gold)}
+  .tour .skip{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));background:var(--card);border:0;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700}
+
+  .drawer-scrim{display:none}
+
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important;scroll-behavior:auto!important} }
+  @media (max-width:980px){ .prompts{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (max-width:760px){
+    .infobtn{display:none}
+    .app{grid-template-columns:minmax(0,1fr)}
+    aside{position:fixed;z-index:40;top:0;bottom:0;left:0;width:min(300px,86vw);transform:translateX(-102%);transition:transform .25s;box-shadow:var(--shadow-lift);padding-top:env(safe-area-inset-top,0px)}
+    aside.open{transform:none}
+    .drawer-scrim{display:block;position:fixed;inset:0;z-index:39;background:var(--scrim)}
+    .topbar{display:flex;align-items:center;gap:10px;padding-block:10px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line);background:var(--rail)}
+    .topbar .name{font-family:var(--display);font-weight:600;font-size:19px;flex:1}
+    .iconbtn{width:40px;height:40px;border-radius:12px;border:0;background:none;display:grid;place-items:center}
+    .iconbtn:hover{background:var(--hover)}
+    .thread{padding-block:var(--s5) var(--s6);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));gap:var(--s5)}
+    .composer{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+    .collapse{display:none}
+    .newchat kbd{display:none}
+    .hist .del{opacity:1}
+    .hero{padding:var(--s5) var(--s5) 60px;flex-direction:column;align-items:flex-start;gap:var(--s3)}
+    .hero .blue{width:60px;height:75px}
+    .hero .s2{left:80px}
+    .hero p{font-size:15px}
+    .pcard{min-height:128px;padding:var(--s3)}
+    .bav{display:none}
+    .sources{margin-left:0}
+    .bot{border-radius:20px}
+    .modebtn{padding:10px;font-size:13px;gap:6px}
+    .bar input{font-size:15px}
+    .foot{justify-content:flex-start}
+  }
+</style>
+
+<!-- shared SVG symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="dropG" x1=".2" y1="0" x2=".7" y2="1"><stop offset="0" stop-color="#9BEBFF"/><stop offset=".5" stop-color="#3FB8E8"/><stop offset="1" stop-color="#1A6FC0"/></linearGradient>
+    <radialGradient id="rimG" cx=".42" cy=".55" r=".6"><stop offset=".78" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#E6FBFF" stop-opacity=".5"/></radialGradient>
+  </defs>
+  <symbol id="blue" viewBox="0 0 80 100"><ellipse fill="#55CBEA" opacity=".25" cx="40" cy="96" rx="20" ry="3.4"/>
+<g class="bodyg">
+<path d="M40 5C45 19 70 37 70 62A30 30 0 0 1 10 62C10 37 35 19 40 5z" fill="url(#dropG)"/>
+<path d="M13 70A30 30 0 0 0 67 70A42 42 0 0 1 13 70z" fill="#0f5f99" opacity=".22"/>
+<path d="M40 5C45 19 70 37 70 62A30 30 0 0 1 10 62C10 37 35 19 40 5z" fill="url(#rimG)"/>
+<path d="M26.5 43c2.2-7.5 6.5-14 10.5-19" stroke="#fff" stroke-width="4.6" stroke-linecap="round" fill="none" opacity=".75"/>
+<circle cx="23.6" cy="52" r="2.5" fill="#fff" opacity=".6"/>
+<path d="M58 30l1.3 3.2 3.2 1.3-3.2 1.3L58 39l-1.3-3.2-3.2-1.3 3.2-1.3z" fill="#fff" opacity=".85"/><ellipse cx="32" cy="57" rx="3.6" ry="4.6" fill="#0b2d45"/><ellipse cx="48" cy="57" rx="3.6" ry="4.6" fill="#0b2d45"/><circle cx="33.4" cy="55.2" r="1.4" fill="#fff"/><circle cx="49.4" cy="55.2" r="1.4" fill="#fff"/><circle cx="24.5" cy="64" r="3.6" fill="#ff8fb0" opacity=".5"/><circle cx="55.5" cy="64" r="3.6" fill="#ff8fb0" opacity=".5"/><path d="M34.5 65.2q5.5 5.2 11 0" stroke="#0b2d45" stroke-width="2.4" fill="none" stroke-linecap="round"/></g></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M12 1.5v1.8M4.6 4.6l1.3 1.3M19.4 4.6l-1.3 1.3M1.8 9h1.8M20.4 9h1.8M3 17h18M5 21l3-4 2 2 3-3 2 3 2-2 2 4"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 2.5h6M10 2.5v6.2L4.6 18.4A2 2 0 006.4 21.5h11.2a2 2 0 001.8-3.1L14 8.7V2.5"/><path d="M7.2 15h9.6"/><circle cx="10.5" cy="18" r=".7" fill="currentColor"/><circle cx="13.8" cy="17.2" r=".7" fill="currentColor"/></symbol>
+  <symbol id="i-river" viewBox="0 0 24 24"><path d="M2 18l5-9 3.5 5L14 8l8 10"/><path d="M3 21.5c2-1.2 4-1.2 6 0s4 1.2 6 0 4-1.2 6 0"/></symbol>
+  <symbol id="i-leafdrop" viewBox="0 0 24 24"><path d="M12 2.5C9 7 5.5 10.5 5.5 14.5a6.5 6.5 0 0013 0C18.5 10.5 15 7 12 2.5z"/><path d="M9.5 16.5c0-3 2-4.8 5-5.2-.2 3-2 5-5 5.2zM9.5 16.5l2.5-2.5"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M4 7h16M7 7l-3 7a3.2 3.2 0 006 0L7 7zM17 7l-3 7a3.2 3.2 0 006 0l-3-7z"/></symbol>
+  <symbol id="i-dam" viewBox="0 0 24 24"><path d="M3 5h5l3 15H3zM11 9h10M12 13h9M13 17h8"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L3 10.5l7 2.8L21 3l-7.7 18L10 13.3"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2.5" fill="currentColor"/></symbol>
+  <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 11v10H3V11zM7 20h10.3a2 2 0 002-1.6l1.2-6.4A2 2 0 0018.5 9.6H14l.8-3.8A2 2 0 0013 3.5L7 11"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5h6a2 2 0 012 2V20a2 2 0 00-2-2H4zM20 4.5h-6a2 2 0 00-2 2V20a2 2 0 012-2h6z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/></symbol>
+  <symbol id="i-retry" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0113.7-5.7L20 8.5M20 3.5v5h-5M20 12a8 8 0 01-13.7 5.7L4 15.5M4 20.5v-5h5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-short" viewBox="0 0 24 24"><path d="M5 9h14M5 15h8"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></symbol>
+  <symbol id="i-para" viewBox="0 0 24 24"><path d="M4 5h16M4 9h16M4 13h16M4 17h10"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9.2-9.4C1.6 7.2 4 4 7.3 4c2 0 3.6 1.1 4.7 2.7C13.1 5.1 14.7 4 16.7 4 20 4 22.4 7.2 21.2 10.6 19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16M15.5 10l-2 2 2 2"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 16l-4-4 4-4M6 12h10"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a5 5 0 007 0l3-3a5 5 0 00-7-7l-1.5 1.5M14 10a5 5 0 00-7 0l-3 3a5 5 0 007 7l1.5-1.5"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-1 .6-1.5 1.2-1.5 2.3M12 17v.5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+</svg>
+
+<div class="app">
+  <aside id="rail" aria-label="Chats">
+    <div class="rail-top">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 80 100"><use href="#blue"/></svg>
+        <div class="words"><div class="name">Blue</div><div class="sub">Arizona water guide</div></div>
+        <button class="collapse" id="collapseBtn" aria-label="Collapse sidebar" title="Collapse sidebar"><svg class="i"><use href="#i-panel"/></svg></button>
+      </div>
+      <button class="newchat" id="newChat" title="New chat"><span class="tile"><svg class="i"><use href="#i-plus"/></svg></span><span class="lbl">New chat</span><kbd>Alt N</kbd></button>
+      <button class="navitem" id="howBtn" title="How it works?"><span class="ic"><svg class="i"><use href="#i-compass"/></svg></span><span class="t">How it works?</span></button>
+    </div>
+    <div class="railscroll" id="railscroll">
+      <div class="group"><div class="grouphead"><span>Recent</span><span class="count" id="recentCount">0</span></div><ul class="hist" id="histRecent"></ul></div>
+    </div>
+    <div class="railfoot"><span class="uchip" id="uchip" aria-hidden="true">G</span><span class="uname"><b id="uname">Guest</b><small>Free research preview</small></span><button class="signout" id="signout" title="Sign out" aria-label="Sign out"><svg class="i"><use href="#i-logout"/></svg></button></div>
+  </aside>
+  <div class="drawer-scrim" id="drawerScrim" hidden></div>
+
+  <section class="chat">
+    <button class="infobtn" id="infoBtn" aria-controls="info" aria-expanded="false"><svg class="i"><use href="#i-info"/></svg>About</button>
+    <div class="topbar">
+      <button class="iconbtn" id="menuBtn" aria-label="Open history"><svg class="i"><use href="#i-menu"/></svg></button>
+      <svg width="26" height="33" viewBox="0 0 80 100"><use href="#blue"/></svg>
+      <span class="name">Blue</span>
+      <button class="iconbtn" id="infoBtn2" aria-label="About Blue" aria-controls="info"><svg class="i"><use href="#i-info"/></svg></button>
+      <button class="iconbtn" id="newChat2" aria-label="New chat"><svg class="i"><use href="#i-plus"/></svg></button>
+    </div>
+    <div class="scroll" id="scroll"><div class="thread" id="thread" aria-live="polite"></div></div>
+    <div class="composer">
+      <div class="cinner">
+        <div class="tip" id="tip" hidden>Select response type</div>
+        <form class="bar" id="form" autocomplete="off">
+          <div class="selwrap" id="modeWrap">
+            <button type="button" class="modebtn" id="modeBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="modeMenu">
+              <svg class="i"><use href="#i-sliders"/></svg><span id="modeLbl">Short</span><svg class="i chev"><use href="#i-chev"/></svg>
+            </button>
+            <div class="menu modemenu" id="modeMenu" role="listbox" aria-label="Response type" hidden></div>
+          </div>
+          <input id="q" placeholder="Ask Blue about Arizona water…" aria-label="Your question">
+          <button class="send" id="send" type="submit" aria-label="Send" disabled>
+            <svg class="i plane"><use href="#i-send"/></svg>
+            <svg class="i stop"><use href="#i-stop"/></svg>
+          </button>
+        </form>
+        <div class="foot"><span class="status" id="status"></span><span>Blue may produce inaccurate information. Answers are not official policy positions.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="info-scrim" id="infoScrim" hidden></div>
+  <aside class="info" id="info" aria-label="About the Arizona Water Chatbot">
+    <div class="info-head">
+      <svg width="56" height="70" viewBox="0 0 80 100" aria-hidden="true"><use href="#blue"/></svg>
+      <h2>Arizona Water Chatbot</h2>
+      <button class="info-close" id="infoClose" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button>
+    </div>
+    <p class="info-intro">Your trusted chatbot companion for all things related to water in the Grand Canyon State. Let’s dive in together and make a difference for Arizona’s water future!</p>
+
+    <section class="info-sec" aria-labelledby="faqH">
+      <h3 id="faqH"><svg class="i"><use href="#i-help"/></svg>FAQs</h3>
+      <details class="faq">
+        <summary><span class="q">What topics does the Arizona Water Chatbot cover?</span><svg class="i"><use href="#i-chev"/></svg></summary>
+        <div class="a"><p>Blue answers questions about Arizona’s water: drought, the Colorado River, Lake Mead and Lake Powell, groundwater, where our water comes from, water quality, water policy, and ways to conserve water at home.</p></div>
+      </details>
+      <details class="faq">
+        <summary><span class="q">How can I personalize my experience with the Chatbot?</span><svg class="i"><use href="#i-chev"/></svg></summary>
+        <div class="a"><p>Pick Short, Bullet points or Descriptive answers from the menu in the message bar, or change any answer’s style afterwards with Edit Response Type. Blue also greets you by the name you entered when you signed in.</p></div>
+      </details>
+      <details class="faq">
+        <summary><span class="q">What kind of updates does the Arizona Water Chatbot receive?</span><svg class="i"><use href="#i-chev"/></svg></summary>
+        <div class="a"><p>This is a free research preview. Answers are written fresh for each question, and the features change based on your feedback, so use Helpful on answers you like. Always check important facts with the agencies listed under Sources.</p></div>
+      </details>
+    </section>
+
+    <section class="info-sec" aria-labelledby="linkH">
+      <h3 id="linkH"><svg class="i"><use href="#i-link"/></svg>Links</h3>
+      <ul class="links">
+        <li><a href="https://www.azwater.gov" target="_blank" rel="noopener noreferrer"><span class="li"><svg class="i"><use href="#i-link"/></svg></span><span class="lt">Arizona Department of Water Resources</span><svg class="i ext"><use href="#i-ext"/></svg></a></li>
+        <li><a href="https://www.azwater.org" target="_blank" rel="noopener noreferrer"><span class="li"><svg class="i"><use href="#i-link"/></svg></span><span class="lt">AZ Water Association</span><svg class="i ext"><use href="#i-ext"/></svg></a></li>
+        <li><a href="https://www.amwua.org" target="_blank" rel="noopener noreferrer"><span class="li"><svg class="i"><use href="#i-link"/></svg></span><span class="lt">Arizona Municipal Water Users Association</span><svg class="i ext"><use href="#i-ext"/></svg></a></li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+<div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="fbTitle" hidden>
+  <div class="modal">
+    <div class="burst" id="fbMascot"></div>
+    <h2 id="fbTitle">Yay! Tell us what you liked</h2>
+    <textarea id="fbText" placeholder="Add your comments..."></textarea>
+    <div class="acts"><button class="cancel" id="fbCancel">Cancel</button><button class="submit" id="fbSubmit">Submit</button></div>
+  </div>
+</div>
+
+<div class="tour" id="tour" hidden>
+  <div class="hole" id="hole"></div>
+  <div class="callout" id="callout"></div>
+  <div class="cont" id="cont"></div>
+  <button class="skip" id="skip">Skip tour</button>
+</div>
+
+<div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="lgTitle" hidden>
+  <div class="lg-art">
+    <div class="sunburst"></div>
+    <div><h1>Explore Arizona’s water story</h1>
+    <p class="lede">Ask Blue about drought, the Colorado River, groundwater and how to save water at home.</p></div>
+    <ul class="feats">
+      <li><span class="fi"><svg class="i"><use href="#i-chat"/></svg></span><div><b>Ask anything</b><span>Type a question or pick a ready-made prompt.</span></div></li>
+      <li><span class="fi"><svg class="i"><use href="#i-sliders"/></svg></span><div><b>Choose your answer style</b><span>Short, bullet points or descriptive.</span></div></li>
+      <li><span class="fi"><svg class="i"><use href="#i-book"/></svg></span><div><b>See where to learn more</b><span>Each answer lists agencies and reports to look up.</span></div></li>
+    </ul>
+    <div class="waves">
+      <svg class="w1" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 30 Q75 10 150 30 T300 30 T450 30 T600 30 T750 30 T900 30 T1050 30 T1200 30 V60 H0z" fill="#fff"/></svg>
+      <svg class="w2" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 40 Q100 22 200 40 T400 40 T600 40 T800 40 T1000 40 T1200 40 V60 H0z" fill="#fff"/></svg>
+    </div>
+  </div>
+  <div class="lg-panel">
+    <div class="lg-card">
+      <div class="lg-brand"><svg width="34" height="42" viewBox="0 0 80 100"><use href="#blue"/></svg><div><div class="name">Blue</div><div class="sub">Arizona water guide</div></div></div>
+      <div><h2 id="lgTitle">Welcome!</h2><p class="intro">Tell Blue what to call you, then jump in.</p></div>
+      <form class="lg-form" id="lgForm" autocomplete="off">
+        <div class="field">
+          <label for="lgName">Your name <small>Optional</small></label>
+          <div class="inwrap"><svg class="i"><use href="#i-user"/></svg><input id="lgName" maxlength="40" placeholder="e.g. Alex"></div>
+        </div>
+        <button class="lg-go" type="submit">Continue <svg class="i"><use href="#i-arrow"/></svg></button>
+      </form>
+      <div class="lg-note"><svg class="i"><use href="#i-info"/></svg><span>No account or password needed. Your name and chats are kept in this browser only.</span></div>
+      <p class="lg-fine">Free research preview. Blue may produce inaccurate information, and answers are not official policy positions.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const ic=(n,cls='i')=>`<svg class="${cls}"><use href="#i-${n}"/></svg>`;
+const FACES={happy: `<ellipse cx="32" cy="55" rx="3.3" ry="4.3" fill="#0b2d45"/><ellipse cx="48" cy="55" rx="3.3" ry="4.3" fill="#0b2d45"/><circle cx="33.3" cy="53.3" r="1.25" fill="#fff"/><circle cx="49.3" cy="53.3" r="1.25" fill="#fff"/><circle cx="25" cy="62" r="3.4" fill="#ff8fb0" opacity=".5"/><circle cx="55" cy="62" r="3.4" fill="#ff8fb0" opacity=".5"/><path d="M34.5 63.2q5.5 5.2 11 0" stroke="#0b2d45" stroke-width="2.4" fill="none" stroke-linecap="round"/>`, wave: `<circle cx="25" cy="62" r="3.4" fill="#ff8fb0" opacity=".5"/><circle cx="55" cy="62" r="3.4" fill="#ff8fb0" opacity=".5"/><path d="M28.6 56.4q3.4-5 6.8 0M44.6 56.4q3.4-5 6.8 0" stroke="#0b2d45" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M34 61.5h12q-.8 7.4-6 7.4t-6-7.4z" fill="#0b2d45"/><path d="M36.8 66.6q3.2-2.6 6.4 0-1.2 2.3-3.2 2.3t-3.2-2.3z" fill="#ff7d9b"/>`, think: `<ellipse cx="32" cy="55" rx="3.3" ry="4.3" fill="#0b2d45"/><ellipse cx="48" cy="55" rx="3.3" ry="4.3" fill="#0b2d45"/><circle cx="33.6" cy="52.3" r="1.3" fill="#fff"/><circle cx="49.6" cy="52.3" r="1.3" fill="#fff"/><path d="M28.5 48.6l6.5-1.4M45 47.2l6.5 1.4" stroke="#0b2d45" stroke-width="2" stroke-linecap="round"/><path d="M37 65q3-1.8 6 0" stroke="#0b2d45" stroke-width="2.3" fill="none" stroke-linecap="round"/>`, sad: `<ellipse cx="32" cy="56.5" rx="3.1" ry="3.7" fill="#0b2d45"/><ellipse cx="48" cy="56.5" rx="3.1" ry="3.7" fill="#0b2d45"/><circle cx="33.1" cy="55.2" r="1.1" fill="#fff"/><circle cx="49.1" cy="55.2" r="1.1" fill="#fff"/><path d="M28 51.5l6.6-2.8M52 51.5l-6.6-2.8" stroke="#0b2d45" stroke-width="2" stroke-linecap="round"/><path d="M35 66.5q5-4.2 10 0" stroke="#0b2d45" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M53.5 59.5c1.2 2.2 2.3 3.3 2.3 4.6a2.3 2.3 0 01-4.6 0c0-1.3 1.1-2.4 2.3-4.6z" fill="#d6f6ff"/>`, love: `<circle cx="25" cy="62" r="3.4" fill="#ff8fb0" opacity=".5"/><circle cx="55" cy="62" r="3.4" fill="#ff8fb0" opacity=".5"/><path d="M32 59.3l-4.4-4.2a2.7 2.7 0 014.4-3.2 2.7 2.7 0 014.4 3.2zM48 59.3l-4.4-4.2a2.7 2.7 0 014.4-3.2 2.7 2.7 0 014.4 3.2z" fill="#ff4f7b"/><path d="M34.5 63.6q5.5 5.2 11 0" stroke="#0b2d45" stroke-width="2.4" fill="none" stroke-linecap="round"/>`};
+const MASCOT_BODY=`<ellipse class="glow" cx="40" cy="96" rx="20" ry="3.4"/>
+<g class="bodyg">
+<path d="M40 5C45 19 70 37 70 62A30 30 0 0 1 10 62C10 37 35 19 40 5z" fill="url(#dropG)"/>
+<path d="M13 70A30 30 0 0 0 67 70A42 42 0 0 1 13 70z" fill="#0f5f99" opacity=".22"/>
+<path d="M40 5C45 19 70 37 70 62A30 30 0 0 1 10 62C10 37 35 19 40 5z" fill="url(#rimG)"/>
+<path d="M26.5 43c2.2-7.5 6.5-14 10.5-19" stroke="#fff" stroke-width="4.6" stroke-linecap="round" fill="none" opacity=".75"/>
+<circle cx="23.6" cy="52" r="2.5" fill="#fff" opacity=".6"/>
+<path d="M58 30l1.3 3.2 3.2 1.3-3.2 1.3L58 39l-1.3-3.2-3.2-1.3 3.2-1.3z" fill="#fff" opacity=".85"/>`;
+function mascot(mood='happy',w=40,cls=''){return `<svg class="mascot m-${mood} ${cls}" width="${w}" height="${Math.round(w*1.25)}" viewBox="0 0 80 100" aria-hidden="true">${MASCOT_BODY}<g transform="translate(0 2)">${FACES[mood]||FACES.happy}</g></g></svg>`}
+const BLUE=(s,mood)=>mascot(mood||'happy',s);
+function setMood(b,mood){ const av=b.closest('.row').querySelector('.bav'); if(av&&!av.querySelector('.m-'+mood)) av.innerHTML=mascot(mood,38,'pop'); }
+const TOPIC_STYLE={drought:['sun','#F7A928'],chem:['flask','#8E5BD8'],source:['river','#1E88C7'],conserve:['leafdrop','#3FA66B'],policy:['scale','#8C1D40'],mead:['dam','#D9653B'],other:['chat','#3CC3D8']};
+const SRC_COLORS=['#1E88C7','#3FA66B','#F7A928','#8E5BD8','#D9653B','#3CC3D8'];
+
+/* ---------- saved answers ---------- */
+const BASE_SRC=['Arizona Drought Preparedness Plan — Arizona Department of Water Resources','U.S. Drought Monitor — National Drought Mitigation Center','Colorado River operations — U.S. Bureau of Reclamation','Central Arizona Project — CAP'];
+const KB=[
+ {key:'drought',match:/drought|dry|rain|precip/i,q:'How are the droughts in Arizona?',
+  short:['Drought in Arizona is a prolonged period of below-average precipitation severe enough to negatively impact the environment and human activities. Some areas of Arizona can receive as high as 22 inches of precipitation, while others may receive less than 4 inches. Arizona has recognized the need for drought planning and preparedness, taking action to reduce the impact of drought on the state.'],
+  bullets:['Drought is a prolonged stretch of below-average precipitation that harms people and ecosystems.','Rainfall varies widely: some areas get up to 22 inches a year, others under 4.','The Arizona Department of Water Resources works with 22 Planning Areas to find supply and demand gaps.','A state technical committee meets weekly to advise the U.S. Drought Monitor.','Cities have invested in importing and storing water as a buffer against drought.'],
+  descriptive:['The Arizona Department of Water Resources collaborates with the 22 Planning Areas to identify issues causing water demand and supply imbalances, developing successful strategies to address them. In urban areas, significant investments have been made to import and store water supplies, serving as a crucial buffer against the impacts of ongoing drought conditions.','Moreover, the U.S. Drought Monitor serves as the official record of drought for Federal relief claims. The Arizona Drought Monitoring Technical Committee meets weekly to advise the U.S. Drought Monitor authors on the current drought conditions in the state, making recommendations regarding the position of drought boundaries in Arizona. This proactive approach helps in monitoring and managing drought situations effectively, ensuring water resource sustainability in the region.']},
+ {key:'policy',match:/policy|law|regulat|rule/i,q:'Whats the water policy at arizona?',
+  short:["Arizona's water policy is focused on managing and conserving water resources effectively. The state has implemented various strategies to address water supply challenges, such as promoting water conservation, reusing water, and managing groundwater resources sustainably. Additionally, Arizona collaborates with neighboring states and stakeholders to ensure the efficient use of water resources in the region."],
+  bullets:['The 1980 Groundwater Management Act created Active Management Areas to limit groundwater overdraft.','New development in those areas must show a 100-year assured water supply.','The state promotes conservation, water reuse and underground storage.','Arizona shares Colorado River water with six other states and Mexico.'],
+  descriptive:["Arizona's modern water policy rests largely on the 1980 Groundwater Management Act, which created Active Management Areas around the major population centers. Inside them, groundwater pumping is regulated and new development must demonstrate a 100-year assured water supply.","Beyond groundwater, the state manages its Colorado River share through interstate agreements and stores surplus water underground through the Arizona Water Banking Authority. Conservation programs, recycled water and cooperation with neighboring states and tribal nations round out the approach."]},
+ {key:'mead',match:/mead|powell|reservoir|lake/i,q:'Relation between Lake Mead and Lake Powell',
+  short:['Lake Powell and Lake Mead are the two largest reservoirs on the Colorado River. Powell sits upstream behind Glen Canyon Dam and releases water that flows through the Grand Canyon into Mead, behind Hoover Dam. Releases from Powell directly affect Mead’s level, which sets shortage tiers for Arizona.'],
+  bullets:['Both are Colorado River reservoirs; Powell is upstream, Mead downstream.','Water released at Glen Canyon Dam flows into Lake Mead.','Lake Mead’s elevation triggers shortage declarations for Arizona, California and Nevada.','The two reservoirs are operated together under federal guidelines.'],
+  descriptive:['Lake Powell, on the Utah–Arizona border, and Lake Mead, near Las Vegas, are linked by the Colorado River as it runs through the Grand Canyon. Powell works as the Upper Basin’s savings account, while Mead supplies the Lower Basin states of Arizona, California and Nevada.','Because they are run together, the Bureau of Reclamation’s yearly release from Powell shapes Mead’s elevation. When Mead drops below set levels, shortage tiers take effect, and Arizona, with the most junior Colorado River rights in the Lower Basin, takes the largest cuts.']},
+ {key:'conserve',match:/conserv|save|saving|residential|home|garden|landscap/i,q:'Conservation practices for residential owners',
+  short:['Homeowners save the most water outdoors, where much of residential use goes in Arizona. Desert-adapted landscaping, drip irrigation on a smart controller, fixing leaks and installing WaterSense fixtures can cut household use substantially.'],
+  bullets:['Replace grass with low-water, desert-adapted plants.','Use drip irrigation and a weather-based controller; water early in the morning.','Fix leaks; a running toilet can waste hundreds of gallons a day.','Install WaterSense toilets, showerheads and faucet aerators.','Check your utility for turf-removal and fixture rebates.'],
+  descriptive:['In Arizona much of a household’s water goes to the yard, so the biggest savings usually start outside. Desert-adapted plants, mulch and drip irrigation on a weather-aware controller cut outdoor use while keeping a landscape healthy.','Indoors, fixing leaks and upgrading to efficient fixtures add steady savings. Many cities offer rebates for turf removal, smart controllers and efficient toilets, so check with your water provider before starting a project.']},
+ {key:'chem',match:/chemic|contamin|quality|safe|drink|pfas|arsenic/i,q:'What chemicals are in the water?',
+  short:['Arizona tap water is treated to meet federal drinking-water standards. Naturally occurring minerals such as calcium, magnesium and arsenic are common, and some areas monitor for nitrates and PFAS. Your utility’s annual Consumer Confidence Report lists what was found in your water.'],
+  bullets:['Hardness minerals (calcium, magnesium) are common and not a health risk.','Arsenic occurs naturally in some groundwater and is treated to federal limits.','Nitrates can appear near farmland.','Some systems monitor for PFAS.','Your utility’s Consumer Confidence Report has local results.'],
+  descriptive:['Public water systems in Arizona must meet EPA drinking-water standards and test regularly. Much of the state’s water is naturally hard from dissolved calcium and magnesium, which affects taste and scaling but not safety.','Arsenic from geology and nitrates from agriculture are the most common groundwater concerns, and some communities are monitoring PFAS. Each utility publishes an annual Consumer Confidence Report, the best source for your address.']},
+ {key:'source',match:/where.*(water|come)|source|supply|colorado|groundwater|come from/i,q:'Where do we get water from?',
+  short:['Arizona’s water comes from three main sources: the Colorado River, largely delivered by the Central Arizona Project canal; in-state rivers such as the Salt and Verde; and groundwater from aquifers. Reclaimed wastewater is a growing fourth source.'],
+  bullets:['Colorado River, carried to Phoenix and Tucson by the Central Arizona Project.','In-state rivers: the Salt, Verde and Gila systems.','Groundwater from aquifers, regulated in Active Management Areas.','Reclaimed water for irrigation, industry and aquifer recharge.'],
+  descriptive:['Roughly a third of Arizona’s water comes from the Colorado River, much of it lifted hundreds of miles by the Central Arizona Project canal to the Phoenix and Tucson areas. Another large share comes from in-state rivers such as the Salt and Verde, stored behind a chain of dams.','Groundwater makes up most of the rest and matters most in rural areas. Reclaimed wastewater rounds out the supply and is used more and more for irrigation, power plant cooling and recharging aquifers.']}
+];
+const PROMPTS=[['drought','How are the droughts in Arizona?','Rainfall, dry spells & planning'],['chem','What chemicals are in the water?','Minerals, testing & safety'],['source','Where do we get water from?','Rivers, canals & aquifers'],['conserve','Water Conservation Practices','Saving water at home']];
+const MODE_LABEL={short:'Short',bullets:'Bullet points',descriptive:'Descriptive'};
+const MODE_ICON={short:'short',bullets:'list',descriptive:'para'};
+
+/* ---------- state ---------- */
+const $=s=>document.querySelector(s);
+const isMobile=()=>matchMedia('(max-width:760px)').matches;
+const thread=$('#thread'),scrollEl=$('#scroll'),form=$('#form'),q=$('#q'),send=$('#send'),mode={value:'short'},tip=$('#tip'),statusEl=$('#status');
+let sample=null, liveOff=false, convos=[], current=null, busy=null;
+const SEEDS=[['Water policy questions','policy'],['Relation between Lake Mead and lake Powell','mead'],['Conservation practices for residential owners','conserve']];
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function topicOf(text){const t=KB.find(x=>x.match.test(text));return t?t.key:'other'}
+function cannedText(t,m){return m==='bullets'?t.bullets.map(b=>'- '+b).join('\n'):t[m].join('\n\n')}
+function load(){try{const s=JSON.parse(localStorage.getItem('blue-convos')||'null');if(Array.isArray(s))return s}catch(e){}return null}
+function save(){try{localStorage.setItem('blue-convos',JSON.stringify(convos.filter(c=>!c.seed).slice(0,12)))}catch(e){}}
+function seedConvos(){
+  const seeds=SEEDS.map(([title,k],i)=>{const t=KB.find(x=>x.key===k);return {id:'seed'+i,title,seed:true,topic:k,turns:[{q:t.q,mode:'short',text:cannedText(t,'short'),sources:BASE_SRC,live:false}]}});
+  convos=load()||[]; void seeds;
+}
+
+/* ---------- rendering ---------- */
+function histItem(c){
+  const [icon,color]=TOPIC_STYLE[c.topic||'other'];
+  const n=c.turns.length, meta=c.seed?'Example chat':(n===1?'1 question':n+' questions');
+  return `<li><button class="item${current&&current.id===c.id?' on':''}" data-id="${esc(c.id)}" title="${esc(c.title)}"${current&&current.id===c.id?' aria-current="true"':''}>
+    <span class="ic">${ic(icon)}</span>
+    <span class="txt"><span class="t">${esc(c.title)}</span><span class="m">${meta}</span></span></button>
+    ${c.seed?'':`<button class="del" data-del="${esc(c.id)}" aria-label="Delete chat" title="Delete chat">${ic('x')}</button>`}</li>`;
+}
+function renderHistory(){
+  const mine=convos.filter(c=>!c.seed), seeds=convos.filter(c=>c.seed);
+  $('#histRecent').innerHTML=mine.length?mine.map(histItem).join(''):'<li class="empty">Your chats will show up here.</li>';
+  $('#recentCount').textContent=mine.length;
+}
+function formatAnswer(text){
+  return text.trim().split(/\n\s*\n/).map(b=>{
+    const lines=b.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(lines.length&&lines.every(l=>/^[-•*]\s+/.test(l))) return '<ul>'+lines.map(l=>'<li>'+esc(l.replace(/^[-•*]\s+/,''))+'</li>').join('')+'</ul>';
+    return '<p>'+esc(lines.join(' ')).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')+'</p>';
+  }).join('');
+}
+function splitSources(text){
+  const i=text.search(/\n?\s*SOURCES:/i);
+  if(i<0) return {body:text,sources:null};
+  const raw=text.slice(i).replace(/^\s*SOURCES:\s*/i,'');
+  return {body:text.slice(0,i),sources:raw.split(/\s*\|\s*|\n/).map(s=>s.replace(/^[-•*]\s*/,'').trim()).filter(Boolean).slice(0,6)};
+}
+function heroHTML(){
+  return `<div class="hero">
+    
+    <div class="hero-text"><h2>Hi ${esc(userName||'there')}, I’m Blue!</h2>
+    <p>I’m here to help guide you through understanding drought, water conservation, and solutions. Ask me anything you want about the story of water in our state, or pick a prompt below to start exploring Arizona’s water situation with me!</p></div>
+    <div class="waves">
+      <svg class="w1" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 30 Q75 10 150 30 T300 30 T450 30 T600 30 T750 30 T900 30 T1050 30 T1200 30 V60 H0z" fill="#fff"/></svg>
+      <svg class="w2" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 40 Q100 22 200 40 T400 40 T600 40 T800 40 T1000 40 T1200 40 V60 H0z" fill="#fff"/></svg>
+    </div>
+  </div>`;
+}
+function promptsHTML(){
+  return `<div class="starter" id="starter"><div class="prompts-label">Try asking about…</div><div class="prompts" id="prompts">${PROMPTS.map(([k,l,h])=>{const [icon,color]=TOPIC_STYLE[k];
+    return `<button class="pcard" data-k="${k}"><span class="tile" style="background:${color}">${ic(icon)}</span><span class="lbl">${l}</span><span class="hint">${h} ${ic('next','i')}</span></button>`}).join('')}</div></div>`;
+}
+function showConvo(c){
+  current=c; closeMenus(); closeDrawer();
+  thread.innerHTML=heroHTML();
+  if(!c||!c.turns.length) thread.insertAdjacentHTML('beforeend',promptsHTML());
+  else c.turns.forEach((t,i)=>appendTurn(t,i,false));
+  renderHistory(); scrollEl.scrollTop=0;
+}
+function appendTurn(turn,idx,scroll){
+  const st=$('#starter'); if(st) st.remove();
+  const turnEl=document.createElement('div'); turnEl.className='turn'; thread.appendChild(turnEl);
+  turnEl.insertAdjacentHTML('beforeend',`<div class="row user"><div class="ububble">${esc(turn.q)}</div><span class="uav">${ic('chat')}</span></div>`);
+  const row=document.createElement('div'); row.className='row botrow';
+  row.innerHTML=`<span class="bav">${BLUE(38)}</span><div class="bot" data-idx="${idx}">
+    <div class="who">Blue <span class="mode-chip"></span></div>
+    <div class="note" hidden></div><div class="body"></div>
+    <div class="meta">
+      <button class="act thumb" aria-label="I liked this answer">${ic('thumb')}<span>Helpful</span></button>
+      <span class="rtype"><button class="act rbtn" aria-haspopup="menu">${ic('sliders')}<span>Edit Response Type</span></button></span>
+      <button class="act srclink">${ic('book')}<span>Sources</span></button>
+      <button class="act copy" aria-label="Copy answer">${ic('copy')}<span>Copy</span></button>
+    </div></div>`;
+  turnEl.appendChild(row);
+  const b=row.querySelector('.bot'); fillBot(b,turn);
+  if(scroll) requestAnimationFrame(()=>turnEl.scrollIntoView({behavior:'smooth',block:'end'}));
+  return b;
+}
+function fillBot(b,turn){
+  setMood(b,turn.mood||'happy');
+  b.querySelector('.body').innerHTML=formatAnswer(turn.text||'');
+  b.querySelector('.mode-chip').textContent=MODE_LABEL[turn.mode]||'';
+  const note=b.querySelector('.note'); note.hidden=!turn.notice; note.innerHTML=turn.notice?ic('info')+esc(turn.notice):'';
+  b.querySelector('.meta').hidden=false;
+  b.querySelector('.srclink').hidden=!(turn.sources&&turn.sources.length);
+}
+function thinking(b,label){
+  setMood(b,'think');
+  b.querySelector('.body').innerHTML=`<p><span class="typing"><i></i><i></i><i></i><span>${label}</span></span></p>`;
+  b.querySelector('.meta').hidden=true; b.querySelector('.note').hidden=true;
+  const s=b.closest('.row').nextElementSibling; if(s&&s.classList.contains('sources')) s.remove();
+}
+function stickToBottom(){ if(scrollEl.scrollHeight-scrollEl.scrollTop-scrollEl.clientHeight<160) scrollEl.scrollTop=scrollEl.scrollHeight; }
+
+/* ---------- asking Claude ---------- */
+const STYLE={
+  short:'Answer in ONE short paragraph of 2 to 4 sentences.',
+  bullets:'Answer as 4 to 6 bullet lines, each starting with "- ", one fact per line, no intro sentence.',
+  descriptive:'Answer in 2 or 3 well-developed paragraphs separated by a blank line.'
+};
+function rules(m){
+  return `You are Blue, a friendly water-drop guide in a chatbot about Arizona water. You help the public understand Arizona's water story: drought, the Colorado River, Lake Mead and Lake Powell, groundwater, water quality, policy and conservation.
+Write in plain, warm, upbeat but accurate language for a general audience. Plain text only: no headings, no markdown except "- " bullets when asked. If a question is unrelated to water, the environment or Arizona, say briefly that you focus on Arizona water and suggest a related question. If you are unsure of a figure, say so rather than guess.
+Response type for this answer: ${STYLE[m]}
+After the answer, add one final line exactly like:
+SOURCES: Title — Publisher | Title — Publisher
+listing 2 to 4 real, well-known references (agencies, reports or programs) a reader could look up for this topic. Never invent article titles or URLs.`;
+}
+async function answer(turnIdx,b){
+  const c=current,turn=c.turns[turnIdx];
+  const topic=KB.find(t=>t.match.test(turn.q));
+  const useCanned=()=>{
+    turn.text=topic?cannedText(topic,turn.mode):"I’m only able to give saved answers right now, and I have them for drought, water policy, Lake Mead and Lake Powell, conservation at home, water quality, and where Arizona’s water comes from. Try one of those topics!";
+    turn.sources=topic?BASE_SRC:[]; turn.live=false; turn.notice='Saved answer. Live answers aren’t available in this view.';
+  };
+  if(!sample||liveOff){ thinking(b,'Blue is thinking…'); await new Promise(r=>setTimeout(r,600)); useCanned(); fillBot(b,turn); stickToBottom(); save(); return; }
+
+  const history=[];
+  c.turns.slice(Math.max(0,turnIdx-4),turnIdx).forEach(t=>{ if(t.text){history.push({role:'user',content:t.q});history.push({role:'assistant',content:t.text});}});
+  const input=[{role:'user',content:rules(turn.mode)},...history,{role:'user',content:turn.q}];
+  turn.mood='happy'; busy=new AbortController(); setBusy(true); thinking(b,'Blue is thinking…');
+  try{
+    const {text,truncated}=await sample(input,{signal:busy.signal,cache:false,modelTier:turn.mode==='descriptive'?'default':'quick',
+      onText:({text})=>{ const {body}=splitSources(text); if(body.trim()){ b.querySelector('.body').innerHTML=formatAnswer(body); stickToBottom(); } }});
+    const {body,sources}=splitSources(text);
+    turn.text=body.trim(); turn.sources=sources||[]; turn.live=true; turn.notice=truncated?'This answer was cut short. Try Short or Bullet points for a briefer reply.':null;
+  }catch(e){
+    const partial=e&&e.text?splitSources(e.text).body.trim():'';
+    if(e&&['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].includes(e.code)){
+      liveOff=true; useCanned(); turn.notice='Live answers are turned off for this page, so this is a saved answer.';
+    } else if(e&&e.code==='cancelled'){
+      turn.mood='sad'; turn.text=partial||'Stopped.'; turn.sources=[]; turn.live=true; turn.notice=partial?'Stopped before Blue finished.':null;
+    } else {
+      const msg={rate_limited:'Blue is getting a lot of questions right now. Wait a moment, then ask again.',session_expired:'Your sign-in expired. Sign in again to keep chatting.',refused:'Blue can’t answer that one. Try rephrasing your question.'}[e&&e.code]||'Blue couldn’t finish this answer because of a connection problem.';
+      turn.text=partial||msg; turn.sources=[]; turn.live=true; turn.notice=partial?msg:null; turn.failed=true; turn.mood='sad';
+    }
+  }finally{ busy=null; setBusy(false); }
+  fillBot(b,turn);
+  if(turn.failed){ delete turn.failed; b.querySelector('.meta').insertAdjacentHTML('beforeend',`<button class="act retry">${ic('retry')}<span>Try again</span></button>`); }
+  stickToBottom(); save(); renderHistory();
+}
+function setBusy(on){
+  form.classList.toggle('busy',on);
+  send.disabled=!on&&!q.value.trim();
+  send.setAttribute('aria-label',on?'Stop answering':'Send');
+  statusEl.textContent=on?'Blue is answering. Tap the square to stop.':'';
+}
+function ask(text,m){
+  if(busy) return;
+  if(!current){ current={id:'c'+Date.now(),title:text.length>48?text.slice(0,46)+'…':text,topic:topicOf(text),turns:[]}; convos.unshift(current); }
+  else if(current.seed){ current.seed=false; current.id='c'+Date.now(); }
+  current.turns.push({q:text,mode:m,text:'',sources:[]});
+  renderHistory();
+  const b=appendTurn({q:text,mode:m,text:'',sources:[]},current.turns.length-1,true);
+  if(!tip.dataset.shown){ tip.dataset.shown='1'; tip.hidden=false; setTimeout(()=>tip.hidden=true,6000); }
+  answer(current.turns.length-1,b);
+}
+
+/* ---------- events ---------- */
+thread.addEventListener('click',e=>{
+  const p=e.target.closest('.pcard'); if(p){ const l=p.querySelector('.lbl').textContent; ask(l==='Water Conservation Practices'?'What are good water conservation practices?':l,mode.value); return; }
+  if(e.target.closest('.sources .close')){ e.target.closest('.sources').remove(); return; }
+  const nx=e.target.closest('.snext');
+  if(nx){ const tr=nx.parentElement.querySelector('.strack'); if(tr.scrollLeft+tr.clientWidth>=tr.scrollWidth-4) tr.scrollLeft=0; else tr.scrollLeft+=tr.clientWidth*.8; return; }
+  const card=e.target.closest('.bot'); if(!card) return;
+  const idx=+card.dataset.idx, turn=current.turns[idx];
+  if(e.target.closest('.thumb')){ const t=e.target.closest('.thumb'); if(!t.classList.contains('liked')){ t.classList.add('liked'); turn.mood='love'; setMood(card,'love'); openFeedback(); } return; }
+  if(e.target.closest('.copy')){ copyText(splitSources(turn.text).body.trim()); return; }
+  if(e.target.closest('.retry')){ e.target.closest('.retry').remove(); if(!busy) answer(idx,card); return; }
+  if(e.target.closest('.rbtn')){
+    const rt=e.target.closest('.rtype'), had=rt.querySelector('.menu'); closeMenus(); if(had) return;
+    const m=document.createElement('div'); m.className='menu'; m.setAttribute('role','menu');
+    m.innerHTML=Object.entries(MODE_LABEL).map(([k,l])=>`<button role="menuitem" data-m="${k}" class="${turn.mode===k?'cur':''}">${ic(MODE_ICON[k])}${l}${turn.mode===k?ic('check'):''}</button>`).join('');
+    rt.appendChild(m); e.stopPropagation(); return;
+  }
+  const mi=e.target.closest('.menu button');
+  if(mi){ closeMenus(); if(busy||mi.dataset.m===turn.mode) return; turn.mode=mi.dataset.m; answer(idx,card); return; }
+  if(e.target.closest('.srclink')){
+    const btn=e.target.closest('.srclink'), row=card.closest('.row'), next=row.nextElementSibling;
+    if(next&&next.classList.contains('sources')){ next.remove(); btn.classList.remove('on'); return; }
+    btn.classList.add('on');
+    const el=document.createElement('div'); el.className='sources';
+    const list=turn.sources||[];
+    el.innerHTML=`<div class="hd">${ic('book')}<span>Sources to look up</span><button class="close">${ic('x')}Close</button></div>
+      <div class="srow"><div class="strack">${list.map((s,i)=>{const [t,p]=s.split(/\s+—\s+|\s+-\s+/);const pub=(p||'Reference').trim();
+        return `<div class="scard"><span class="ini" style="background:${SRC_COLORS[i%SRC_COLORS.length]}">${esc(pub.charAt(0).toUpperCase())}</span><div><div class="t">${esc(t)}</div><div class="s">${esc(pub)}</div></div></div>`}).join('')}</div>
+      ${list.length>3?`<button class="snext" aria-label="More sources">${ic('next')}</button>`:''}</div>`;
+    row.after(el); el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+});
+function closeMenus(){ document.querySelectorAll('.rtype .menu').forEach(m=>m.remove()); }
+document.addEventListener('click',e=>{ if(!e.target.closest('.rtype')) closeMenus(); if(!e.target.closest('#modeWrap')) closeModeMenu(); });
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); toast('Copied to clipboard','check'); }
+  catch(e){ toast('Couldn’t copy. Select the text and copy it instead.','info'); }
+}
+
+$('#railscroll').addEventListener('click',e=>{
+  const d=e.target.closest('.del');
+  if(d){ if(busy&&current&&current.id===d.dataset.del) return; const i=convos.findIndex(c=>c.id===d.dataset.del); if(i<0) return;
+    const gone=convos.splice(i,1)[0]; save(); if(current&&current.id===gone.id) showConvo(null); else renderHistory(); toast('Chat deleted','x'); return; }
+  const b=e.target.closest('.item'); if(!b||busy) return; showConvo(convos.find(c=>c.id===b.dataset.id));
+});
+const appEl=$('.app'); let railPref=false;
+try{ railPref=localStorage.getItem('blue-rail')==='1'; }catch(e){}
+function applyRail(){ appEl.classList.toggle('collapsed',railPref&&!isMobile()); const b=$('#collapseBtn'); const l=railPref?'Expand sidebar':'Collapse sidebar'; b.setAttribute('aria-label',l); b.title=l; }
+$('#collapseBtn').addEventListener('click',()=>{ railPref=!railPref; try{localStorage.setItem('blue-rail',railPref?'1':'0')}catch(e){} applyRail(); });
+addEventListener('resize',applyRail);
+document.addEventListener('keydown',e=>{ if(e.altKey&&loginEl.hidden&&(e.key==='n'||e.key==='N'||e.code==='KeyN')){ e.preventDefault(); newChat(); } });
+function newChat(){ if(busy) busy.abort(); showConvo(null); q.focus(); }
+$('#newChat').addEventListener('click',newChat);
+$('#newChat2').addEventListener('click',newChat);
+q.addEventListener('input',()=>{ if(!busy) send.disabled=!q.value.trim(); });
+form.addEventListener('submit',e=>{ e.preventDefault(); if(busy){ busy.abort(); return; } const t=q.value.trim(); if(!t) return; q.value=''; send.disabled=true; ask(t,mode.value); });
+/* response-type picker (custom, matches the in-answer menu) */
+const MODE_DESC={short:'A quick 2–4 sentence answer',bullets:'Key facts as a list',descriptive:'A fuller, multi-paragraph answer'};
+const modeBtn=$('#modeBtn'), modeMenu=$('#modeMenu');
+function setMode(k){ mode.value=k; $('#modeLbl').textContent=MODE_LABEL[k]; modeBtn.setAttribute('aria-label','Response type: '+MODE_LABEL[k]); }
+function openModeMenu(focusCur){
+  tip.hidden=true;
+  modeMenu.innerHTML=Object.entries(MODE_LABEL).map(([k,l])=>`<button type="button" class="opt${mode.value===k?' cur':''}" role="option" aria-selected="${mode.value===k}" data-m="${k}">${ic(MODE_ICON[k])}${l}${mode.value===k?ic('check'):''}<span class="d">${MODE_DESC[k]}</span></button>`).join('');
+  modeMenu.hidden=false; modeBtn.setAttribute('aria-expanded','true');
+  if(focusCur) (modeMenu.querySelector('.cur')||modeMenu.firstElementChild).focus();
+}
+function closeModeMenu(refocus){ if(modeMenu.hidden) return; modeMenu.hidden=true; modeBtn.setAttribute('aria-expanded','false'); if(refocus) modeBtn.focus(); }
+modeBtn.addEventListener('click',e=>{ modeMenu.hidden?openModeMenu(e.detail===0):closeModeMenu(); });
+modeBtn.addEventListener('keydown',e=>{ if(e.key==='ArrowUp'||e.key==='ArrowDown'){ e.preventDefault(); openModeMenu(true); } });
+modeMenu.addEventListener('click',e=>{ const o=e.target.closest('.opt'); if(!o) return; setMode(o.dataset.m); closeModeMenu(true); });
+modeMenu.addEventListener('keydown',e=>{
+  const opts=[...modeMenu.querySelectorAll('.opt')], i=opts.indexOf(document.activeElement);
+  if(e.key==='ArrowDown'){ e.preventDefault(); opts[(i+1)%opts.length].focus(); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); opts[(i-1+opts.length)%opts.length].focus(); }
+  else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); closeModeMenu(true); }
+  else if(e.key==='Tab'){ closeModeMenu(); }
+});
+
+/* mobile drawer */
+const rail=$('#rail'), dscrim=$('#drawerScrim');
+$('#menuBtn').addEventListener('click',()=>{ rail.classList.add('open'); dscrim.hidden=false; });
+function closeDrawer(){ rail.classList.remove('open'); dscrim.hidden=true; }
+const infoEl=$('#info'), iscrim=$('#infoScrim'), infoBtns=[$('#infoBtn'),$('#infoBtn2')];
+function openInfo(){ closeDrawer(); infoEl.classList.add('open'); iscrim.hidden=false; infoBtns.forEach(b=>b.setAttribute('aria-expanded','true')); setTimeout(()=>$('#infoClose').focus(),60); }
+function closeInfo(){ if(!infoEl.classList.contains('open')) return; infoEl.classList.remove('open'); iscrim.hidden=true; infoBtns.forEach(b=>b.setAttribute('aria-expanded','false')); }
+infoBtns.forEach(b=>b.addEventListener('click',openInfo));
+$('#infoClose').addEventListener('click',closeInfo);
+iscrim.addEventListener('click',closeInfo);
+addEventListener('resize',()=>{ if(!matchMedia('(max-width:1180px)').matches) closeInfo(); });
+dscrim.addEventListener('click',closeDrawer);
+
+/* feedback */
+const scrim=$('#scrim');
+function openFeedback(){ $('#fbMascot').innerHTML=mascot('love',64,'pop'); scrim.hidden=false; $('#fbText').value=''; setTimeout(()=>$('#fbText').focus(),30); }
+function closeFeedback(){ scrim.hidden=true; }
+$('#fbCancel').onclick=closeFeedback;
+$('#fbSubmit').onclick=()=>{ closeFeedback(); toast('Thanks for your feedback!','heart'); };
+scrim.addEventListener('click',e=>{ if(e.target===scrim) closeFeedback(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModeMenu(); closeFeedback(); endTour(); closeMenus(); closeDrawer(); closeInfo(); }});
+let toastT; function toast(t,icon){ const el=$('#toast'); el.innerHTML=(icon?ic(icon):'')+esc(t); el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2200); }
+
+/* how-it-works tour */
+const STEPS=[
+  {sel:'.selwrap',text:'Pick Short, Bullet points or Descriptive before you ask'},
+  {sel:'#q',text:'Type any question about Arizona water here'},
+  {sel:'#send',text:'Send it to Blue. While Blue answers, this turns into a stop button'},
+  {sel:'#starter',text:'Not sure where to start? Pick a prompt',fallback:'#q'},
+  {sel:'.rbtn',text:'Change an answer’s response type after it’s written',fallback:'.selwrap'},
+  {sel:'#newChat',mobile:'#newChat2',text:'Start a fresh conversation anytime'},
+  {sel:'#railscroll',mobile:'#menuBtn',text:'Reopen your earlier chats from here'}
+];
+let step=0; const tour=$('#tour'),hole=$('#hole'),callout=$('#callout'),cont=$('#cont');
+function placeStep(){
+  const s=STEPS[step];
+  let el=(isMobile()&&s.mobile&&document.querySelector(s.mobile))||document.querySelector(s.sel)||document.querySelector(s.fallback);
+  el.scrollIntoView({block:'nearest'});
+  requestAnimationFrame(()=>{
+    const r=el.getBoundingClientRect(),pad=6;
+    Object.assign(hole.style,{left:r.left-pad+'px',top:r.top-pad+'px',width:r.width+pad*2+'px',height:r.height+pad*2+'px'});
+    callout.innerHTML=BLUE(28)+'<span>'+esc(s.text)+'</span>';
+    const cw=Math.min(420,innerWidth-32), below=r.top<innerHeight/2;
+    const left=Math.min(Math.max(16,r.left+r.width/2-cw/2),innerWidth-cw-16);
+    callout.style.left=left+'px'; callout.style.width=cw+'px';
+    const ch=callout.offsetHeight;
+    const top=below?r.bottom+22:r.top-ch-60;
+    callout.style.top=top+'px';
+    cont.innerHTML=`Click anywhere to continue<div class="dots">${STEPS.map((_,i)=>`<i class="${i===step?'on':''}"></i>`).join('')}</div>`;
+    cont.style.left=left+'px'; cont.style.width=cw+'px'; cont.style.top=(top+ch+10)+'px';
+  });
+}
+function startTour(){ closeDrawer(); step=0; tour.hidden=false; placeStep(); }
+function endTour(){ tour.hidden=true; }
+tour.addEventListener('click',e=>{ if(e.target.id==='skip') return endTour(); step++; step>=STEPS.length?endTour():placeStep(); });
+addEventListener('resize',()=>{ if(!tour.hidden) placeStep(); });
+$('#howBtn').addEventListener('click',startTour);
+
+/* boot */
+/* login (design only: no accounts, the name lives in this browser) */
+var userName='';
+const loginEl=$('#login');
+function readUser(){ try{ const u=JSON.parse(localStorage.getItem('blue-user')||'null'); return u&&typeof u==='object'?u:null; }catch(e){ return null; } }
+function applyUser(){
+  $('#uname').textContent=userName||'Guest';
+  $('#uchip').textContent=(userName||'Guest').trim().charAt(0).toUpperCase();
+}
+function showLogin(){ loginEl.hidden=false; $('#lgName').value=userName; setTimeout(()=>$('#lgName').focus(),60); }
+$('#lgForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  userName=$('#lgName').value.trim().slice(0,40);
+  try{ localStorage.setItem('blue-user',JSON.stringify({name:userName})); }catch(err){}
+  applyUser(); if(!current||!current.turns.length) showConvo(current);
+  loginEl.classList.add('leaving');
+  setTimeout(()=>{ loginEl.hidden=true; loginEl.classList.remove('leaving'); q.focus(); },280);
+  toast(userName?'Welcome, '+userName+'!':'Welcome!','check');
+});
+$('#signout').addEventListener('click',()=>{
+  if(busy) busy.abort();
+  try{ localStorage.removeItem('blue-user'); }catch(e){}
+  userName=''; applyUser(); closeDrawer(); showConvo(null); showLogin();
+});
+const savedUser=readUser(); if(savedUser) userName=String(savedUser.name||'').slice(0,40);
+applyUser();
+seedConvos(); applyRail(); showConvo(null);
+if(!savedUser) showLogin();
+(async()=>{ try{ sample=window.claude&&await window.claude.use('sample'); }catch(e){ sample=null; } })();
+</script>
+
+</body></html>

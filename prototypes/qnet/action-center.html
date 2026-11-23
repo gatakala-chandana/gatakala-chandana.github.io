@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qnet · Action Center</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Source+Sans+3:ital,wght@0,300..800;1,300..800&display=swap"><script>window.__resources={"https://unpkg.com/react@18.3.1/umd/react.production.min.js":"assets/react.js","https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js":"assets/react-dom.js"};</script><link rel="stylesheet" href="assets/qnet-glue.css"><script src="assets/dc-runtime.js"></script>
+</head>
+<body>
+
+<x-dc>
+<helmet>
+<script>(function(){if(window.top===window&&!document.getElementById("vt-opt")){var s=document.createElement("style");s.id="vt-opt";s.textContent="@view-transition{navigation:auto}";document.head.appendChild(s)}function q(v){if(!v)return;["ready","finished","updateCallbackDone"].forEach(function(k){v[k]&&v[k].catch(function(){})})}addEventListener("pagereveal",function(e){q(e.viewTransition)});addEventListener("pageswap",function(e){q(e.viewTransition)});addEventListener("unhandledrejection",function(e){if(e.reason&&/Transition was aborted|ViewTransition/i.test(String(e.reason&&e.reason.message||e.reason)))e.preventDefault()})})();</script>
+<style>/* Team Quality Services — design system entry point.
+   Consumers link this one file. Source of truth: TQS-AI-Team/tqs-brand-guide
+   (tokens/tokens.json → tokens/tqs-tokens.css). Import lines only. */
+/* Two webfonts, split by output medium — brand/05-typography.md.
+   Open Sans   → web and software UI (screen).
+   Source Sans 3 → print, Word documents, decks, posters, ad creative.
+   Both are SIL OFL 1.1, so both may be self-hosted and embedded with no
+   licensing gate. No binaries were supplied in tqs-brand-guide/assets/fonts
+   (README only), so both load from the Google CDN; the brand guide prefers
+   self-hosting — drop .woff2 files into assets/fonts/ and swap to @font-face.
+
+   Source Sans 3 replaced Myriad Pro on 2026-08-18 (decision D21). Myriad Pro
+   is retired: never specify it. "Source Sans Pro" stays in the print stack
+   because some machines carry that earlier release name instead.
+   Do not ship final ad creative rendered in a fallback face — stop and flag. */
+/* Color — brand/04-color.md. Canonical unless marked [PROPOSED]. */
+:root {
+  /* Primary brand */
+  --tqs-yellow: #fedd00;   /* Pantone Yellow C — surface/accent, never a text color */
+  --tqs-ink: #212322;      /* Pantone 419 C — replaces black, everywhere */
+  --tqs-gray: #aaaaaa;     /* Pantone Cool Gray 6 C — NOT a text color on light */
+  --tqs-white: #ffffff;    /* Pantone 000C White */
+
+  /* Secondary — accent only, never dominant */
+  --tqs-mist: #c4c6c8;     /* Pantone 421 C */
+
+  /* Artwork value, not a palette color: the horizontal lockup wordmark fill. */
+  --tqs-logo-wordmark-ink: #5b6670;
+
+  /* Neutral ramp ([PROPOSED]: 50, 200, 600) */
+  --tqs-neutral-50: #f4f4f4;
+  --tqs-neutral-100: #e2e2e2;
+  --tqs-neutral-200: #d2d2d2;
+  --tqs-neutral-300: #c4c6c8; /* = mist */
+  --tqs-neutral-400: #aaaaaa; /* = gray */
+  --tqs-neutral-500: #8d8d8d; /* lightest neutral usable as a perceivable border (3.32:1) */
+  --tqs-neutral-600: #6b6b6b; /* lowest step passing AA on white (5.33:1) */
+  --tqs-neutral-700: #555555;
+  --tqs-neutral-800: #383838;
+  --tqs-neutral-900: #212322; /* = ink */
+
+  /* Semantic text */
+  --tqs-text-primary: var(--tqs-ink);              /* 15.81:1 on white — AAA */
+  --tqs-text-secondary: var(--tqs-neutral-600);    /*  5.33:1 on white — AA  */
+  --tqs-text-disabled: var(--tqs-neutral-400);     /*  2.32:1 — disabled only */
+  --tqs-text-on-dark: var(--tqs-white);            /* 15.81:1 on ink — AAA */
+  --tqs-text-on-dark-secondary: var(--tqs-mist);   /*  9.23:1 on ink — AAA */
+  --tqs-text-on-yellow: var(--tqs-ink);            /* 11.71:1 — the ONLY approved text color on yellow */
+  --tqs-text-yellow-on-light: #867400;             /*  4.65:1 — last resort; prefer the accent bar */
+
+  /* Surfaces */
+  --tqs-surface: var(--tqs-white);
+  --tqs-surface-subtle: var(--tqs-neutral-50);
+  --tqs-surface-inverse: var(--tqs-ink);
+  --tqs-surface-accent: var(--tqs-yellow);
+
+  /* Borders */
+  --tqs-border-subtle: var(--tqs-neutral-200);
+  --tqs-border: var(--tqs-gray);                /* 2.32:1 — decorative dividers only */
+  --tqs-border-strong: var(--tqs-neutral-500);  /* 3.32:1 — meets the 3:1 non-text minimum */
+
+  /* Interaction (hover/active fills, [PROPOSED] — derived by darkening ~8% / ~14%) */
+  --tqs-yellow-hover: #e8ca00;
+  --tqs-yellow-active: #d4b800;
+  --tqs-ink-hover: #383838;
+  --tqs-ink-active: #4a4a4a;
+
+  /* Status — indicator = fills/chart marks/icons on dark; -text = text on light;
+     -surface = the tint behind that text (pairs at exactly 4.5:1). */
+  --tqs-info: #0a84ff;
+  --tqs-info-text: #086dd3;
+  --tqs-info-surface: #e6f3ff;
+  --tqs-info-surface-dark: #1d344a;
+
+  --tqs-success: #30d158;
+  --tqs-success-text: #1e8237;
+  --tqs-success-surface: #eafaee;
+  --tqs-success-surface-dark: #24422c;
+
+  /* Warning is TQS brand yellow. Status-yellow ALWAYS carries a warning icon
+     and a text label, or it is not a valid warning state. */
+  --tqs-warning: var(--tqs-yellow);
+  --tqs-warning-text: #867400;
+  --tqs-warning-surface: #fffce6;
+  --tqs-warning-surface-dark: #49441c;
+
+  --tqs-danger: #ff453a;
+  --tqs-danger-text: #ca372e;
+  --tqs-danger-surface: #ffeceb;
+  --tqs-danger-surface-dark: #492926;
+
+  /* Chart series — quality trend data. Yellow marks the SERIES OF INTEREST only;
+     the rest of a chart is the neutral ramp. Never yellow for every series. */
+  --tqs-chart-focus: var(--tqs-yellow);
+  --tqs-chart-1: var(--tqs-ink);
+  --tqs-chart-2: var(--tqs-neutral-500);
+  --tqs-chart-3: var(--tqs-mist);
+  --tqs-chart-4: var(--tqs-neutral-700);
+  --tqs-chart-grid: var(--tqs-neutral-200);
+  --tqs-chart-axis: var(--tqs-neutral-600);
+  --tqs-chart-pass: var(--tqs-success);
+  --tqs-chart-fail: var(--tqs-danger);
+}
+
+/* Typography — brand/05-typography.md. Two families split by output MEDIUM,
+   not by heading vs body: Open Sans if it renders in a browser as software,
+   Source Sans 3 if it renders on a page or in generated creative. Within each
+   medium there is one family — hierarchy comes from weight and size, never
+   from mixing families. Type scale is [PROPOSED]. */
+:root {
+  --tqs-font-web: "Open Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tqs-font-heading: var(--tqs-font-web);
+  --tqs-font-body: var(--tqs-font-web);
+  /* Print / Word / decks / posters / social & ad creative. Replaced Myriad Pro
+     2026-08-18 (D21); Myriad Pro is retired — never specify it. */
+  --tqs-font-print: "Source Sans 3", "Source Sans Pro", Arial, sans-serif;
+  --tqs-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --tqs-weight-light: 300;      /* large body, long-form web text */
+  --tqs-weight-regular: 400;    /* default body, UI text */
+  --tqs-weight-semibold: 600;   /* subheads, buttons, table headers, emphasis */
+  --tqs-weight-bold: 700;       /* display and ad headlines */
+
+  /* 1.25 modular scale, 16px base [PROPOSED] */
+  --tqs-text-xs: 0.75rem;    /* 12 — labels, legal, table meta */
+  --tqs-text-sm: 0.875rem;   /* 14 — secondary text, captions */
+  --tqs-text-base: 1rem;     /* 16 — body default; never ship body below this */
+  --tqs-text-lg: 1.125rem;   /* 18 */
+  --tqs-text-xl: 1.375rem;   /* 22 — H4, lead paragraph */
+  --tqs-text-2xl: 1.75rem;   /* 28 — H3 */
+  --tqs-text-3xl: 2.25rem;   /* 36 — section H2 */
+  --tqs-text-4xl: 3rem;      /* 48 — page H1 */
+  --tqs-text-5xl: 3.75rem;   /* 60 — hero display */
+
+  --tqs-leading-tight: 1.15;   /* 3xl and up */
+  --tqs-leading-snug: 1.3;     /* xl, 2xl */
+  --tqs-leading-normal: 1.55;  /* body */
+  --tqs-leading-relaxed: 1.7;
+
+  --tqs-tracking-tight: -0.02em; /* display sizes */
+  --tqs-tracking-normal: 0em;
+  --tqs-tracking-wide: 0.04em;   /* xs labels */
+  --tqs-tracking-caps: 0.08em;   /* all-caps labels and badges */
+
+  /* PRINT SCALE. Source Sans 3 sets a 9.2% smaller x-height than Open Sans
+     (0.486 vs 0.535 em) — at 16px it has the apparent size of Open Sans at
+     14.5px. Do NOT reuse the web scale verbatim on a print artboard: these
+     are the web steps sized up ~10% and optically checked. Body is 17.5px. */
+  --tqs-print-xs: 0.8125rem;  /* 13 — legal, table meta */
+  --tqs-print-sm: 0.9375rem;  /* 15 — captions, secondary */
+  --tqs-print-base: 1.09375rem; /* 17.5 — body default on a page */
+  --tqs-print-lg: 1.25rem;    /* 20 — large body */
+  --tqs-print-xl: 1.5rem;     /* 24 — lead paragraph, deck body minimum */
+  --tqs-print-2xl: 1.9375rem; /* 31 */
+  --tqs-print-3xl: 2.5rem;    /* 40 */
+  --tqs-print-4xl: 3.3125rem; /* 53 */
+  --tqs-print-5xl: 4.125rem;  /* 66 — poster / cover display */
+}
+
+/* Spacing, radius, layout — brand/07-ui-design-system.md.
+   4px base. The whole scale is [PROPOSED] scaffolding: no TQS precedent existed. */
+:root {
+  --tqs-space-1: 0.25rem;  /*  4 */
+  --tqs-space-2: 0.5rem;   /*  8 */
+  --tqs-space-3: 0.75rem;  /* 12 */
+  --tqs-space-4: 1rem;     /* 16 */
+  --tqs-space-5: 1.5rem;   /* 24 */
+  --tqs-space-6: 2rem;     /* 32 */
+  --tqs-space-7: 3rem;     /* 48 */
+  --tqs-space-8: 4rem;     /* 64 */
+  --tqs-space-9: 6rem;     /* 96 */
+  --tqs-space-10: 8rem;    /* 128 */
+
+  --tqs-radius-none: 0;
+  --tqs-radius-sm: 0.125rem;  /* 2 */
+  --tqs-radius-md: 0.25rem;   /* 4 — the default for buttons, inputs, cards */
+  --tqs-radius-lg: 0.5rem;    /* 8 — dialogs, drawers */
+  --tqs-radius-pill: 9999px;  /* chips, tags, status badges only */
+
+  --tqs-border-hairline: 1px;
+  --tqs-border-thick: 2px;
+  --tqs-accent-bar: 4px;      /* the yellow rule motif */
+
+  /* Controls */
+  --tqs-control-h-sm: 32px;
+  --tqs-control-h-md: 40px;   /* default button and input height */
+  --tqs-control-h-lg: 48px;
+  --tqs-touch-min: 44px;      /* minimum touch target */
+  --tqs-row-h: 44px;          /* table row, default */
+  --tqs-row-h-compact: 36px;
+
+  /* Layout — content max and breakpoints are canonical */
+  --tqs-content-max: 1140px;
+  --tqs-prose-max: 68ch;
+  --tqs-gutter: 24px;
+  --tqs-gutter-mobile: 16px;
+  --tqs-bp-md: 767px;
+  --tqs-bp-lg: 1024px;
+
+  /* Icons — Lucide, 24px grid, 1.5px stroke */
+  --tqs-icon-size: 24px;
+  --tqs-icon-stroke: 1.5px;
+
+  /* Motif opacities — brand/06-imagery-motifs.md */
+  /* yellow 8x6 dot grid, right-anchored */
+  --tqs-dot-grid-opacity: 0.4; /* @kind other */
+  /* dotted-Q watermark, in Mist */
+  --tqs-watermark-opacity: 0.24; /* @kind other */
+  --tqs-map-watermark-opacity: 0.6; /* @kind other */
+}
+
+/* Elevation — [PROPOSED]. Ink-tinted, never black. Prefer borders for static
+   grouping; reserve shadow for things that genuinely float. */
+:root {
+  --tqs-shadow-sm: 0 1px 2px rgba(33, 35, 34, 0.08);   /* card at rest */
+  --tqs-shadow-md: 0 2px 8px rgba(33, 35, 34, 0.1);    /* interactive card hover */
+  --tqs-shadow-lg: 0 8px 24px rgba(33, 35, 34, 0.14);  /* menus, dialogs, popovers */
+  --tqs-scrim: rgba(33, 35, 34, 0.6);                  /* text over photography, modal backdrop */
+}
+
+/* Motion — [PROPOSED]. Precise and mechanical. No bounce, no overshoot, no spin. */
+:root {
+  --tqs-duration-micro: 140ms; /* @kind other */
+  --tqs-duration-base: 220ms; /* @kind other */
+  --tqs-ease-enter: cubic-bezier(0.2, 0, 0, 1); /* @kind other */
+  --tqs-ease-exit: cubic-bezier(0.4, 0, 1, 1); /* @kind other */
+  --tqs-translate: 8px;         /* 4–12px is the whole range */
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --tqs-duration-micro: 0ms; /* @kind other */
+    --tqs-duration-base: 0ms; /* @kind other */
+    --tqs-translate: 0px;
+  }
+}
+
+/* Dark surface context — brand/07-ui-design-system.md#dark-mode.
+   The dark surface is the SIGNATURE TQS look, not an accommodation: white/mist
+   type on ink with yellow accents. Reach for it before a light layout.
+   Apply .tqs-inverse to any section that should render dark. Yellow never remaps. */
+.tqs-inverse {
+  --tqs-surface: var(--tqs-ink);
+  --tqs-surface-subtle: var(--tqs-neutral-800);
+  --tqs-text-primary: var(--tqs-white);
+  --tqs-text-secondary: var(--tqs-mist);
+  --tqs-text-disabled: var(--tqs-neutral-600);
+  --tqs-border-subtle: var(--tqs-neutral-800);
+  --tqs-border: var(--tqs-neutral-700);
+  --tqs-border-strong: var(--tqs-gray);
+
+  /* On dark, the raw indicator colors ARE legible — use them directly. */
+  --tqs-info-text: var(--tqs-info);
+  --tqs-success-text: var(--tqs-success);
+  --tqs-warning-text: var(--tqs-warning);
+  --tqs-danger-text: var(--tqs-danger);
+  --tqs-info-surface: var(--tqs-info-surface-dark);
+  --tqs-success-surface: var(--tqs-success-surface-dark);
+  --tqs-warning-surface: var(--tqs-warning-surface-dark);
+  --tqs-danger-surface: var(--tqs-danger-surface-dark);
+
+  /* Chart series invert to light-on-dark; focus stays yellow. */
+  --tqs-chart-1: var(--tqs-white);
+  --tqs-chart-2: var(--tqs-gray);
+  --tqs-chart-3: var(--tqs-neutral-600);
+  --tqs-chart-4: var(--tqs-mist);
+  --tqs-chart-grid: var(--tqs-neutral-800);
+  --tqs-chart-axis: var(--tqs-mist);
+
+  background-color: var(--tqs-surface);
+  color: var(--tqs-text-primary);
+}
+
+/* Explicit theme toggle: light on :root, dark by preference unless forced light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+}
+
+/* Base utilities that carry accessibility rules the tokens alone can't. */
+
+/* Focus visibility. Yellow alone is 1.35:1 on white — a yellow-only ring is
+   invisible on light surfaces. Pair it with an ink ring. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--tqs-border-thick) solid var(--tqs-ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--tqs-yellow);
+}
+.tqs-inverse :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--tqs-border-thick) solid var(--tqs-yellow);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* Links: underlined, ink on light, white on dark. Never yellow on white. */
+a { color: var(--tqs-text-primary); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--tqs-neutral-700); }
+.tqs-inverse a { color: var(--tqs-white); }
+.tqs-inverse a:hover { color: var(--tqs-mist); }
+
+/* The accent bar — the correct way to get yellow emphasis into a light layout. */
+.tqs-accent-bar { border-left: var(--tqs-accent-bar) solid var(--tqs-yellow); padding-left: var(--tqs-space-4); }
+.tqs-accent-rule { border-bottom: var(--tqs-accent-bar) solid var(--tqs-yellow); padding-bottom: var(--tqs-space-2); display: inline-block; }
+
+/* Dot grid motif: yellow, 40%, 8x6, right-anchored. Decorative — aria-hidden it. */
+.tqs-dot-grid {
+  background-image: radial-gradient(var(--tqs-yellow) 1.5px, transparent 1.6px);
+  background-size: 14px 14px;
+  opacity: var(--tqs-dot-grid-opacity);
+  width: 112px; height: 84px;
+}
+
+/* Tabular figures for data displays. */
+.tqs-tnum { font-variant-numeric: tabular-nums; }
+
+/* Light island inside a dark section. The ink surface is a context, so a white
+   card placed inside .tqs-inverse would otherwise inherit white text. Put
+   .tqs-light on that card to restore the light token values. */
+.tqs-light {
+  --tqs-surface: var(--tqs-white);
+  --tqs-surface-subtle: var(--tqs-neutral-50);
+  --tqs-text-primary: var(--tqs-ink);
+  --tqs-text-secondary: var(--tqs-neutral-600);
+  --tqs-text-disabled: var(--tqs-neutral-400);
+  --tqs-border-subtle: var(--tqs-neutral-200);
+  --tqs-border: var(--tqs-gray);
+  --tqs-border-strong: var(--tqs-neutral-500);
+  --tqs-info-text: #086dd3;
+  --tqs-success-text: #1e8237;
+  --tqs-warning-text: #867400;
+  --tqs-danger-text: #ca372e;
+  --tqs-info-surface: #e6f3ff;
+  --tqs-success-surface: #eafaee;
+  --tqs-warning-surface: #fffce6;
+  --tqs-danger-surface: #ffeceb;
+  background-color: var(--tqs-surface);
+  color: var(--tqs-text-primary);
+}
+
+</style>
+<style></style>
+<script src="assets/lucide.js"></script>
+<script src="assets/tqs-ds.js"></script>
+<style>::view-transition-old(root),::view-transition-new(root){animation-duration:160ms;animation-timing-function:cubic-bezier(0.2,0,0,1)}::view-transition-group(sidebar),::view-transition-group(topbar){animation-duration:0s}body{margin:0;font-family:"Geist","Open Sans",system-ui,sans-serif;background:#f7f7f8;color:#212322;-webkit-font-smoothing:antialiased}a{color:#4f46e5}a:hover{color:#4338ca}input::placeholder,textarea::placeholder{color:#8d8d8d}@keyframes acSlide{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes acFade{from{opacity:0}to{opacity:1}}</style>
+<script src="assets/qnet-nav.js"></script>
+</helmet>
+<div data-screen-label="Action Center" style="display:flex;min-height:100vh;min-width:1280px;background:#f7f7f8">
+<aside aria-label="Primary" style="position:sticky;top:0;align-self:flex-start;width:240px;height:100vh;flex-shrink:0;background:#161616;border-right:1px solid #161616;display:flex;flex-direction:column;padding:16px 12px;box-sizing:border-box;overflow-y:auto">
+<div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 4px 0 8px;margin-bottom:20px">
+<a href="dashboard.html" aria-label="Qnet home" style="display:flex;align-items:center;text-decoration:none;color:#ffffff;font-size:22px;font-weight:800;letter-spacing:-0.01em;line-height:1">QNET</a>
+<button type="button" aria-label="Collapse sidebar" style="margin-left:auto;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:#aaaaaa;cursor:pointer" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="panel-left" size="18" hint-size="18px,18px"></x-import></button>
+</div>
+<div style="padding:0 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">Overview</div>
+<nav aria-label="Overview" style="display:flex;flex-direction:column;gap:2px">
+<a href="dashboard.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="layout-grid" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Dashboard</span></a>
+<a href="metrics.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="trending-up" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Metrics</span></a>
+</nav>
+<div style="padding:24px 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">Operations</div>
+<nav aria-label="Operations" style="display:flex;flex-direction:column;gap:2px">
+<a href="quality-issues.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="bell" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Quality Issues</span></a>
+<a href="locations.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="map-pin" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Locations</span></a>
+<a href="agreements.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="file-text" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Agreements</span></a>
+<a href="part-management.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="package" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Part Management</span></a>
+<a href="action-center.html" aria-current="page" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c7d2fe;background:rgba(99,102,241,0.22);text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#a5b4fc"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="clipboard-check" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Action Center</span></a>
+</nav>
+<div style="padding:24px 8px 8px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8d8d8d">System</div>
+<nav aria-label="System" style="display:flex;flex-direction:column;gap:2px">
+<a href="account.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="user" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Account</span></a>
+<a href="settings.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="settings" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Settings</span></a>
+<a href="index.html" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;color:#c4c6c8;background:transparent;text-decoration:none" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="log-out" size="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:0">Log Out</span></a>
+</nav>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:2px;padding-top:16px;border-top:1px solid #2a2a2a">
+<button type="button" role="switch" aria-checked="false" style="display:flex;align-items:center;gap:10px;height:44px;padding:0 12px;border-radius:8px;border:none;background:transparent;font:inherit;font-size:16px;font-weight:600;color:#c4c6c8;cursor:pointer;text-align:left" style-hover="background:rgba(255,255,255,0.06);color:#ffffff"><span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="moon" size="18" hint-size="18px,18px"></x-import></span><span style="flex:1">Dark mode</span><span aria-hidden="true" style="position:relative;width:32px;height:18px;border-radius:999px;background:#3a3a3a;flex-shrink:0"><span style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:999px;background:#ffffff"></span></span></button>
+</div>
+</aside>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column">
+<header style="view-transition-name:topbar;position:sticky;top:0;z-index:5;display:flex;align-items:center;height:60px;padding:0 32px;background:#ffffff;border-bottom:1px solid #e2e2e2;box-sizing:border-box">
+<nav aria-label="Breadcrumb" style="display:flex;align-items:center;gap:8px;font-size:13px;min-width:0">
+<sc-for list="{{ nav.crumbs }}" as="c" hint-placeholder-count="2"><sc-if value="{{ c.sep }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="display:flex;color:#8d8d8d"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-right" size="14" hint-size="14px,14px"></x-import></span></sc-if><sc-if value="{{ c.link }}" hint-placeholder-val="{{ true }}"><a href="{{ c.href }}" style="color:#6b6b6b;text-decoration:none;white-space:nowrap" style-hover="color:#212322;text-decoration:underline">{{ c.label }}</a></sc-if><sc-if value="{{ c.cur }}" hint-placeholder-val="{{ false }}"><span aria-current="page" style="color:#212322;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.label }}</span></sc-if></sc-for>
+</nav>
+<div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+<span style="font-size:14px;font-weight:500;color:#212322">Daniel Brown</span>
+<span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:999px;background:#eef2ff;color:#212322;font-size:12px;font-weight:600">DB</span>
+</div>
+</header>
+
+<main style="flex:1;padding:32px clamp(32px,4vw,64px) 48px;box-sizing:border-box">
+<div style="max-width:1440px;margin:0 auto">
+<sc-if value="{{ nav.hasBack }}" hint-placeholder-val="{{ false }}"><a href="{{ nav.backHref }}" style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin:0 0 12px -2px;padding:2px;border-radius:6px;font-size:14px;font-weight:600;color:#555555;text-decoration:none" style-hover="color:#212322;text-decoration:underline" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-left" size="16" hint-size="16px,16px"></x-import>Back to {{ nav.backLabel }}</a></sc-if>
+<h1 style="margin:0;font-size:26px;line-height:1.2;letter-spacing:-0.02em;font-weight:600;color:#212322">Action Center</h1>
+<p style="margin:6px 0 0;font-size:14px;line-height:1.55;color:#6b6b6b">Both tasks are required at each location before close-out</p>
+
+<div role="tablist" aria-label="Locations" style="display:flex;gap:24px;margin-top:20px;border-bottom:1px solid #e2e2e2">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{ t.active }}" sc-camel-on-click="{{ t.pick }}" style="{{ t.style }}">{{ t.label }}</button>
+</sc-for>
+</div>
+
+<div style="display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start;margin-top:24px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div role="button" tabindex="0" sc-camel-on-click="{{ openChecklist }}" style="{{ clCardStyle }}" style-hover="border-color:#aaaaaa">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="{{ clIconStyle }}"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="clipboard-list" size="15" hint-size="15px,15px"></x-import></span>
+<span style="flex:1;font-size:15px;font-weight:600;color:#212322">Daily checklist</span>
+<span style="{{ clBadgeStyle }}">{{ clBadgeText }}</span>
+</div>
+<div style="display:flex;flex-direction:column;margin:12px -6px 0">
+<sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+<button type="button" sc-camel-on-click="{{ s.pick }}" style="{{ s.rowStyle }}" style-hover="background:#f4f4f4" style-focus="outline:2px solid #212322;outline-offset:-2px">
+<span style="{{ s.labelStyle }}">{{ s.label }}</span>
+<span style="{{ s.subStyle }}">{{ s.sub }}</span>
+<span style="display:flex;color:#aaaaaa"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-right" size="14" hint-size="14px,14px"></x-import></span>
+</button>
+</sc-for>
+</div>
+<sc-if value="{{ showClBtn }}" hint-placeholder-val="{{ true }}">
+<button type="button" sc-camel-on-click="{{ openChecklist }}" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;height:36px;margin-top:12px;border-radius:8px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#212322;border-color:#212322;color:#ffffff" style-focus="outline:2px solid #4f46e5;outline-offset:2px">{{ clBtnLabel }}<x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-right" size="14" hint-size="14px,14px"></x-import></button>
+</sc-if>
+</div>
+
+<div role="button" tabindex="0" sc-camel-on-click="{{ openAudits }}" style="{{ auCardStyle }}" style-hover="border-color:#aaaaaa">
+<div style="display:flex;align-items:center;gap:10px">
+<span style="{{ auIconStyle }}"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="shield-check" size="15" hint-size="15px,15px"></x-import></span>
+<span style="flex:1;font-size:15px;font-weight:600;color:#212322">Proactive audits</span>
+<span style="{{ auBadgeStyle }}">{{ auBadgeText }}</span>
+</div>
+<div style="height:6px;margin-top:14px;border-radius:999px;background:#f4f4f4;overflow:hidden"><div style="{{ auBarStyle }}"></div></div>
+<div style="margin-top:8px;font-size:13px;color:#6b6b6b">{{ auSummary }}</div>
+<sc-if value="{{ showAuBtn }}" hint-placeholder-val="{{ false }}">
+<button type="button" sc-camel-on-click="{{ openAudits }}" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;height:36px;margin-top:12px;border-radius:8px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#212322;border-color:#212322;color:#ffffff" style-focus="outline:2px solid #4f46e5;outline-offset:2px">View audits<x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-right" size="14" hint-size="14px,14px"></x-import></button>
+</sc-if>
+</div>
+<div style="display:flex;align-items:center;gap:6px;padding:0 4px;font-size:12px;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="cloud" size="13" hint-size="13px,13px"></x-import><span>{{ savedText }}</span></div>
+</div>
+
+<section style="min-width:0;min-height:560px;background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.03)">
+<sc-if value="{{ isAudits }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid #f4f4f4">
+<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid #e2e2e2;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="{{ auHeadIcon }}" size="15" hint-size="15px,15px"></x-import></span>
+<h2 style="margin:0;font-size:15px;font-weight:600;color:#212322">Proactive audits</h2>
+<div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+<div style="display:inline-flex;align-items:center;gap:2px;height:34px;padding:0 3px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff">
+<button type="button" aria-label="Previous week" sc-camel-on-click="{{ prevWeek }}" disabled="{{ atMinWeek }}" style="{{ prevWkStyle }}" style-hover="background:#f4f4f4"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-left" size="14" hint-size="14px,14px"></x-import></button>
+<span style="display:inline-flex;align-items:center;gap:6px;padding:0 6px;font-size:13px;font-weight:600;color:#212322;white-space:nowrap"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="calendar" size="13" hint-size="13px,13px"></x-import></span>{{ weekLabel }}</span>
+<button type="button" aria-label="Next week" sc-camel-on-click="{{ nextWeek }}" disabled="{{ atThisWeek }}" style="{{ nextWkStyle }}" style-hover="background:#f4f4f4"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-right" size="14" hint-size="14px,14px"></x-import></button>
+</div>
+<span style="position:relative;display:block;width:200px"><span aria-hidden="true" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);display:flex;color:#6b6b6b;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="search" size="14" hint-size="14px,14px"></x-import></span><input type="search" aria-label="Search customers" placeholder="Search customers" value="{{ q }}" sc-camel-on-input="{{ onQ }}" style="height:34px;width:100%;box-sizing:border-box;padding:0 10px 0 30px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:13px;outline:none" style-focus="border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></span>
+</div>
+</div>
+<div style="padding:20px">
+<sc-if value="{{ showMissedNote }}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:10px 14px;border-radius:10px;background:#fff1f2;border:1px solid #fecdd3;color:#9f1239;font-size:13px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="circle-alert" size="15" hint-size="15px,15px"></x-import>{{ missedNote }}</div>
+</sc-if>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start">
+<sc-for list="{{ lanes }}" as="lane" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+<div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 6px">
+<span aria-hidden="true" style="{{ lane.dotStyle }}"></span>
+<h3 style="margin:0;font-size:13px;font-weight:600;color:#212322;white-space:nowrap">{{ lane.title }}</h3>
+<span style="{{ lane.countStyle }}">{{ lane.count }}</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;max-height:560px;overflow-y:auto">
+<sc-for list="{{ lane.rows }}" as="r" hint-placeholder-count="3">
+<article sc-camel-on-click="{{ r.onOpen }}" style="{{ r.style }}" style-hover="box-shadow:0 2px 8px rgba(33,35,34,0.08);border-color:#aaaaaa">
+<div style="display:flex;align-items:flex-start;gap:8px">
+<div style="flex:1;min-width:0">
+<h4 style="margin:0;font-size:14px;font-weight:600;line-height:1.35;color:#212322">{{ r.short }}</h4>
+<div style="margin-top:3px;font-size:12px;color:#6b6b6b">{{ r.meta }}</div>
+</div>
+<sc-if value="{{ r.viewable }}" hint-placeholder-val="{{ false }}"><span style="display:flex;color:#aaaaaa;margin-top:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-right" size="16" hint-size="16px,16px"></x-import></span></sc-if>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #f4f4f4">
+<span style="{{ r.pillStyle }}"><sc-if value="{{ r.hasDone }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="check" size="12" hint-size="12px,12px"></x-import></sc-if>{{ r.pill }}</span>
+<sc-if value="{{ r.live }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#212322;white-space:nowrap"><span style="position:relative;display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:999px;background:#eef2ff;color:#212322;font-size:9px;font-weight:700">DB<span style="position:absolute;right:-1px;bottom:-1px;width:7px;height:7px;border-radius:999px;background:#22c55e;border:1.5px solid #ffffff"></span></span>Daniel is editing</span></sc-if>
+<sc-if value="{{ r.canLog }}" hint-placeholder-val="{{ true }}"><button type="button" sc-camel-on-click="{{ r.onLog }}" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:8px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:#212322;border-color:#212322;color:#ffffff" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="plus" size="14" hint-size="14px,14px"></x-import>Audit</button></sc-if>
+</div>
+</article>
+</sc-for>
+<sc-if value="{{ lane.empty }}" hint-placeholder-val="{{ false }}">
+<div style="padding:28px 12px;text-align:center;border:1px dashed #d2d2d2;border-radius:10px;background:#ffffff"><div style="font-size:14px;font-weight:600;color:#212322">{{ lane.emptyT }}</div><div style="margin-top:4px;font-size:13px;color:#6b6b6b">{{ lane.emptyS }}</div></div>
+</sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isChecklist }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid #f4f4f4">
+<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid #e2e2e2;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="clipboard-list" size="15" hint-size="15px,15px"></x-import></span>
+<h2 style="margin:0;font-size:15px;font-weight:600;color:#212322">Daily checklist</h2>
+<span style="{{ clStatusStyle }}">{{ clStatus }}</span>
+<span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid #d2d2d2;border-radius:8px;font-size:13px;font-weight:600;color:#212322;white-space:nowrap"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="calendar" size="13" hint-size="13px,13px"></x-import></span>Wed, Aug 12</span>
+</div>
+<div role="tablist" aria-label="Checklist sections" style="display:flex;gap:24px;padding:0 20px;border-bottom:1px solid #e2e2e2">
+<sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{ s.on }}" sc-camel-on-click="{{ s.pick }}" style="{{ s.tabStyle }}"><span style="{{ s.tabDot }}"></span>{{ s.label }}</button>
+</sc-for>
+</div>
+<div style="padding:24px;display:flex;flex-direction:column;gap:18px;max-width:640px">
+<sc-if value="{{ secSite }}" hint-placeholder-val="{{ true }}">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;color:#212322">Location notes</span><textarea rows="4" placeholder="Anything notable on the floor today" value="{{ f.notes }}" sc-camel-on-input="{{ onNotes }}" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none" style-focus="border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></textarea></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;color:#212322">Production volume today</span><input type="text" placeholder="e.g. 12,400 units" value="{{ f.vol }}" sc-camel-on-input="{{ onVol }}" style="height:40px;width:100%;box-sizing:border-box;padding:0 12px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+</sc-if>
+<sc-if value="{{ secReturns }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;color:#212322">Customer</span><sc-raw-select value="{{ f.cust }}" sc-camel-on-change="{{ onCust }}" style="height:40px;width:100%;box-sizing:border-box;padding:0 12px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none;cursor:pointer" style-focus="border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><sc-for list="{{ custOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for></sc-raw-select></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;color:#212322">Part</span><sc-raw-select value="{{ f.part }}" sc-camel-on-change="{{ onPart }}" style="height:40px;width:100%;box-sizing:border-box;padding:0 12px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none;cursor:pointer" style-focus="border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><sc-for list="{{ partOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for></sc-raw-select></label>
+</div>
+<button type="button" sc-camel-on-click="{{ addReturn }}" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;border-radius:8px;border:1px dashed #aaaaaa;background:#fafafa;color:#212322;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#f4f4f4;border-color:#212322" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="plus" size="15" hint-size="15px,15px"></x-import>Add returned part</button>
+<sc-for list="{{ returns }}" as="rt" hint-placeholder-count="0">
+<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e2e2e2;border-radius:8px;background:#ffffff"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="package" size="15" hint-size="15px,15px"></x-import></span><span style="flex:1;min-width:0;font-size:14px;color:#212322;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ rt.label }}</span><button type="button" aria-label="Remove" sc-camel-on-click="{{ rt.remove }}" style="display:flex;border:none;background:none;color:#8d8d8d;cursor:pointer;padding:4px;border-radius:6px" style-hover="background:#f4f4f4;color:#212322"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="x" size="14" hint-size="14px,14px"></x-import></button></div>
+</sc-for>
+</sc-if>
+<sc-if value="{{ secNotes }}" hint-placeholder-val="{{ false }}">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:600;color:#212322">Notes</span><textarea rows="5" placeholder="Anything a customer flagged or asked for" value="{{ f.cnotes }}" sc-camel-on-input="{{ onCnotes }}" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none" style-focus="border-color:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></textarea></label>
+</sc-if>
+<div style="display:flex;justify-content:flex-end;gap:8px;padding-top:18px;border-top:1px solid #f4f4f4">
+<button type="button" sc-camel-on-click="{{ openAudits }}" style="height:38px;padding:0 16px;border-radius:8px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f4" style-focus="outline:2px solid #4f46e5;outline-offset:2px">Back to audits</button>
+<button type="button" sc-camel-on-click="{{ completeSec }}" style="display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 18px;border-radius:8px;border:1px solid transparent;background:#4f46e5;color:#ffffff;font:inherit;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(33,35,34,0.12)" style-hover="background:#4338ca" style-focus="outline:2px solid #4f46e5;outline-offset:2px">{{ nextLabel }}<x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-right" size="16" hint-size="16px,16px"></x-import></button>
+</div>
+</div>
+</sc-if>
+</section>
+</div>
+</div>
+</main>
+</div>
+
+<sc-if value="{{ hasPanel }}" hint-placeholder-val="{{ false }}">
+<div sc-camel-on-click="{{ closePanel }}" style="position:fixed;inset:0;z-index:59;background:rgba(33,35,34,0.32);animation:acFade 160ms ease-out"></div>
+<aside role="dialog" aria-modal="true" aria-label="Audits" style="position:fixed;top:0;right:0;bottom:0;z-index:60;width:{{ asideW }};max-width:100vw;transition:width 220ms cubic-bezier(0.2,0,0,1);display:flex;flex-direction:column;background:#ffffff;border-left:1px solid #e2e2e2;box-shadow:-16px 0 40px rgba(33,35,34,0.16);animation:acSlide 220ms cubic-bezier(0.2,0,0,1)">
+<div style="display:flex;align-items:flex-start;gap:12px;padding:16px 20px;border-bottom:1px solid #e2e2e2">
+<div style="flex:1;min-width:0">
+<div style="margin-bottom:4px;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#6b6b6b">Proactive Audit</div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0;font-size:18px;font-weight:600;letter-spacing:-0.01em;color:#212322;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.short }}</h2><span style="display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 10px;border-radius:999px;background:#eef2ff;color:#212322;font-size:12px;font-weight:600;white-space:nowrap"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="map-pin" size="13" hint-size="13px,13px"></x-import>{{ p.loc }}</span><span style="display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;background:#dcfce7;color:#166534;font-size:11px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums">{{ p.countText }}</span></div>
+<div style="margin-top:3px;font-size:13px;color:#6b6b6b">{{ p.meta }}</div>
+</div>
+<button type="button" aria-label="Close" sc-camel-on-click="{{ closePanel }}" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;border:none;background:transparent;color:#6b6b6b;cursor:pointer" style-hover="background:#f4f4f4;color:#212322" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="x" size="18" hint-size="18px,18px"></x-import></button>
+</div>
+<div style="flex:1;overflow-y:auto;padding:20px;background:#f7f7f8;display:flex;flex-direction:column;gap:12px">
+<sc-if value="{{ pIsForm }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:16px;padding:18px;background:#ffffff;border:1px solid #e2e2e2;border-radius:12px">
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Lot date<span aria-label="required" style="color:#be123c">*</span></span><input type="date" value="{{ af.lot }}" sc-camel-on-input="{{ afLot }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+<div style="display:flex;flex-direction:column;gap:8px">
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Part<span aria-label="required" style="color:#be123c">*</span></span><span style="position:relative;display:block"><sc-raw-select value="{{ af.part }}" sc-camel-on-change="{{ afPart }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none;padding-right:40px;appearance:none;cursor:pointer" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option value="">Select a part</option><sc-for list="{{ auditPartOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o }}">{{ o }}</option></sc-for></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+<button type="button" sc-camel-on-click="{{ afStartPart }}" style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;height:28px;padding:0 4px;border:none;border-radius:6px;background:transparent;color:#4f46e5;font:inherit;font-size:14px;font-weight:600;cursor:pointer" style-hover="text-decoration:underline" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="plus" size="15" hint-size="15px,15px"></x-import>Add a new part</button>
+</div>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Were any issues found?<span aria-label="required" style="color:#be123c">*</span></span><span style="position:relative;display:block"><sc-raw-select value="{{ afIssueVal }}" sc-camel-on-change="{{ afIssueChange }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none;padding-right:40px;appearance:none;cursor:pointer" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option value="">Select an option</option><option value="no">No issues found</option><option value="yes">Yes — issue found</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Serial number</span><input type="text" value="{{ af.serial }}" sc-camel-on-input="{{ afSerial }}" placeholder="Optional" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+</div>
+<label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Notes<span aria-label="required" style="color:#be123c">*</span></span><textarea rows="4" sc-camel-max-length="1000" value="{{ af.notes }}" sc-camel-on-input="{{ afNotes }}" style="width:100%;box-sizing:border-box;min-height:110px;padding:12px 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;line-height:1.5;resize:vertical;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></textarea><span style="align-self:flex-end;font-size:13px;color:#6b6b6b;font-variant-numeric:tabular-nums">{{ afNotesCount }}/1000</span></label>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Attachments</span>
+<sc-if value="{{ afNoFile }}" hint-placeholder-val="{{ true }}"><button type="button" sc-camel-on-click="{{ afAttach }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:112px;border:1px dashed #aaaaaa;border-radius:10px;background:#fafafa;color:#383838;font:inherit;cursor:pointer" style-hover="background:#f4f4f4;border-color:#4f46e5" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="cloud-upload" size="22" hint-size="22px,22px"></x-import><span style="font-size:14px"><span style="color:#4f46e5;font-weight:600;text-decoration:underline">Click to upload</span> or drag &amp; drop</span></button></sc-if>
+<sc-if value="{{ afHasFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:10px;height:48px;padding:0 8px 0 14px;border:1px solid #e2e2e2;border-radius:8px"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="paperclip" size="16" hint-size="16px,16px"></x-import></span><span style="flex:1;min-width:0;font-size:14px;color:#212322;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ af.file }}</span><button type="button" aria-label="Remove attachment" sc-camel-on-click="{{ afRemoveFile }}" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:none;border-radius:6px;background:transparent;color:#6b6b6b;cursor:pointer" style-hover="background:#f4f4f4;color:#212322" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="x" size="15" hint-size="15px,15px"></x-import></button></div></sc-if>
+</div>
+</div>
+</sc-if>
+<sc-for list="{{ entries }}" as="e" hint-placeholder-count="2">
+<div style="padding:14px 16px;background:#ffffff;border:1px solid #e2e2e2;border-radius:12px">
+<div style="display:flex;align-items:flex-start;gap:8px">
+<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:#212322">{{ e.part }}</div><div style="margin-top:2px;font-size:12px;color:#6b6b6b;font-variant-numeric:tabular-nums">Lot date: {{ e.lot }}</div></div>
+<span style="{{ e.resultStyle }}"><span aria-hidden="true" style="{{ e.resultDot }}"></span>{{ e.result }}</span>
+<sc-if value="{{ e.editable }}" hint-placeholder-val="{{ false }}"><button type="button" aria-label="Edit audit" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;margin:-2px -6px 0 0;border:none;border-radius:6px;background:none;color:#8d8d8d;cursor:pointer" style-hover="background:#f4f4f4;color:#212322"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="pencil" size="14" hint-size="14px,14px"></x-import></button></sc-if>
+<sc-if value="{{ e.locked }}" hint-placeholder-val="{{ true }}"><span title="View only" style="display:flex;color:#aaaaaa;margin-top:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="lock" size="13" hint-size="13px,13px"></x-import></span></sc-if>
+</div>
+<div style="margin-top:10px;font-size:12px;color:#6b6b6b">Serial: <span style="color:#383838;font-variant-numeric:tabular-nums">{{ e.serial }}</span></div>
+<p style="margin:8px 0 0;font-size:13px;line-height:1.55;color:#383838">{{ e.notes }}</p>
+<sc-if value="{{ e.hasFile }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;height:26px;padding:0 10px;border-radius:6px;background:#f4f4f4;color:#383838;font-size:12px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="paperclip" size="12" hint-size="12px,12px"></x-import>{{ e.file }}</span></sc-if>
+<div style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid #f4f4f4;font-size:12px;color:#6b6b6b"><span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:999px;background:#f4f4f4;color:#383838;font-size:9px;font-weight:700">{{ e.initials }}</span><span>{{ e.byLine }}</span></div>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ pEditable }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:8px;padding:14px 20px;border-top:1px solid #e2e2e2">
+<button type="button" sc-camel-on-click="{{ closePanel }}" style="flex:1;height:40px;border-radius:8px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f4" style-focus="outline:2px solid #4f46e5;outline-offset:2px">{{ pCancelLabel }}</button>
+<button type="button" sc-camel-on-click="{{ pPrimary }}" disabled="{{ pPrimaryDisabled }}" style="{{ pPrimaryStyle }}" style-focus="outline:2px solid #4f46e5;outline-offset:2px">{{ pPrimaryLabel }}</button>
+</div>
+</sc-if>
+</aside>
+<sc-if value="{{ afAddingPart }}" hint-placeholder-val="{{ false }}">
+<div sc-camel-on-click="{{ npCancel }}" style="position:fixed;inset:0;z-index:61;background:rgba(33,35,34,0.18)"></div>
+<aside role="dialog" aria-modal="true" aria-labelledby="np-title" style="position:fixed;top:0;right:0;bottom:0;z-index:62;width:min(560px,100vw);display:flex;flex-direction:column;min-height:0;background:#f7f7f8;border-left:1px solid #e2e2e2;box-shadow:-16px 0 40px rgba(33,35,34,0.18)">
+<div style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid #e2e2e2;background:#ffffff">
+<button type="button" aria-label="Back to audit" title="Back to audit" sc-camel-on-click="{{ npCancel }}" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex-shrink:0;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#383838;cursor:pointer" style-hover="background:#f4f4f4;color:#212322" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="arrow-left" size="16" hint-size="16px,16px"></x-import></button>
+<div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#6b6b6b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Proactive Audit · {{ p.short }}</div><h2 id="np-title" style="margin:2px 0 0;font-size:18px;font-weight:600;color:#212322">New Part</h2></div>
+</div>
+<div style="flex:1;overflow-y:auto;padding:16px 20px 20px;display:flex;flex-direction:column;gap:20px">
+<section style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:8px;padding:0 2px"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="package" size="16" hint-size="16px,16px"></x-import></span><h3 style="margin:0;font-size:15px;font-weight:600;color:#212322">Basic Part Information</h3><span tabindex="0" aria-label="More info" aria-describedby="nptip-basic" sc-camel-on-mouse-enter="{{ npTipOn.basic }}" sc-camel-on-mouse-leave="{{ npTipOff }}" sc-camel-on-focus="{{ npTipOn.basic }}" sc-camel-on-blur="{{ npTipOff }}" style="position:relative;display:flex;color:#8d8d8d;cursor:help;border-radius:999px;outline:none" style-hover="color:#212322" style-focus="color:#212322;box-shadow:0 0 0 2px #4f46e5"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="info" size="15" hint-size="15px,15px"></x-import><sc-if value="{{ npTip.basic }}" hint-placeholder-val="{{ false }}"><span id="nptip-basic" role="tooltip" style="position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);z-index:30;width:260px;padding:8px 10px;border-radius:8px;background:#212322;color:#ffffff;font-size:12px;font-weight:400;line-height:1.45;text-align:left;box-shadow:0 8px 24px rgba(33,35,34,0.2);pointer-events:none">Disabled if this is not a new part to prevent modifying another location's information. Please contact your manager if any of these fields need updated.<span aria-hidden="true" style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #212322"></span></span></sc-if></span></div>
+<div style="display:flex;flex-direction:column;gap:14px;padding:16px;background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.04);margin-top:4px">
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Part Number<span aria-label="required" style="color:#be123c">*</span></span><input type="text" value="{{ np.v.num }}" sc-camel-on-input="{{ np.on.num }}" placeholder="e.g. ABC 123-LH" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Production Team<span aria-label="required" style="color:#be123c">*</span></span><span style="position:relative;display:block"><sc-raw-select value="{{ np.v.team }}" sc-camel-on-change="{{ np.on.team }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none;padding-right:40px;appearance:none;cursor:pointer" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option value="">Select…</option><option value="Body Shop">Body Shop</option><option value="Paint">Paint</option><option value="General Assembly">General Assembly</option><option value="Chassis">Chassis</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Part Category<span aria-label="required" style="color:#be123c">*</span></span><span style="position:relative;display:block"><sc-raw-select value="{{ np.v.cat }}" sc-camel-on-change="{{ np.on.cat }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none;padding-right:40px;appearance:none;cursor:pointer" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option value="">Select…</option><option value="Body">Body</option><option value="Chassis">Chassis</option><option value="Bracket">Bracket</option><option value="Trim">Trim</option><option value="Hose">Hose</option><option value="Interior">Interior</option><option value="Hood Support">Hood Support</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Description<span aria-label="required" style="color:#be123c">*</span></span><input type="text" value="{{ np.v.desc }}" sc-camel-on-input="{{ np.on.desc }}" placeholder="e.g. Front right wheel liner" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+</div>
+</div>
+</section>
+<section style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:8px;padding:0 2px"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="map-pin" size="16" hint-size="16px,16px"></x-import></span><h3 style="margin:0;font-size:15px;font-weight:600;color:#212322">Location Specific Information for {{ p.loc }}</h3><span tabindex="0" aria-label="More info" aria-describedby="nptip-loc" sc-camel-on-mouse-enter="{{ npTipOn.loc }}" sc-camel-on-mouse-leave="{{ npTipOff }}" sc-camel-on-focus="{{ npTipOn.loc }}" sc-camel-on-blur="{{ npTipOff }}" style="position:relative;display:flex;color:#8d8d8d;cursor:help;border-radius:999px;outline:none" style-hover="color:#212322" style-focus="color:#212322;box-shadow:0 0 0 2px #4f46e5"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="info" size="15" hint-size="15px,15px"></x-import><sc-if value="{{ npTip.loc }}" hint-placeholder-val="{{ false }}"><span id="nptip-loc" role="tooltip" style="position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);z-index:30;width:260px;padding:8px 10px;border-radius:8px;background:#212322;color:#ffffff;font-size:12px;font-weight:400;line-height:1.45;text-align:left;box-shadow:0 8px 24px rgba(33,35,34,0.2);pointer-events:none">This information only applies to this service location.<span aria-hidden="true" style="position:absolute;left:50%;bottom:100%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:6px solid #212322"></span></span></sc-if></span></div>
+<div style="display:flex;flex-direction:column;gap:14px;padding:16px;background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.04);margin-top:4px">
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Part Platform<span aria-label="required" style="color:#be123c">*</span></span><span style="position:relative;display:block"><sc-raw-select value="{{ np.v.platform }}" sc-camel-on-change="{{ np.on.platform }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none;padding-right:40px;appearance:none;cursor:pointer" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option value="">Select…</option><option value="K2XX">K2XX</option><option value="T1XX">T1XX</option><option value="C1XX">C1XX</option><option value="BEV3">BEV3</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Part Program</span><input type="text" value="{{ np.v.program }}" sc-camel-on-input="{{ np.on.program }}" placeholder="e.g. K2UC" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">User Location (ULOC)<span aria-label="required" style="color:#be123c">*</span></span><input type="text" value="{{ np.v.uloc }}" sc-camel-on-input="{{ np.on.uloc }}" placeholder="e.g. Body Shop" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Delivery Location (DLOC)<span aria-label="required" style="color:#be123c">*</span></span><input type="text" value="{{ np.v.dloc }}" sc-camel-on-input="{{ np.on.dloc }}" placeholder="e.g. Receiving Dock 7" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"></label>
+<label style="display:flex;flex-direction:column;gap:8px;min-width:0"><span style="display:flex;gap:4px;font-size:14px;font-weight:600;color:#212322">Where does this part come from?<span aria-label="required" style="color:#be123c">*</span></span><span style="position:relative;display:block"><sc-raw-select value="{{ np.v.source }}" sc-camel-on-change="{{ np.on.source }}" style="height:44px;width:100%;box-sizing:border-box;padding:0 14px;border:1px solid #d2d2d2;border-radius:8px;background:#ffffff;color:#212322;font:inherit;font-size:14px;outline:none;padding-right:40px;appearance:none;cursor:pointer" style-focus="border-color:#212322;box-shadow:0 0 0 3px rgba(79,70,229,0.15)"><option value="">Select…</option><option value="Warehouse">Warehouse</option><option value="Sequencer">Sequencer</option><option value="Direct-Ship">Direct-Ship</option></sc-raw-select><span aria-hidden="true" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;color:#383838;pointer-events:none"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="chevron-down" size="18" hint-size="18px,18px"></x-import></span></span></label>
+</div>
+</div>
+</section>
+<section style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:8px;padding:0 2px"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="image" size="16" hint-size="16px,16px"></x-import></span><h3 style="margin:0;font-size:15px;font-weight:600;color:#212322">Sample Part for Reference</h3><span aria-label="required" style="color:#be123c;font-weight:600">*</span></div>
+<div style="display:flex;flex-direction:column;gap:14px;padding:16px;background:#ffffff;border:1px solid #e2e2e2;border-radius:12px;box-shadow:0 1px 2px rgba(33,35,34,0.04)">
+<sc-if value="{{ np.noFile }}" hint-placeholder-val="{{ true }}"><button type="button" sc-camel-on-click="{{ np.attach }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:104px;border:1px dashed #aaaaaa;border-radius:10px;background:#fafafa;color:#383838;font:inherit;cursor:pointer" style-hover="background:#f4f4f4;border-color:#4f46e5" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="cloud-upload" size="22" hint-size="22px,22px"></x-import><span style="font-size:14px"><span style="color:#4f46e5;font-weight:600;text-decoration:underline">Click to upload</span> or drag &amp; drop</span><span style="font-size:12px;color:#6b6b6b">PNG, JPG, PPT, PDF up to 20MB</span></button></sc-if>
+<sc-if value="{{ np.hasFile }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:10px;height:48px;padding:0 8px 0 14px;border:1px solid #e2e2e2;border-radius:8px"><span style="display:flex;color:#6b6b6b"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="image" size="16" hint-size="16px,16px"></x-import></span><span style="flex:1;min-width:0;font-size:14px;color:#212322;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ np.v.file }}</span><button type="button" aria-label="Remove file" sc-camel-on-click="{{ np.removeFile }}" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:none;border-radius:6px;background:transparent;color:#6b6b6b;cursor:pointer" style-hover="background:#f4f4f4;color:#212322" style-focus="outline:2px solid #4f46e5;outline-offset:2px"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="x" size="15" hint-size="15px,15px"></x-import></button></div></sc-if>
+</div>
+</section>
+</div>
+<div style="display:flex;gap:8px;padding:14px 20px;border-top:1px solid #e2e2e2;background:#ffffff">
+<button type="button" sc-camel-on-click="{{ npCancel }}" style="flex:1;height:40px;border-radius:8px;border:1px solid #d2d2d2;background:#ffffff;color:#212322;font:inherit;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#f4f4f4" style-focus="outline:2px solid #4f46e5;outline-offset:2px">Back to audit</button>
+<button type="button" sc-camel-on-click="{{ np.save }}" aria-disabled="{{ np.cantSave }}" style="{{ np.saveStyle }}" style-focus="outline:2px solid #4f46e5;outline-offset:2px">Save part</button>
+</div>
+</aside>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+<div role="status" style="position:fixed;left:50%;bottom:32px;transform:translateX(-50%);z-index:120;display:flex;align-items:center;gap:10px;padding:10px 14px;background:#212322;color:#ffffff;border-radius:10px;box-shadow:0 8px 24px rgba(33,35,34,0.24);font-size:13px;font-weight:500"><span style="display:flex;color:#22c55e"><x-import component-from-global-scope="TQSDesignSystem_42d4d9.Icon" name="circle-check" size="16" hint-size="16px,16px"></x-import></span><span>{{ toast }}</span></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="">
+class Component extends DCLogic {
+  static LOCS = [{ id: "flint", name: "GM · Flint" }, { id: "warren", name: "Stellantis · Warren" }, { id: "dearborn", name: "Ford · Dearborn" }];
+  static STEPS = [{ k: "site", t: "Site overview" }, { k: "returns", t: "Part returns" }, { k: "notes", t: "Customer notes" }];
+  static OWED = [["o1","Lear Seating - Detroit, MI","flint","Trim",1,1],["o2","BorgWarner - Auburn Hills, MI","dearborn","Chassis",1,0],["o3","Adient - Plymouth, MI","dearborn","Final",1,0],["o4","Magna Cosma - Warren, MI","warren","Body / Paint",1,1],["o5","Autokiniton - Chicago, IL","warren","Trim",1,0],["o6","Bosch - Charleston, SC","flint","Chassis",2,2],["o7","Autoliv - Ogden, UT","dearborn","Final",1,0],["o8","Akwel - Juarez, MX","flint","Body / Paint, Final",1,0],["o9","Widget Company - Butler, IN","flint","Trim",1,1],["o10","XYZ Company - New Haven, IN","flint","Trim, Chassis",1,0],["o11","Gestamp - Chattanooga, TN","warren","Final",1,0],["o12","Tenneco - Grass Lake, MI","warren","Body / Paint",1,1],["o13","Flex-N-Gate - Urbana, IL","warren","Trim",1,0],["o14","Dana - Maumee, OH","warren","Chassis",1,0],["o15","American Axle - Three Rivers, MI","flint","Final",3,3],["o16","Nexteer - Saginaw, MI","warren","Body / Paint",1,1],["o17","Yanfeng - Novi, MI","warren","Trim",1,0],["o18","Faurecia - Auburn Hills, MI","dearborn","Chassis",1,0],["o19","Aptiv - Troy, MI","dearborn","Final",1,1],["o20","ZF Group - Northville, MI","warren","Body / Paint",1,0],["o21","Denso - Southfield, MI","dearborn","Trim",1,0],["o22","Valeo - Auburn Hills, MI","dearborn","Chassis",1,1],["o23","Martinrea - Jonesville, MI","warren","Final",1,0],["o24","Shiloh Industries - Valley City, OH","dearborn","Body / Paint",1,0],["o25","Android Industries - Auburn Hills, MI","dearborn","Trim",1,0],["o26","Piston Automotive - Redford, MI","flint","Chassis",1,0],["o27","Ryder Logistics - Novi, MI","warren","Final",1,0],["o28","Kuka Systems - Sterling Heights, MI","dearborn","Body / Paint",1,0],["o29","Comau - Southfield, MI","dearborn","Trim",1,0],["o30","Grupo Antolin - Shelby Twp, MI","dearborn","Chassis",1,0],["o31","Brose - New Boston, MI","flint","Final",1,0],["o32","Cooper Standard - Auburn Hills, MI","flint","Body / Paint",1,0],["o33","Detroit Manufacturing - Detroit, MI","flint","Trim",1,0],["o34","Eberspaecher - Brighton, MI","flint","Chassis",1,1],["o35","Freudenberg - Plymouth, MI","flint","Final",1,0],["o36","Gentex - Zeeland, MI","flint","Body / Paint",1,0],["o37","Hitachi Astemo - Harrodsburg, KY","flint","Trim",1,0],["o38","IAC Group - Warren, MI","flint","Chassis",1,1],["o39","Joyson Safety - Auburn Hills, MI","flint","Final",1,0],["o40","Kautex Textron - Troy, MI","flint","Body / Paint",1,0],["o41","Lacks Enterprises - Grand Rapids, MI","flint","Trim",1,1],["o42","Magneti Marelli - Sterling Heights, MI","flint","Chassis",1,0],["o43","Nifco America - Canal Winchester, OH","flint","Final",1,0],["o44","Plastic Omnium - Troy, MI","flint","Body / Paint",1,0],["o45","Roush Industries - Livonia, MI","flint","Trim",1,0],["o46","Sika Automotive - Madison Heights, MI","flint","Chassis",1,0],["o47","Toyoda Gosei - Troy, MI","flint","Final",1,0],["o48","Unipres - Portland, TN","flint","Body / Paint",1,1],["o49","Vitesco - Auburn Hills, MI","flint","Trim",1,0],["o50","Webasto - Plymouth, MI","flint","Chassis",1,0],["o51","Yazaki - Canton, MI","flint","Final",1,0]].map(([id, name, loc, meta, required, done]) => ({ id, name, loc, meta, required, done }));
+  static CUST_BY_LOC = { flint: ["Lear Seating", "Bosch", "Akwel", "Widget Company", "XYZ Company"], warren: ["Magna Cosma", "Autokiniton", "Tenneco", "Gestamp", "Nexteer"], dearborn: ["BorgWarner", "Adient", "Autoliv", "Aptiv", "Valeo"] };
+  static PARTS = ["R182758 — floor pan", "R245634 — cross member", "F256124 — bracket assy"];
+  static LOG = {
+    o15: [["Axle Shaft - 552104","2026-08-10","AX-5521",false,"Driveline sample checked, no run-out issues.","","Daniel Brown","Mon, Aug 10 · 8:20 am"],["Half Shaft - 552870","2026-08-11","AX-5528",false,"Second shift audit, all within spec.","line-audit-2.jpg","Wendy Biroth","Tue, Aug 11 · 1:05 pm"],["Pinion Gear - 553019","2026-08-12","AX-5530",true,"Surface scoring on one unit; flagged for containment.","","Daniel Brown","Wed, Aug 12 · 7:48 am"]],
+    o1: [["Test Part From IT - 041923","2026-08-12","123123",false,"Trim set audited at line 3, no defects found.","","Daniel Brown","Wed, Aug 12 · 9:12 am"]],
+    o4: [["Cross Member - 118840","2026-08-10","884120",true,"Weld splatter on two units; flagged to the plant.","weld-splatter.jpg","Sarah Kim","Mon, Aug 10 · 2:40 pm"]],
+    o6: [["Injector Rail - 221012","2026-08-10","PWT-2210",false,"Sampled 20 units, all within spec.","","Daniel Brown","Mon, Aug 10 · 7:55 am"],["Manifold - 226509","2026-08-11","PWT-2265",false,"No issues on second shift audit.","lot-sheet.pdf","Daniel Brown","Tue, Aug 11 · 10:04 am"]],
+  };
+  blankForm() { return { notes: "", vol: "", cust: "", part: Component.PARTS[0], cnotes: "", returns: [] }; }
+  state = {
+    loc: "flint", view: (() => { try { return new URLSearchParams(window.location.search).get("view") === "checklist" ? "checklist" : "audits"; } catch (e) { return "audits"; } })(), sec: (() => { try { const v = new URLSearchParams(window.location.search).get("sec"); return ["site","returns","notes"].includes(v) ? v : "site"; } catch (e) { return "site"; } })(), q: "", week: 0,
+    secs: { flint: {}, warren: { site: "done" }, dearborn: { site: "done", returns: "done", notes: "done" } },
+    forms: {}, added: {}, panel: null, af: { part: "", lot: "", serial: "", issue: null, notes: "" }, toast: null,
+  };
+  componentWillUnmount() { clearTimeout(this.tt); }
+  toastIt(t) { clearTimeout(this.tt); this.setState({ toast: t }); this.tt = setTimeout(() => this.setState({ toast: null }), 3500); }
+  hash(s) { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
+  entriesFor(row, n) {
+    const base = (Component.LOG[row.id] || []).map(([part, lot, serial, issue, notes, file, by, when]) => ({ part, lot, serial, issue, notes, file, by, when }));
+    const filler = ["Test Part From IT - 041923", "Cross Member - 118840", "Injector Rail - 221012", "Manifold - 226509", "Seat Frame - 480221"];
+    const days = ["Mon, Aug 10 · 9:12 am", "Tue, Aug 11 · 8:40 am", "Tue, Aug 11 · 1:15 pm", "Wed, Aug 12 · 7:55 am"];
+    const reps = ["Daniel Brown", "Wendy Biroth", "Cody Biroth"];
+    const out = base.slice(0, n);
+    for (let i = out.length; i < n; i++) out.push({ part: filler[i % 5], lot: "2026-08-1" + (i % 3), serial: "SN-" + (4820 + i * 37), issue: i % 4 === 3, notes: "Sampled units at line side, all within spec.", file: i % 3 === 1 ? `line-audit-${i + 1}.jpg` : "", by: reps[i % 3], when: days[i % 4] });
+    return out;
+  }
+  renderVals() {
+    const N = window.QnetNav;
+    const v = this.__rv();
+    const label = "Action Center";
+    const parents = [{ label: "Locations", href: "locations.html" }];
+    const nav = N ? N.vals(parents, label) : { crumbs: [...parents.map((p, i) => ({ ...p, link: true, cur: false, sep: i > 0 })), { label, href: "#", link: false, cur: true, sep: parents.length > 0 }], hasBack: false };
+    return { ...v, nav };
+  }
+  __rv() {
+    const s = this.state, C = Component;
+    const locObj = C.LOCS.find((l) => l.id === s.loc);
+    const secs = s.secs[s.loc] || {};
+    const form = s.forms[s.loc] || this.blankForm();
+    const custOpts = C.CUST_BY_LOC[s.loc];
+    if (!form.cust) form.cust = custOpts[0];
+    const isToday = s.week === 0;
+    const added = s.added;
+    const rows = C.OWED.filter((r) => r.loc === s.loc).map((r) => ({ ...r, done: r.done + (added[r.id] || []).length }));
+    const total = rows.length;
+    const doneRows = rows.filter((r) => r.done >= r.required);
+    const auDone = doneRows.length;
+    const remaining = total - auDone;
+    const clDoneN = C.STEPS.filter((st) => secs[st.k] === "done").length;
+    const activeIdx = C.STEPS.findIndex((st) => secs[st.k] !== "done");
+    const isCl = s.view === "checklist";
+    const setForm = (patch) => this.setState((st) => ({ forms: { ...st.forms, [st.loc]: { ...(st.forms[st.loc] || this.blankForm()), cust: form.cust, ...patch } } }));
+    const badge = (st) => ({ display: "inline-flex", alignItems: "center", height: 22, padding: "0 9px", borderRadius: 999, fontSize: 11, fontWeight: 600, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums",
+      background: st === "done" ? "#dcfce7" : st === "partial" ? "#fef3c7" : "#f4f4f4", color: st === "done" ? "#166534" : st === "partial" ? "#92400e" : "#555555" });
+    const card = (on) => ({ padding: "16px", borderRadius: 12, background: "#ffffff", border: on ? "1px solid #8d8d8d" : "1px solid #e2e2e2", boxShadow: on ? "0 0 0 3px #eef2ff" : "0 1px 2px rgba(33,35,34,0.03)", cursor: "pointer", outline: "none", transition: "border-color 140ms, box-shadow 140ms" });
+    const icon = (on) => ({ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: 8, flexShrink: 0, background: on ? "#eef2ff" : "#f4f4f4", color: on ? "#212322" : "#6b6b6b" });
+    // week
+    const mon = new Date(2026, 7, 10 + s.week * 7), sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
+    const M3 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const weekLabel = isToday ? "This week" : `${M3[mon.getMonth()]} ${mon.getDate()} – ${mon.getMonth() === sun.getMonth() ? sun.getDate() : M3[sun.getMonth()] + " " + sun.getDate()}`;
+    const minWeek = -13;
+    const wkBtn = (dis) => ({ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, border: "none", borderRadius: 6, background: "transparent", color: dis ? "#d2d2d2" : "#555555", cursor: dis ? "default" : "pointer" });
+    const q = s.q.trim().toLowerCase();
+    const match = (r) => !q || (r.name + " " + r.meta).toLowerCase().includes(q);
+    const pastDone = (r) => this.hash(r.id + s.week) % 3 !== 0;
+    const rowCard = (r, kind) => {
+      const n = isToday ? r.done : (kind === "done" ? 1 + (this.hash(r.id + s.week) % 3) : 0);
+      const viewable = n > 0;
+      return { ...r, short: r.name.split(" - ")[0], viewable, hasDone: n > 0, live: isToday && r.id === "o8",
+        canLog: isToday && kind === "needs",
+        pill: `${n} completed`,
+        pillStyle: { display: "inline-flex", alignItems: "center", gap: 4, height: 22, padding: "0 8px", borderRadius: 999, fontSize: 11, fontWeight: 600, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap",
+          background: n > 0 ? "#dcfce7" : kind === "missed" ? "#ffe4e6" : "#f4f4f4", color: n > 0 ? "#166534" : kind === "missed" ? "#9f1239" : "#555555" },
+        style: { padding: "14px 16px", background: "#ffffff", borderRadius: 10, cursor: viewable ? "pointer" : "default", transition: "box-shadow 140ms, border-color 140ms",
+          border: kind === "done" ? "1px solid #e2e2e2" : kind === "missed" ? "1px dashed #fda4af" : "1px dashed #aaaaaa" },
+        onOpen: () => viewable && this.setState({ panel: { id: r.id, mode: "view", n, readOnly: !isToday } }),
+        onLog: (e) => { e.stopPropagation(); this.setState({ panel: { id: r.id, mode: "new", n }, af: { part: "", lot: "", serial: "", issue: null, notes: "" } }); },
+      };
+    };
+    const laneDot = (c) => ({ width: 8, height: 8, borderRadius: 999, background: c, flexShrink: 0 });
+    const cnt = (bg, fg) => ({ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 20, height: 20, padding: "0 6px", borderRadius: 999, background: bg, color: fg, fontSize: 11, fontWeight: 600, fontVariantNumeric: "tabular-nums" });
+    let lanes, missedN = 0;
+    if (isToday) {
+      const needs = rows.filter((r) => r.done < r.required && match(r)).sort((a, b) => this.hash(b.id) % 40 - this.hash(a.id) % 40).map((r) => rowCard(r, "needs"));
+      const done = doneRows.filter(match).sort((a, b) => a.name.localeCompare(b.name)).map((r) => rowCard(r, "done"));
+      lanes = [
+        { title: "Needs an audit", count: needs.length, rows: needs, empty: needs.length === 0, emptyT: "All caught up", emptyS: "Every customer has been audited this week.", dotStyle: laneDot("#e11d48"), countStyle: cnt("#ffffff", "#555555") },
+        { title: "Audited this week", count: done.length, rows: done, empty: done.length === 0, emptyT: "No audits logged yet", emptyS: "Audits logged this week appear here.", dotStyle: laneDot("#22c55e"), countStyle: cnt("#dcfce7", "#166534") },
+      ];
+    } else {
+      const missed = rows.filter((r) => !pastDone(r) && match(r)).map((r) => rowCard(r, "missed"));
+      const done = rows.filter((r) => pastDone(r) && match(r)).map((r) => rowCard(r, "done"));
+      missedN = missed.length;
+      lanes = [
+        { title: "Not audited that week", count: missed.length, rows: missed, empty: missed.length === 0, emptyT: "Nothing missed", emptyS: "Every customer was audited this week.", dotStyle: laneDot("#e11d48"), countStyle: cnt(missed.length ? "#ffe4e6" : "#ffffff", missed.length ? "#9f1239" : "#555555") },
+        { title: "Audited that week", count: done.length, rows: done, empty: done.length === 0, emptyT: "No audits that week", emptyS: "Nothing was logged during this week.", dotStyle: laneDot("#22c55e"), countStyle: cnt("#dcfce7", "#166534") },
+      ];
+    }
+    const pastAudited = isToday ? auDone : rows.filter(pastDone).length;
+    // steps
+    const steps = C.STEPS.map((st, i) => {
+      const dn = secs[st.k] === "done", on = isCl && s.sec === st.k;
+      const sub = dn ? "Complete" : i === activeIdx ? (clDoneN > 0 ? "Up next" : "Not started") : "Not started";
+      return { label: st.t, done: dn, on, sub,
+        pick: (e) => { e && e.stopPropagation && e.stopPropagation(); this.setState({ view: "checklist", sec: st.k }); },
+        rowStyle: { display: "flex", alignItems: "center", gap: 10, width: "100%", minHeight: 40, padding: "0 8px", border: "none", borderRadius: 8, background: on ? "#eef2ff" : "transparent", fontFamily: "inherit", textAlign: "left", cursor: "pointer" },
+        dotStyle: { display: "flex", alignItems: "center", justifyContent: "center", width: 18, height: 18, borderRadius: 999, flexShrink: 0, boxSizing: "border-box", background: dn ? "#22c55e" : "#ffffff", border: dn ? "none" : `1.5px solid ${i === activeIdx ? "#212322" : "#d2d2d2"}`, color: "#ffffff" },
+        labelStyle: { flex: 1, minWidth: 0, fontSize: 13, fontWeight: on || i === activeIdx ? 600 : 500, color: on ? "#212322" : "#212322" },
+        subStyle: { fontSize: 12, color: dn ? "#166534" : i === activeIdx ? "#212322" : "#6b6b6b", whiteSpace: "nowrap" },
+        tabStyle: { display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 2px", border: "none", borderBottom: s.sec === st.k ? "2px solid #212322" : "2px solid transparent", marginBottom: -1, background: "transparent", fontFamily: "inherit", fontSize: 14, fontWeight: 500, color: s.sec === st.k ? "#212322" : "#6b6b6b", cursor: "pointer", whiteSpace: "nowrap" },
+        tabDot: { width: 7, height: 7, borderRadius: 999, background: dn ? "#22c55e" : "#d2d2d2" },
+      };
+    });
+    const secIdx = C.STEPS.findIndex((st) => st.k === s.sec);
+    const clState = clDoneN === 3 ? "done" : clDoneN > 0 ? "partial" : "todo";
+    // panel
+    const pr = s.panel && rows.find((r) => r.id === s.panel.id);
+    const pIsForm = !!(s.panel && s.panel.mode === "new");
+    const pn = pr ? (s.panel.readOnly ? s.panel.n : pr.done) : 0;
+    const userAdded = pr ? (added[pr.id] || []) : [];
+    const entries = pr ? [...this.entriesFor(pr, Math.max(0, pn - userAdded.length)), ...userAdded].reverse().map((e) => ({
+      ...e, byLine: `${e.by} · ${e.when}`, serial: e.serial || "—", hasFile: !!e.file, initials: e.by.split(" ").map((x) => x[0]).join("").slice(0, 2).toUpperCase(),
+      editable: !s.panel.readOnly && /Aug 12|Today/.test(e.when), locked: s.panel.readOnly || !/Aug 12|Today/.test(e.when),
+      result: e.issue ? "Issue found" : "No issue",
+      resultStyle: { display: "inline-flex", alignItems: "center", gap: 5, height: 22, padding: "0 8px", borderRadius: 999, fontSize: 11, fontWeight: 600, whiteSpace: "nowrap", background: e.issue ? "#ffe4e6" : "#dcfce7", color: e.issue ? "#9f1239" : "#166534" },
+      resultDot: { width: 6, height: 6, borderRadius: 999, background: e.issue ? "#f43f5e" : "#22c55e" },
+    })) : [];
+    const af = s.af;
+    const canSubmit = !!(af.part && af.lot && af.issue !== null && af.notes.trim());
+    const resBtn = (on, tone) => ({ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, height: 40, borderRadius: 8, fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer",
+      border: on ? `1px solid ${tone === "bad" ? "#fda4af" : "#86efac"}` : "1px solid #d2d2d2", background: on ? (tone === "bad" ? "#ffe4e6" : "#dcfce7") : "#ffffff", color: on ? (tone === "bad" ? "#9f1239" : "#166534") : "#383838" });
+    const setAf = (patch) => this.setState((st) => ({ af: { ...st.af, ...patch } }));
+    const primaryStyle = (enabled) => ({ flex: 1, height: 40, borderRadius: 8, border: "1px solid transparent", fontFamily: "inherit", fontSize: 14, fontWeight: 600, background: enabled ? "#212322" : "#e2e2e2", color: enabled ? "#ffffff" : "#8d8d8d", cursor: enabled ? "pointer" : "not-allowed" });
+    return {
+      locName: locObj.name,
+      tabs: C.LOCS.map((l) => { const active = l.id === s.loc; return { label: l.name, active, pick: () => this.setState({ loc: l.id, panel: null }),
+        style: { height: 40, padding: "0 2px", border: "none", borderBottom: active ? "2px solid #4f46e5" : "2px solid transparent", marginBottom: -1, background: "transparent", fontFamily: "inherit", fontSize: 14, fontWeight: 500, color: active ? "#4f46e5" : "#6b6b6b", cursor: "pointer", whiteSpace: "nowrap" } }; }),
+      clCardStyle: card(isCl), clIconStyle: icon(isCl), clBadgeStyle: badge(clState), clDoneN, steps,
+      showClBtn: !isCl, clBtnLabel: clDoneN === 0 ? "Start checklist" : clDoneN === 3 ? "View checklist" : "Continue checklist",
+      openChecklist: () => this.setState({ view: "checklist", sec: activeIdx >= 0 ? C.STEPS[activeIdx].k : "site" }),
+      auCardStyle: card(!isCl), auIconStyle: icon(!isCl), auBadgeStyle: badge(pastAudited >= total ? "done" : pastAudited > 0 ? "partial" : "todo"),
+      auDone: pastAudited, auTotal: total,
+      auBarStyle: { height: "100%", width: `${Math.round((pastAudited / Math.max(total, 1)) * 100)}%`, borderRadius: 999, background: "#22c55e", transition: "width 240ms" },
+      auSummary: isToday ? `${remaining} audit${remaining === 1 ? "" : "s"} need${remaining === 1 ? "s" : ""} to be done this week` : `${pastAudited} customers audited · ${total - pastAudited} not audited`,
+      showAuBtn: isCl && remaining > 0, openAudits: () => this.setState({ view: "audits" }),
+      savedText: "Autosaved 9:41 am", clBadgeText: `${clDoneN} of 3`, auBadgeText: `${pastAudited} of ${total}`,
+      isAudits: !isCl, isChecklist: isCl, auHeadIcon: isToday ? "shield-check" : "history",
+      weekLabel, atMinWeek: s.week <= minWeek, atThisWeek: isToday, prevWkStyle: wkBtn(s.week <= minWeek), nextWkStyle: wkBtn(isToday),
+      prevWeek: () => this.setState((st) => ({ week: Math.max(minWeek, st.week - 1) })), nextWeek: () => this.setState((st) => ({ week: Math.min(0, st.week + 1) })),
+      q: s.q, onQ: (e) => this.setState({ q: e.target.value }), lanes,
+      showMissedNote: !isToday && missedN > 0, missedNote: `${missedN} of ${total} customers weren’t audited the week of ${M3[mon.getMonth()]} ${mon.getDate()}`,
+      clStatus: clState === "done" ? "Completed" : clState === "partial" ? "In progress" : "Not started", clStatusStyle: badge(clState),
+      secSite: s.sec === "site", secReturns: s.sec === "returns", secNotes: s.sec === "notes",
+      f: form, custOpts, partOpts: C.PARTS,
+      onNotes: (e) => setForm({ notes: e.target.value }), onVol: (e) => setForm({ vol: e.target.value }), onCnotes: (e) => setForm({ cnotes: e.target.value }),
+      onCust: (e) => setForm({ cust: e.target.value }), onPart: (e) => setForm({ part: e.target.value }),
+      addReturn: () => setForm({ returns: [...form.returns, { id: Date.now(), label: `${form.cust} · ${form.part.split(" — ")[0]}` }] }),
+      returns: form.returns.map((r) => ({ ...r, remove: () => setForm({ returns: form.returns.filter((x) => x.id !== r.id) }) })),
+      nextLabel: secIdx < 2 ? `Next — ${C.STEPS[secIdx + 1].t.toLowerCase()}` : "Finish checklist",
+      completeSec: () => {
+        const k = s.sec, next = secIdx < 2 ? C.STEPS[secIdx + 1].k : null;
+        this.setState((st) => ({ secs: { ...st.secs, [st.loc]: { ...(st.secs[st.loc] || {}), [k]: "done" } }, sec: next || k, view: next ? "checklist" : "audits" }));
+        if (!next) this.toastIt(`Daily checklist completed for ${locObj.name}`);
+      },
+      hasPanel: !!pr, closePanel: () => this.setState({ panel: null }),
+      p: pr ? { short: pr.name.split(" - ")[0], meta: pr.meta, countText: `${pn} completed`, loc: locObj ? locObj.name.replace(" — ", " · ").replace(/,.*$/, "") : "" } : { short: "", meta: "", countText: "", loc: "" },
+      pIsForm, entries, pEditable: !!(s.panel && !s.panel.readOnly),
+      pCancelLabel: pIsForm ? "Cancel" : "Close",
+      pPrimaryLabel: pIsForm ? "Log audit" : "Add audit",
+      pPrimaryDisabled: pIsForm && !canSubmit, pPrimaryStyle: primaryStyle(!pIsForm || canSubmit),
+      pPrimary: () => {
+        if (!pIsForm) { this.setState((st) => ({ panel: { ...st.panel, mode: "new" }, af: { part: "", lot: "", serial: "", issue: null, notes: "" } })); return; }
+        if (!canSubmit) return;
+        const entry = { part: af.part, lot: af.lot, serial: af.serial, issue: af.issue, notes: af.notes.trim(), file: af.file || "", by: "You", when: "Today · just now" };
+        this.setState((st) => ({ added: { ...st.added, [pr.id]: [...(st.added[pr.id] || []), entry] }, panel: { ...st.panel, mode: "view" } }));
+        this.toastIt(`Audit logged for ${pr.name.split(" - ")[0]}`);
+      },
+      af, afPart: (e) => setAf({ part: e.target.value }), afLot: (e) => setAf({ lot: e.target.value }), afSerial: (e) => setAf({ serial: e.target.value }), afNotes: (e) => setAf({ notes: e.target.value }),
+      auditPartOpts: [...C.PARTS, ...(s.extraParts || [])],
+      afAddingPart: !!af.addingPart, afNotAddingPart: !af.addingPart,
+      afStartPart: () => setAf({ addingPart: true, np: { num: "", team: "", cat: "", desc: "", platform: "", program: "", uloc: "", dloc: "", source: "", file: "" } }),
+      npCancel: () => setAf({ addingPart: false }),
+      npTip: { basic: s.npTip === "basic", loc: s.npTip === "loc" }, npTipOn: { basic: () => this.setState({ npTip: "basic" }), loc: () => this.setState({ npTip: "loc" }) }, npTipOff: () => this.setState({ npTip: null }),
+      asideW: "min(520px, 100vw)",
+      np: (() => {
+        const v = af.np || {}; const setNp = (k) => (e) => { const val = e.target.value; this.setState((st) => ({ af: { ...st.af, np: { ...st.af.np, [k]: val } } })); };
+        const on = {}; ["num", "team", "cat", "desc", "platform", "program", "uloc", "dloc", "source"].forEach((k) => (on[k] = setNp(k)));
+        const ok = ["num", "team", "cat", "desc", "platform", "uloc", "dloc", "source", "file"].every((k) => (v[k] || "").trim());
+        return { v, on, noFile: !v.file, hasFile: !!v.file, cantSave: !ok,
+          attach: () => this.setState((st) => ({ af: { ...st.af, np: { ...st.af.np, file: "sample-part_" + ((st.af.np.num || "new").replace(/\s+/g, "-")) + ".jpg" } } })),
+          removeFile: () => this.setState((st) => ({ af: { ...st.af, np: { ...st.af.np, file: "" } } })),
+          saveStyle: { flex: 1, height: 40, borderRadius: 8, border: "none", fontFamily: "inherit", fontSize: 14, fontWeight: 600, background: ok ? "#4f46e5" : "#f4f4f4", color: ok ? "#ffffff" : "#8d8d8d", cursor: ok ? "pointer" : "not-allowed" },
+          save: () => { if (!ok) return; const label = v.num.trim() + " — " + v.desc.trim(); this.setState((st) => ({ extraParts: [...(st.extraParts || []), label], af: { ...st.af, part: label, addingPart: false } })); this.toastIt(`${v.num.trim()} added`); } };
+      })(),
+      afIssueVal: af.issue === true ? "yes" : af.issue === false ? "no" : "",
+      afIssueChange: (e) => setAf({ issue: e.target.value === "yes" ? true : e.target.value === "no" ? false : null }),
+      afNotesCount: (af.notes || "").length,
+      afNoFile: !af.file, afHasFile: !!af.file, afAttach: () => setAf({ file: "audit-photo_" + (af.lot || "today") + ".jpg" }), afRemoveFile: () => setAf({ file: "" }),
+      afNoIssue: af.issue === false, afIssue: af.issue === true, pickNoIssue: () => setAf({ issue: false }), pickIssue: () => setAf({ issue: true }),
+      noIssueStyle: resBtn(af.issue === false, "ok"), issueStyle: resBtn(af.issue === true, "bad"),
+      hasToast: !!s.toast, toast: s.toast,
+    };
+  }
+}
+</script>
+
+
+<script src="assets/qnet-glue.js"></script><link rel="stylesheet" href="assets/qnet-mobile.css"><script src="assets/qnet-mobile.js"></script>
+</body></html>

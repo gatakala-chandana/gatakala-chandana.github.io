@@ -1,0 +1,18 @@
+/* Qnet prototype glue: sidebar collapse + dark mode across all screens */
+html.qn-dark{filter:invert(1) hue-rotate(180deg);background:#fff}
+html.qn-dark aside[aria-label="Primary"],html.qn-dark img,html.qn-dark video,html.qn-dark picture{filter:invert(1) hue-rotate(180deg)}
+html.qn-dark aside[aria-label="Primary"] img{filter:none}
+aside[aria-label="Primary"] [role="switch"]>span[aria-hidden]{transition:background 160ms}
+aside[aria-label="Primary"] [role="switch"]>span[aria-hidden]>span{transition:left 160ms}
+html.qn-dark aside[aria-label="Primary"] [role="switch"]>span[aria-hidden]{background:#6366f1!important}
+html.qn-dark aside[aria-label="Primary"] [role="switch"]>span[aria-hidden]>span{left:16px!important}
+aside[aria-label="Primary"]{transition:width 180ms cubic-bezier(.2,0,0,1)}
+html.qn-collapsed aside[aria-label="Primary"]{width:72px!important;padding-left:12px!important;padding-right:12px!important;overflow-x:hidden}
+html.qn-collapsed aside[aria-label="Primary"]>div:first-child{padding:0!important;justify-content:center}
+html.qn-collapsed aside[aria-label="Primary"]>div:first-child>a{display:none!important}
+html.qn-collapsed aside[aria-label="Primary"]>div:first-child>button{margin:0!important;transform:scaleX(-1)}
+html.qn-collapsed aside[aria-label="Primary"]>div[style*="uppercase"]{font-size:0!important;height:1px;padding:0!important;margin:14px 8px;background:#2a2a2a}
+html.qn-collapsed aside[aria-label="Primary"] nav a,html.qn-collapsed aside[aria-label="Primary"] [role="switch"]{justify-content:center;padding:0!important;gap:0!important}
+html.qn-collapsed aside[aria-label="Primary"] nav a>span:not(:first-child),html.qn-collapsed aside[aria-label="Primary"] [role="switch"]>span:not(:first-child){display:none!important}
+@keyframes qnFlash{0%,60%{box-shadow:0 0 0 4px rgba(79,70,229,.28);background:rgba(79,70,229,.06)}100%{box-shadow:0 0 0 4px rgba(79,70,229,0);background:transparent}}
+.qn-flash{animation:qnFlash 2.2s ease-out;border-radius:10px}

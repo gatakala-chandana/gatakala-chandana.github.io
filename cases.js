@@ -18,7 +18,7 @@ water: {
   colors: ["#cc5500", "#f5a25d"],
   cover: "water-home",
   facts: [["What", "An AI guide to drought, water sources and conservation in Arizona"], ["For", "Residents, students, newcomers"], ["Role", "Product & conversation designer · UX, UI, prototyping"], ["Status", "Research preview · working prototype"]],
-  live: [["Try the prototype", "https://claude.ai/artifact/DzRNbrHd2j5Bw81Nrr532Y"]],
+  live: [["Try the prototype", "prototypes/water/"]],
   sections: [
     { kind: "tldr", items: [
       ["Problem", "Arizona's water information is accurate but inaccessible. It's buried in technical reports, and a plain chatbot doesn't help people who don't know what to ask."],
@@ -162,11 +162,11 @@ care: {
   "live": [
     [
       "Nursing Station prototype",
-      "https://claude.ai/artifact/DaVS8NonQFUAq3pZS7rHqP"
+      "prototypes/healthwink-station/"
     ],
     [
       "Caregiver Tablet prototype",
-      "https://claude.ai/artifact/868vHgbnhLvNxwLxD6xF2d"
+      "prototypes/healthwink-tablet/"
     ]
   ],
   "sections": [
@@ -575,11 +575,11 @@ curo: {
   "live": [
     [
       "Patient app",
-      "https://claude.ai/artifact/Rc5f6EayhsSnYZEse68L4P"
+      "prototypes/curo-patient/"
     ],
     [
       "Clinician portal",
-      "https://claude.ai/artifact/9bWxPmWxoap8K99VnKTWNE"
+      "prototypes/curo-clinician/"
     ]
   ],
   "sections": [
@@ -871,7 +871,7 @@ qnet: {
   colors: ["#4f46e5", "#a5b4fc"],
   cover: "qnet-dashboard",
   facts: [["What", "Qnet rep portal, rebuilt as Project Phoenix: Dashboard, Action Center, Part Management, Location Agreements"], ["For", "TQS field reps working inside OEM assembly plants"], ["Role", "UI/UX Design Specialist: research, information architecture, UI, design system, UI testing and developer handoff"], ["Status", "Oct to Nov 2026 · rep testing next"]],
-  live: [["Try the prototype", "https://claude.ai/artifact/QnFiygcvnTJJo9JjPUpGsk"]],
+  live: [["Try the prototype", "prototypes/qnet/"]],
   sections: [
     { kind: "chapter", label: "01 · The problem", h: "Legacy Qnet flagged almost everything as urgent, so nothing stood out." },
     { h: "Reps saw everything at once.", before: "legacy-qa-form", bcap: "Legacy New Quality Alert / Near Miss form, the record reps will need to finish in under 60 seconds", p: [
