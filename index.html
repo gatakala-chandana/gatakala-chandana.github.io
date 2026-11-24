@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sai Chandana Gatakala | UX/UI Designer &amp; Researcher</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -274,6 +276,11 @@
   /* Nav refinement */
   nav .bar{height:72px;padding:0 clamp(20px,4.4vw,64px)}
   .logo{font-size:16px!important;letter-spacing:-.005em}
+  .logo{font-family:"Instrument Serif",Georgia,serif!important;font-weight:400!important;font-size:28px!important;line-height:1;letter-spacing:0!important;color:var(--ink);display:inline-flex;align-items:baseline;white-space:nowrap}
+  .logo .bloom{width:.6em;height:.6em;margin-left:.06em;align-self:flex-start;margin-top:.04em;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .logo .bloom .pt{fill:var(--accent)}
+  .logo:hover .bloom{transform:rotate(72deg)}
+  @media (max-width:520px){.logo{font-size:22px!important;margin-right:14px}nav ul{gap:18px!important}nav ul a{font-size:14px!important}}
   nav ul{gap:40px!important}
   nav ul a{font-size:15.5px!important}
   .tgl{position:relative;width:58px;height:30px;border-radius:99px;border:1px solid var(--line);background:var(--soft);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:space-between;transition:background .35s,border-color .35s}
@@ -676,7 +683,7 @@
 </head>
 <body>
 <nav><div class="bar">
-  <a href="#top" class="logo"><span class="lf">Sai </span>Chandana<span class="lf"> Gatakala</span></a>
+  <a href="#top" class="logo" aria-label="Sai Chandana Gatakala, home">chandana<svg class="bloom" viewBox="-20 -20 40 40" aria-hidden="true"><g class="pt"><circle cx="0" cy="-9.7" r="7.6"/><circle cx="9.2" cy="-3" r="7.6"/><circle cx="5.7" cy="7.8" r="7.6"/><circle cx="-5.7" cy="7.8" r="7.6"/><circle cx="-9.2" cy="-3" r="7.6"/></g><circle r="5.2" fill="#b6d39a"/></svg></a>
   <ul>
     <li><a href="#projects">Work</a></li>
     <li><a href="https://www.linkedin.com/in/saichandana-gatakala/" target="_blank" rel="noopener">LinkedIn</a></li>
