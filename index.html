@@ -196,7 +196,8 @@
   .ctx-s{font-size:12.5px;color:var(--muted)}
   .b-ini{display:grid;place-items:center;min-height:200px;background:var(--bc,#7445e0)!important;border:0!important}
   .ini-big{font-family:"Instrument Serif",Georgia,serif;font-size:76px;color:#fff;line-height:1}
-  .ini-photo{width:112px;height:112px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,.85);box-shadow:0 10px 24px -10px rgba(0,0,0,.35)}
+  .b-name .who{display:flex;align-items:center;gap:14px}
+  .b-name .dp{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;border:2px solid var(--card);box-shadow:0 0 0 1px var(--line)}
   .b-name{grid-column:2/4;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .nm{font-size:28px;display:block;line-height:1.1}
   .rl{display:block;font-size:13.5px;color:var(--muted);margin-top:4px}
@@ -919,8 +920,8 @@
     <div class="bento reveal" id="bento">
       <div class="bq-card"><span class="qm serif">“</span><p class="bq-text serif"></p><p class="bq-more"></p></div>
       <div class="b-ctx"><span class="ctx-ic">✦</span><b class="ctx-t"></b><small class="ctx-s"></small></div>
-      <div class="b-ini"><span class="ini-big"></span><img class="ini-photo" alt="" hidden></div>
-      <div class="b-name"><b class="nm serif"></b><span class="rl"></span>
+      <div class="b-ini"><span class="ini-big"></span></div>
+      <div class="b-name"><span class="who"><img class="dp" alt="" hidden><b class="nm serif"></b></span><span class="rl"></span>
         <div class="bnav"><button class="prev" aria-label="Previous">←</button><span class="dots"></span><button class="next" aria-label="Next">→</button></div>
       </div>
     </div>
@@ -1209,7 +1210,7 @@
     dots.innerHTML=T.map((_,k)=>`<i data-k="${k}"></i>`).join('');
     function fill(){ const t=T[i];
       $('.bq-text').textContent=t.q; $('.bq-more').textContent='“'+t.m+'”'; $('.ctx-t').textContent=t.c; $('.ctx-s').textContent=t.cs;
-      $('.ini-big').textContent=t.n.split(' ').map(w=>w[0]).join(''); const ph=$('.ini-photo'); if(t.img){ ph.src=t.img; ph.alt=t.n; ph.hidden=false; $('.ini-big').hidden=true; } else { ph.hidden=true; $('.ini-big').hidden=false; } $('.b-ini').style.setProperty('--bc',t.col);
+      $('.ini-big').textContent=t.n.split(' ').map(w=>w[0]).join(''); const ph=$('.dp'); if(t.img){ ph.src=t.img; ph.alt=t.n; ph.hidden=false; } else { ph.hidden=true; } $('.b-ini').style.setProperty('--bc',t.col);
       $('.nm').textContent=t.n; $('.rl').textContent=t.r; dots.querySelectorAll('i').forEach((d,k)=>d.classList.toggle('on',k===i)); }
     async function go(n){ B.classList.add('swap'); await new Promise(r=>setTimeout(r,320)); i=(n+T.length)%T.length; fill(); B.classList.remove('swap'); }
     function auto(){ clearInterval(timer); timer=setInterval(()=>go(i+1),7000); }
