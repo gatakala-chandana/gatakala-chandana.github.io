@@ -688,6 +688,7 @@
   <a href="#top" class="logo" aria-label="Sai Chandana Gatakala, home">chandana<svg class="bloom" viewBox="-20 -20 40 40" aria-hidden="true"><g class="pt"><circle cx="0" cy="-9.7" r="7.6"/><circle cx="9.2" cy="-3" r="7.6"/><circle cx="5.7" cy="7.8" r="7.6"/><circle cx="-5.7" cy="7.8" r="7.6"/><circle cx="-9.2" cy="-3" r="7.6"/></g><circle r="5.2" fill="#b6d39a"/></svg></a>
   <ul>
     <li><a href="#projects">Work</a></li>
+    <li><a href="#about">About</a></li>
     <li><a href="https://www.linkedin.com/in/saichandana-gatakala/" target="_blank" rel="noopener">LinkedIn</a></li>
     <li><a href="#" target="_blank" rel="noopener">Resume</a></li>
     <li><button class="tgl" id="theme" role="switch" aria-checked="false" aria-label="Dark mode"><span class="ti sun">☀</span><span class="ti moon">☾</span><span class="knob"></span></button></li>
@@ -757,7 +758,7 @@
 
   <section id="work">
     <div class="whead reveal">
-      <div class="label">Work</div>
+      <div class="label">Selected work</div>
       <a class="wall" href="#projects">See all projects <span>→</span></a>
     </div>
     <div id="wsel">
@@ -1449,7 +1450,7 @@
       const wasCase = !caseEl.hidden || !projEl.hidden;
       caseEl.hidden = true; projEl.hidden = true; home.hidden = false;
       const t = h && document.getElementById(h);
-      if(t) { const y=t.getBoundingClientRect().top+scrollY-70; if(window.lenis_) lenis_.scrollTo(y,{immediate:true}); else scrollTo(0,y); } else if(wasCase) { if(window.lenis_) lenis_.scrollTo(0,{immediate:true}); scrollTo(0,0); }
+      if(t) { const go=()=>{ if(window.lenis_&&lenis_.resize) lenis_.resize(); const y=t.getBoundingClientRect().top+scrollY-70; if(window.lenis_) lenis_.scrollTo(y,{immediate:true}); else scrollTo(0,y); }; go(); if(wasCase){ requestAnimationFrame(()=>requestAnimationFrame(go)); setTimeout(go,250); } } else if(wasCase) { if(window.lenis_) lenis_.scrollTo(0,{immediate:true}); scrollTo(0,0); }
       if(typeof fx==='function') requestAnimationFrame(fx);
     }
   }
